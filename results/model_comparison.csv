@@ -1,0 +1,11 @@
+Model,Target,RMSE,NSE
+Persistence,DO (mg/L),0.4463,0.765
+Persistence,Temp (°C),1.3653,0.861
+Climatology,DO (mg/L),0.3343,0.87
+Climatology,Temp (°C),1.4441,0.852
+Ridge Regression,DO (mg/L),0.3301,0.871
+Ridge Regression,Temp (°C),1.2822,0.877
+LSTM (default),DO (mg/L),0.298799991607666,0.8920000195503235
+LSTM (default),Temp (°C),1.3253999948501587,0.8700000047683716
+LSTM (best),DO (mg/L),0.34279999136924744,0.8579999804496765
+LSTM (best),Temp (°C),1.4186999797821045,0.8500000238418579

@@ -1,0 +1,20 @@
+# Data files (too large for git)
+data/camels_ch_chem/
+data/camels_ch/
+data/*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+*.egg-info/
+.env
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Results (optional — uncomment to track)
+# results/

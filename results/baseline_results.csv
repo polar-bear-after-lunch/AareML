@@ -1,0 +1,7 @@
+Model,Target,RMSE,MAE,NSE,KGE,RMSE_lo,RMSE_hi
+Persistence,DO (mg/L),0.3389,0.2655,0.86,0.93,0.3101,0.3669
+Persistence,Temp (°C),1.3653,1.0736,0.861,0.93,1.2639,1.4722
+Climatology,DO (mg/L),0.3343,0.2712,0.87,0.853,0.2988,0.3689
+Climatology,Temp (°C),1.4441,1.1604,0.852,0.884,1.2673,1.6028
+Ridge Regression,DO (mg/L),0.3028,0.24,0.888,0.908,0.2756,0.3307
+Ridge Regression,Temp (°C),1.2612,1.0192,0.881,0.916,1.1763,1.3557

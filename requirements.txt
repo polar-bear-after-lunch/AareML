@@ -1,0 +1,33 @@
+# AareML — Python dependencies
+# Install core: pip install -r requirements.txt
+# PyTorch CPU:  pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+# Core
+numpy>=1.24
+pandas>=2.0
+matplotlib>=3.7
+seaborn>=0.12
+scipy>=1.10
+statsmodels>=0.14
+scikit-learn>=1.3
+
+# Deep learning
+torch>=2.0                     # CPU build fine for dev; install GPU build for training
+
+# Hyper-parameter search
+optuna>=3.0
+
+# Attribution / interpretability
+captum>=0.7                    # GradientSHAP on LSTM (pip install captum)
+shap>=0.44                     # TreeSHAP on GBM surrogate (pip install shap)
+
+# GBM for catchment-attribute surrogate (at least one required for notebook 05)
+lightgbm>=4.0                  # preferred
+# xgboost>=2.0                 # alternative
+
+# Geospatial (optional — for station map; falls back to scatter)
+geopandas>=0.14
+
+# Notebook tooling
+jupyter
+nbconvert
