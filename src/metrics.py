@@ -64,10 +64,15 @@ def kge(y_true: np.ndarray, y_pred: np.ndarray,
     for i, t in enumerate(targets):
         obs = y_true[:, :, i].ravel()
         sim = y_pred[:, :, i].ravel()
-        r   = float(np.corrcoef(obs, sim)[0, 1])
-        b   = float(sim.mean() / obs.mean()) if obs.mean() != 0 else float("nan")
-        g   = float((sim.std() / sim.mean()) / (obs.std() / obs.mean())) \
-              if (obs.std() > 0 and obs.mean() != 0 and sim.mean() != 0) else float("nan")
+        # B6 fix: guard all three KGE components against degenerate predictions
+        # (flat predictions produce nan correlation; use r=0, b=1, g=1 fallbacks)
+        corr_mat = np.corrcoef(obs, sim)
+        r = float(corr_mat[0, 1]) if np.isfinite(corr_mat[0, 1]) else 0.0
+        b = float(sim.mean() / obs.mean()) if obs.mean() != 0 else 1.0
+        if obs.std() > 0 and obs.mean() != 0 and sim.mean() != 0 and sim.std() > 0:
+            g = float((sim.std() / sim.mean()) / (obs.std() / obs.mean()))
+        else:
+            g = 1.0
         kge_val = 1 - np.sqrt((r - 1)**2 + (b - 1)**2 + (g - 1)**2)
         result[t] = float(kge_val)
     return result
@@ -168,6 +173,9 @@ def metrics_table(models: dict, y_true: np.ndarray,
             ci_rmse = block_bootstrap_ci(
                 y_true, y_pred, mean_rmse, n_boot=n_boot, targets=targets
             )
+            ci_mae = block_bootstrap_ci(
+                y_true, y_pred, mean_mae, n_boot=n_boot, targets=targets
+            )
         for t in targets:
             row = {
                 "Model":  name,
@@ -180,6 +188,9 @@ def metrics_table(models: dict, y_true: np.ndarray,
             if n_boot > 0:
                 row["RMSE_lo"] = round(ci_rmse[t]["lo"], 4)
                 row["RMSE_hi"] = round(ci_rmse[t]["hi"], 4)
+                # F2: also compute MAE bootstrap CIs for consistency
+                row["MAE_lo"]  = round(ci_mae[t]["lo"],  4)
+                row["MAE_hi"]  = round(ci_mae[t]["hi"],  4)
             rows.append(row)
 
     return pd.DataFrame(rows)

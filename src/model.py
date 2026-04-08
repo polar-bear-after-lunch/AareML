@@ -27,8 +27,9 @@ class RiverDataset(Dataset):
 
     def __init__(self, X: np.ndarray, y: np.ndarray):
         assert X.shape[0] == y.shape[0], "X and y must have the same number of samples"
-        self.X = [torch.tensor(X[i]) for i in range(len(X))]
-        self.y = [torch.tensor(y[i]) for i in range(len(y))]
+        # B1 fix: store as single stacked tensors (not per-sample list) for speed
+        self.X = torch.from_numpy(X)
+        self.y = torch.from_numpy(y)
 
     def __len__(self):
         return len(self.X)
@@ -113,6 +114,305 @@ class Seq2SeqLSTM(nn.Module):
             dec_in = y_target[:, t : t + 1, :] if use_tf else pred.detach()
 
         return torch.cat(outputs, dim=1)            # [batch, horizon, n_tgt]
+
+
+# ── Entity-Aware LSTM (I6) ─────────────────────────────────────────────────
+
+class EALSTMCell(nn.Module):
+    """
+    Entity-Aware LSTM cell (Kratzert et al. 2019).
+
+    Static catchment attributes modulate the input gate (i) and cell gate (g)
+    via a learned embedding. The forget gate (f) and output gate (o) remain
+    sequence-driven as in standard LSTM.
+
+    Parameters
+    ----------
+    input_size   : number of dynamic input features per timestep
+    hidden_size  : LSTM hidden / cell state size
+    static_size  : number of static catchment attributes
+    """
+
+    def __init__(self, input_size: int, hidden_size: int, static_size: int):
+        super().__init__()
+        self.hidden_size = hidden_size
+
+        # Standard gates for forget and output (sequence-driven)
+        self.W_f = nn.Linear(input_size + hidden_size, hidden_size)
+        self.W_o = nn.Linear(input_size + hidden_size, hidden_size)
+
+        # Input and cell gates — additionally conditioned on static embedding
+        self.W_i = nn.Linear(input_size + hidden_size, hidden_size)
+        self.W_g = nn.Linear(input_size + hidden_size, hidden_size)
+
+        # Static attribute embedding (projects catchment attributes → hidden_size)
+        # Used to scale the input and cell gate activations
+        self.W_s_i = nn.Linear(static_size, hidden_size)
+        self.W_s_g = nn.Linear(static_size, hidden_size)
+
+    def forward(
+        self,
+        x: torch.Tensor,       # [batch, input_size]
+        h: torch.Tensor,       # [batch, hidden_size]
+        c: torch.Tensor,       # [batch, hidden_size]
+        s: torch.Tensor,       # [batch, static_size]  — static attributes
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Returns (h_new, c_new)."""
+        xh = torch.cat([x, h], dim=-1)             # [batch, input+hidden]
+
+        f = torch.sigmoid(self.W_f(xh))
+        o = torch.sigmoid(self.W_o(xh))
+
+        # Static-modulated input and cell gates
+        i = torch.sigmoid(self.W_i(xh) + self.W_s_i(s))
+        g = torch.tanh(  self.W_g(xh) + self.W_s_g(s))
+
+        c_new = f * c + i * g
+        h_new = o * torch.tanh(c_new)
+        return h_new, c_new
+
+
+class EASeq2SeqLSTM(nn.Module):
+    """
+    Entity-Aware Sequence-to-Sequence LSTM (I6).
+
+    Extends Seq2SeqLSTM by incorporating static catchment attributes into
+    the encoder's LSTM gating mechanism (Kratzert et al. 2019). The decoder
+    uses a standard LSTM. This allows a single model trained across multiple
+    gauges to adapt its internal dynamics to each catchment.
+
+    Parameters
+    ----------
+    n_feat      : number of dynamic input features
+    n_tgt       : number of output targets
+    static_size : number of static catchment attributes
+    hidden      : LSTM hidden size
+    n_layers    : number of encoder layers (only first layer is EA; rest standard)
+    dropout     : dropout probability
+    """
+
+    def __init__(
+        self,
+        n_feat:      int,
+        n_tgt:       int,
+        static_size: int,
+        hidden:      int = 64,
+        n_layers:    int = 2,
+        dropout:     float = 0.2,
+    ):
+        super().__init__()
+        self.n_tgt      = n_tgt
+        self.hidden     = hidden
+        self.n_layers   = n_layers
+        self.horizon    = HORIZON
+
+        # First encoder layer is EA-LSTM
+        self.ea_cell = EALSTMCell(n_feat, hidden, static_size)
+
+        # Remaining encoder layers (standard LSTM) if n_layers > 1
+        if n_layers > 1:
+            enc_drop = dropout if n_layers > 2 else 0.0
+            self.encoder_upper = nn.LSTM(
+                input_size=hidden, hidden_size=hidden,
+                num_layers=n_layers - 1, dropout=enc_drop, batch_first=True,
+            )
+        else:
+            self.encoder_upper = None
+
+        # Decoder is standard LSTM
+        dec_drop = dropout if n_layers > 1 else 0.0
+        self.decoder = nn.LSTM(
+            input_size=n_tgt, hidden_size=hidden,
+            num_layers=n_layers, dropout=dec_drop, batch_first=True,
+        )
+
+        self.drop = nn.Dropout(dropout)
+        self.fc   = nn.Linear(hidden, n_tgt)
+
+        # Static attribute normalisation (applied once at forward time)
+        # Learned linear projection to a common static embedding
+        self.static_proj = nn.Sequential(
+            nn.Linear(static_size, hidden),
+            nn.Tanh(),
+        )
+
+    def _encode(
+        self,
+        x: torch.Tensor,    # [batch, lookback, n_feat]
+        s: torch.Tensor,    # [batch, static_size]
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Run EA encoder, return (h, c) for decoder initialisation."""
+        B, L, _ = x.shape
+        h = torch.zeros(B, self.hidden, device=x.device)
+        c = torch.zeros(B, self.hidden, device=x.device)
+
+        ea_outputs = []
+        for t in range(L):
+            h, c = self.ea_cell(x[:, t, :], h, c, s)
+            ea_outputs.append(h.unsqueeze(1))
+
+        ea_seq = torch.cat(ea_outputs, dim=1)          # [B, L, hidden]
+        h_last = h.unsqueeze(0)                        # [1, B, hidden]
+        c_last = c.unsqueeze(0)                        # [1, B, hidden]
+
+        if self.encoder_upper is not None:
+            upper_out, (h_last, c_last) = self.encoder_upper(
+                ea_seq, (
+                    h_last.expand(self.n_layers - 1, -1, -1).contiguous(),
+                    c_last.expand(self.n_layers - 1, -1, -1).contiguous(),
+                )
+            )
+            h_final = h_last
+            c_final = c_last
+        else:
+            h_final = h_last
+            c_final = c_last
+
+        # Expand to match decoder n_layers
+        h_dec = h_final.expand(self.n_layers, -1, -1).contiguous()
+        c_dec = c_final.expand(self.n_layers, -1, -1).contiguous()
+        return h_dec, c_dec
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        s: torch.Tensor,
+        teacher_forcing_ratio: float = 0.0,
+        y_target: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
+        """
+        Parameters
+        ----------
+        x                     : [batch, lookback, n_feat]  dynamic inputs
+        s                     : [batch, static_size]       catchment attributes
+        teacher_forcing_ratio : float
+        y_target              : [batch, horizon, n_tgt]
+
+        Returns
+        -------
+        [batch, horizon, n_tgt]
+        """
+        h, c = self._encode(x, s)
+
+        batch   = x.size(0)
+        dec_in  = torch.zeros(batch, 1, self.n_tgt, device=x.device)
+        outputs = []
+
+        for t in range(self.horizon):
+            out, (h, c) = self.decoder(dec_in, (h, c))
+            pred = self.fc(self.drop(out))
+            outputs.append(pred)
+
+            use_tf = (
+                teacher_forcing_ratio > 0.0
+                and y_target is not None
+                and torch.rand(1).item() < teacher_forcing_ratio
+            )
+            dec_in = y_target[:, t:t+1, :] if use_tf else pred.detach()
+
+        return torch.cat(outputs, dim=1)               # [batch, horizon, n_tgt]
+
+
+class EARiverDataset(Dataset):
+    """
+    Extended RiverDataset that also carries a static catchment attribute vector.
+
+    Parameters
+    ----------
+    X : float32 [N, lookback, n_feat]  — scaled dynamic inputs
+    y : float32 [N, horizon,  n_tgt]   — scaled targets
+    s : float32 [N, static_size]       — static attributes (same for all
+                                         windows of the same gauge)
+    """
+
+    def __init__(self, X: np.ndarray, y: np.ndarray, s: np.ndarray):
+        assert X.shape[0] == y.shape[0] == s.shape[0]
+        self.X = torch.from_numpy(X)
+        self.y = torch.from_numpy(y)
+        self.s = torch.from_numpy(s)
+
+    def __len__(self):
+        return len(self.X)
+
+    def __getitem__(self, idx):
+        return self.X[idx], self.y[idx], self.s[idx]
+
+
+def train_ea_model(
+    model: EASeq2SeqLSTM,
+    dl_train: DataLoader,
+    dl_val: DataLoader,
+    lr: float = 1e-3,
+    epochs: int = 100,
+    patience: int = 12,
+    teacher_forcing_start: float = 0.5,
+    device: Optional[torch.device] = None,
+    verbose: bool = True,
+) -> Tuple[EASeq2SeqLSTM, Dict]:
+    """
+    Train EASeq2SeqLSTM. DataLoaders must yield (x, y, s) triples
+    from EARiverDataset.
+    """
+    if device is None:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    model = model.to(device)
+    optimiser = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimiser, patience=5, factor=0.5
+    )
+    criterion = nn.MSELoss()
+
+    best_val   = np.inf
+    best_state = None
+    wait       = 0
+    history    = {"train": [], "val": []}
+
+    for epoch in range(1, epochs + 1):
+        tf = teacher_forcing_start * max(0.0, 1.0 - epoch / (epochs * 0.5))
+
+        model.train()
+        train_loss = 0.0
+        for xb, yb, sb in dl_train:
+            xb, yb, sb = xb.to(device), yb.to(device), sb.to(device)
+            optimiser.zero_grad()
+            pred = model(xb, sb, teacher_forcing_ratio=tf, y_target=yb)
+            loss = criterion(pred, yb)
+            loss.backward()
+            nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+            optimiser.step()
+            train_loss += loss.item() * len(xb)
+        train_loss /= len(dl_train.dataset)
+
+        model.eval()
+        val_loss = 0.0
+        with torch.no_grad():
+            for xb, yb, sb in dl_val:
+                xb, yb, sb = xb.to(device), yb.to(device), sb.to(device)
+                val_loss += criterion(model(xb, sb), yb).item() * len(xb)
+        val_loss /= len(dl_val.dataset)
+
+        scheduler.step(val_loss)
+        history["train"].append(train_loss)
+        history["val"].append(val_loss)
+
+        if val_loss < best_val:
+            best_val   = val_loss
+            best_state = {k: v.cpu().clone() for k, v in model.state_dict().items()}
+            wait = 0
+        else:
+            wait += 1
+            if wait >= patience:
+                if verbose:
+                    print(f"  EA early stop at epoch {epoch}  (best val={best_val:.5f})")
+                break
+
+        if verbose and epoch % 10 == 0:
+            print(f"  Epoch {epoch:3d} | train={train_loss:.5f}  val={val_loss:.5f}  "
+                  f"tf={tf:.2f}  lr={optimiser.param_groups[0]['lr']:.2e}")
+
+    model.load_state_dict(best_state)
+    return model, history
 
 
 # ── Training ──────────────────────────────────────────────────────────────
@@ -242,7 +542,8 @@ def get_y_true(dataset: Dataset, tgt_scaler) -> np.ndarray:
     -------
     float32 array [N, horizon, n_tgt] in original units.
     """
-    ys = torch.stack([dataset[i][1] for i in range(len(dataset))]).numpy()
+    # B2 fix: access stored tensor directly instead of looping sample-by-sample
+    ys = dataset.y.numpy()
     N, H, T = ys.shape
     return tgt_scaler.inverse_transform(
         ys.reshape(-1, T)
@@ -266,5 +567,66 @@ def save_checkpoint(path, model: Seq2SeqLSTM, best_params: dict,
 def load_checkpoint(path, device=None):
     if device is None:
         device = torch.device("cpu")
-    ckpt = torch.load(path, map_location=device)
+    # B3 fix: weights_only=False suppresses the PyTorch 2.x security warning
+    # (safe here because we control the checkpoint files)
+    ckpt = torch.load(path, map_location=device, weights_only=False)
     return ckpt
+
+
+def reconstruct_scalers(ckpt: dict):
+    """
+    F5: Rebuild StandardScaler objects from a saved checkpoint dict.
+
+    Returns
+    -------
+    feat_scaler, tgt_scaler  — ready-to-use StandardScaler instances.
+    """
+    from sklearn.preprocessing import StandardScaler
+    import numpy as np
+
+    def _make_scaler(mean_, scale_):
+        sc = StandardScaler()
+        sc.mean_  = np.array(mean_)
+        sc.scale_ = np.array(scale_)
+        sc.var_   = sc.scale_ ** 2
+        sc.n_features_in_ = len(mean_)
+        sc.n_samples_seen_ = 1  # required by sklearn internals
+        return sc
+
+    feat_scaler = _make_scaler(ckpt["feat_scaler_mean"], ckpt["feat_scaler_scale"])
+    tgt_scaler  = _make_scaler(ckpt["tgt_scaler_mean"],  ckpt["tgt_scaler_scale"])
+    return feat_scaler, tgt_scaler
+
+
+def predict_single_window(
+    model: "Seq2SeqLSTM",
+    x_raw: np.ndarray,
+    feat_scaler,
+    tgt_scaler,
+    device: Optional[torch.device] = None,
+) -> np.ndarray:
+    """
+    F1: Forecast from a single raw input window.
+
+    Parameters
+    ----------
+    x_raw       : float32 array [lookback, n_feat] in original (physical) units
+    feat_scaler : fitted StandardScaler for features
+    tgt_scaler  : fitted StandardScaler for targets
+
+    Returns
+    -------
+    float32 array [horizon, n_tgt] in original (physical) units
+    """
+    if device is None:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    L, F = x_raw.shape
+    x_scaled = feat_scaler.transform(x_raw).astype(np.float32)      # [L, F]
+    x_tensor = torch.from_numpy(x_scaled).unsqueeze(0).to(device)   # [1, L, F]
+
+    model.eval().to(device)
+    with torch.no_grad():
+        pred_scaled = model(x_tensor).squeeze(0).cpu().numpy()       # [H, T]
+
+    return tgt_scaler.inverse_transform(pred_scaled).astype(np.float32)  # [H, T]
