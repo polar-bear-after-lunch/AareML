@@ -23,6 +23,13 @@ def load_gauge(gauge_id: str | int, daily_dir: Path = DAILY_DIR) -> pd.DataFrame
     """Load a single gauge's daily sensor CSV and return a date-indexed DataFrame."""
     path = daily_dir / f"camels_ch_chem_daily_{gauge_id}.csv"
     df = pd.read_csv(path, parse_dates=["date"], index_col="date").sort_index()
+    assert not df.empty, f"load_gauge: file for gauge {gauge_id} is empty"
+    assert isinstance(df.index, pd.DatetimeIndex), \
+        f"load_gauge: index is not DatetimeIndex for gauge {gauge_id}"
+    if __debug__:
+        print(f"[data] load_gauge {gauge_id}: {len(df)} rows, "
+              f"{df.index.min().date()} \u2192 {df.index.max().date()}, "
+              f"cols={list(df.columns)}")
     return df
 
 
@@ -67,6 +74,12 @@ def preprocess(df: pd.DataFrame, max_gap: int = 7) -> pd.DataFrame:
     df = df.reindex(pd.date_range(df.index.min(), df.index.max(), freq="D"))
     for col in df.columns:
         df[col] = df[col].interpolate(method="linear", limit=max_gap)
+    assert len(df) > 0, "preprocess: result is empty"
+    assert df.index.freq is not None or len(df) == 1, \
+        "preprocess: index is not regular daily frequency after reindex"
+    if __debug__:
+        nan_pct = df.isna().mean().round(3).to_dict()
+        print(f"[data] preprocess: {len(df)} days, NaN%={nan_pct}")
     return df
 
 
@@ -82,6 +95,16 @@ def train_val_test_split(
     train = df.loc[:train_end]
     val   = df.loc[train_end:val_end].iloc[1:]
     test  = df.loc[val_end:].iloc[1:]
+    assert len(train) > 0, f"train split is empty (train_end={train_end})"
+    assert len(val)   > 0, f"val split is empty (val_end={val_end})"
+    assert len(test)  > 0, "test split is empty"
+    # Ensure no temporal overlap
+    assert train.index.max() < val.index.min(), \
+        f"train/val overlap: train ends {train.index.max()}, val starts {val.index.min()}"
+    assert val.index.max() < test.index.min(), \
+        f"val/test overlap: val ends {val.index.max()}, test starts {test.index.min()}"
+    if __debug__:
+        print(f"[data] split: train={len(train)}, val={len(val)}, test={len(test)}")
     return train, val, test
 
 
@@ -161,6 +184,22 @@ def make_windows(
 
     X = np.array(X_list, dtype=np.float32)
     y = np.array(y_list, dtype=np.float32)
+    assert X.ndim == 3, f"make_windows: X should be 3D, got shape {X.shape}"
+    assert y.ndim == 3, f"make_windows: y should be 3D, got shape {y.shape}"
+    assert X.shape[0] == y.shape[0] == len(date_list), \
+        f"make_windows: N mismatch \u2014 X={X.shape[0]}, y={y.shape[0]}, dates={len(date_list)}"
+    assert X.shape[1] == lookback, \
+        f"make_windows: wrong lookback dim \u2014 expected {lookback}, got {X.shape[1]}"
+    assert y.shape[1] == horizon, \
+        f"make_windows: wrong horizon dim \u2014 expected {horizon}, got {y.shape[1]}"
+    assert not np.isnan(X).any(), \
+        f"make_windows: NaN in X after imputation \u2014 check train_means coverage"
+    assert not np.isnan(y).any(), \
+        "make_windows: NaN in y \u2014 targets should be fully observed in valid windows"
+    if __debug__:
+        print(f"[data] make_windows: {X.shape[0]} windows, "
+              f"X={X.shape}, y={y.shape}, "
+              f"date range {date_list[0].date()} \u2192 {date_list[-1].date()}")
     return X, y, pd.DatetimeIndex(date_list)
 
 

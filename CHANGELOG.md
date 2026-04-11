@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.4] — 2026-04-08
+
+### Developer Experience
+- **Debug asserts** added throughout all `src/` modules — every critical shape, dtype, range, and temporal invariant is now explicitly checked with an informative error message.
+- **Debug print checkpoints** (`if __debug__:` guards) added at every major pipeline stage — loading, preprocessing, splitting, windowing, training, predicting, imputing. Run with `python -O` to silence all debug output in production.
+- `src/data.py` — asserts in `load_gauge`, `preprocess`, `train_val_test_split`, `make_windows`
+- `src/model.py` — asserts in `RiverDataset.__init__`, `train_model` (start + per-epoch loss finiteness), `predict`, `save_checkpoint`, `load_checkpoint`
+- `src/metrics.py` — asserts in `mean_rmse`, `mean_mae`, `metrics_table`
+- `src/impute.py` — asserts in `SATSImputer.fit` and `SATSImputer.transform`
+
+---
+
 ## [v1.3] — 2026-04-07
 
 ### New Features

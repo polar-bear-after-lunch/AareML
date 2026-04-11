@@ -27,6 +27,14 @@ class RiverDataset(Dataset):
 
     def __init__(self, X: np.ndarray, y: np.ndarray):
         assert X.shape[0] == y.shape[0], "X and y must have the same number of samples"
+        assert X.ndim == 3, f"RiverDataset: X must be 3D [N, L, F], got {X.shape}"
+        assert y.ndim == 3, f"RiverDataset: y must be 3D [N, H, T], got {y.shape}"
+        assert not np.isnan(X).any(), "RiverDataset: NaN in X — impute before creating dataset"
+        assert not np.isnan(y).any(), "RiverDataset: NaN in y — targets must be fully observed"
+        assert X.dtype == np.float32, f"RiverDataset: X dtype should be float32, got {X.dtype}"
+        assert y.dtype == np.float32, f"RiverDataset: y dtype should be float32, got {y.dtype}"
+        if __debug__:
+            print(f"[model] RiverDataset: {len(X)} samples, X={X.shape}, y={y.shape}")
         # B1 fix: store as single stacked tensors (not per-sample list) for speed
         self.X = torch.from_numpy(X)
         self.y = torch.from_numpy(y)
@@ -440,6 +448,15 @@ def train_model(
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    assert len(dl_train.dataset) > 0, "train_model: training DataLoader is empty"
+    assert len(dl_val.dataset)   > 0, "train_model: validation DataLoader is empty"
+    assert epochs > 0,   f"train_model: epochs must be > 0, got {epochs}"
+    assert patience > 0, f"train_model: patience must be > 0, got {patience}"
+    if __debug__:
+        n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        print(f"[model] train_model: {n_params:,} trainable params, "
+              f"device={device}, epochs={epochs}, patience={patience}, lr={lr}")
+
     model = model.to(device)
     optimiser = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -477,6 +494,11 @@ def train_model(
                 xb, yb = xb.to(device), yb.to(device)
                 val_loss += criterion(model(xb), yb).item() * len(xb)
         val_loss /= len(dl_val.dataset)
+
+        assert np.isfinite(train_loss), \
+            f"train_model: train loss is {train_loss} at epoch {epoch} — check for NaN inputs or exploding gradients"
+        assert np.isfinite(val_loss), \
+            f"train_model: val loss is {val_loss} at epoch {epoch} — check for NaN in validation data"
 
         scheduler.step(val_loss)
         history["train"].append(train_loss)
@@ -528,6 +550,14 @@ def predict(
             out = model(xb.to(device)).cpu().numpy()
             preds.append(out)
     preds = np.concatenate(preds, axis=0)           # [N, H, n_tgt]
+    assert preds.ndim == 3, f"predict: output should be 3D [N, H, T], got {preds.shape}"
+    if np.isnan(preds).any():
+        nan_frac = np.isnan(preds).mean()
+        import warnings
+        warnings.warn(f"predict: {nan_frac:.1%} NaN in predictions — model may have diverged")
+    if __debug__:
+        print(f"[model] predict: {preds.shape[0]} samples, "
+              f"DO range [{preds[:,:,0].min():.2f}, {preds[:,:,0].max():.2f}] mg/L (scaled)")
     N, H, T = preds.shape
     return tgt_scaler.inverse_transform(
         preds.reshape(-1, T)
@@ -562,6 +592,10 @@ def save_checkpoint(path, model: Seq2SeqLSTM, best_params: dict,
         "tgt_scaler_mean":   tgt_scaler.mean_,
         "tgt_scaler_scale":  tgt_scaler.scale_,
     }, path)
+    if __debug__:
+        import os
+        size_kb = os.path.getsize(path) / 1024
+        print(f"[model] save_checkpoint: saved to {path} ({size_kb:.1f} KB)")
 
 
 def load_checkpoint(path, device=None):
@@ -570,6 +604,11 @@ def load_checkpoint(path, device=None):
     # B3 fix: weights_only=False suppresses the PyTorch 2.x security warning
     # (safe here because we control the checkpoint files)
     ckpt = torch.load(path, map_location=device, weights_only=False)
+    required_keys = {"model_state", "feat_scaler_mean", "tgt_scaler_mean"}
+    missing = required_keys - set(ckpt.keys())
+    assert not missing, f"load_checkpoint: checkpoint missing keys {missing}"
+    if __debug__:
+        print(f"[model] load_checkpoint: loaded from {path}, keys={list(ckpt.keys())}")
     return ckpt
 
 

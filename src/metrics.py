@@ -26,6 +26,11 @@ def mae_per_step(y_true: np.ndarray, y_pred: np.ndarray) -> np.ndarray:
 def mean_rmse(y_true: np.ndarray, y_pred: np.ndarray,
               targets: List[str] = TARGETS) -> Dict[str, float]:
     """Mean RMSE across all horizon steps, per target."""
+    assert y_true.shape == y_pred.shape, \
+        f"metrics: y_true {y_true.shape} and y_pred {y_pred.shape} shape mismatch"
+    assert y_true.ndim == 3, \
+        f"metrics: expected 3D arrays [N, H, T], got {y_true.ndim}D"
+    assert not np.isnan(y_true).any(), "metrics: NaN in y_true"
     per = rmse_per_step(y_true, y_pred)          # [H, n_tgt]
     return {t: float(per[:, i].mean()) for i, t in enumerate(targets)}
 
@@ -33,6 +38,11 @@ def mean_rmse(y_true: np.ndarray, y_pred: np.ndarray,
 def mean_mae(y_true: np.ndarray, y_pred: np.ndarray,
              targets: List[str] = TARGETS) -> Dict[str, float]:
     """Mean MAE across all horizon steps, per target."""
+    assert y_true.shape == y_pred.shape, \
+        f"metrics: y_true {y_true.shape} and y_pred {y_pred.shape} shape mismatch"
+    assert y_true.ndim == 3, \
+        f"metrics: expected 3D arrays [N, H, T], got {y_true.ndim}D"
+    assert not np.isnan(y_true).any(), "metrics: NaN in y_true"
     per = mae_per_step(y_true, y_pred)
     return {t: float(per[:, i].mean()) for i, t in enumerate(targets)}
 
@@ -193,4 +203,10 @@ def metrics_table(models: dict, y_true: np.ndarray,
                 row["MAE_hi"]  = round(ci_mae[t]["hi"],  4)
             rows.append(row)
 
-    return pd.DataFrame(rows)
+    df = pd.DataFrame(rows)
+    assert len(df) > 0, "metrics_table: result DataFrame is empty"
+    if __debug__:
+        for name in models:
+            print(f"[metrics] metrics_table for '{name}':")
+            print(df[df["Model"] == name].to_string(index=False))
+    return df

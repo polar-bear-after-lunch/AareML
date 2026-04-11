@@ -117,6 +117,13 @@ class SATSImputer:
         ----------
         X : float32 [N, lookback, n_feat]  — training windows, may contain NaN
         """
+        assert X.ndim == 3, f"SATSImputer.fit: expected 3D [N, L, F], got {X.shape}"
+        assert X.shape[2] == self.n_feat, \
+            f"SATSImputer.fit: expected {self.n_feat} features, got {X.shape[2]}"
+        obs_rate = np.isfinite(X).mean()
+        if __debug__:
+            print(f"[impute] SATSImputer.fit: {X.shape[0]} windows, "
+                  f"obs_rate={obs_rate:.1%}, epochs={self.epochs}")
         N, L, F = X.shape
         self._col_means = np.nanmean(X.reshape(-1, F), axis=0)
         # Replace remaining NaN in col_means with 0
@@ -213,7 +220,14 @@ class SATSImputer:
                 x_imp = self.model_(xb, ob.bool())
                 results.append(x_imp.cpu().numpy())
 
-        return np.concatenate(results, axis=0).astype(np.float32)
+        result = np.concatenate(results, axis=0).astype(np.float32)
+        assert not np.isnan(result).any(), \
+            "SATSImputer.transform: NaN in output — col_means may be nan (all-missing column)"
+        assert result.shape == X.shape, \
+            f"SATSImputer.transform: output shape {result.shape} != input shape {X.shape}"
+        if __debug__:
+            print(f"[impute] SATSImputer.transform: imputed {X.shape[0]} windows")
+        return result
 
     def fit_transform(self, X: np.ndarray, verbose: bool = False) -> np.ndarray:
         return self.fit(X, verbose=verbose).transform(X)
