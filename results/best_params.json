@@ -1,0 +1,9 @@
+{
+  "hidden": 32,
+  "n_layers": 1,
+  "dropout": 0.2010635299892269,
+  "lr": 0.008865935186458508,
+  "batch_size": 64,
+  "best_val_loss": 0.127739,
+  "trial": 15
+}

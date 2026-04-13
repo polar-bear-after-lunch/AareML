@@ -1,11 +1,12 @@
-Model,Target,RMSE,NSE
-Persistence,DO (mg/L),0.4463,0.765
-Persistence,Temp (°C),1.3653,0.861
-Climatology,DO (mg/L),0.3343,0.87
-Climatology,Temp (°C),1.4441,0.852
-Ridge Regression,DO (mg/L),0.3301,0.871
-Ridge Regression,Temp (°C),1.2822,0.877
-LSTM (default),DO (mg/L),0.298799991607666,0.8920000195503235
-LSTM (default),Temp (°C),1.3253999948501587,0.8700000047683716
-LSTM (best),DO (mg/L),0.34279999136924744,0.8579999804496765
-LSTM (best),Temp (°C),1.4186999797821045,0.8500000238418579
+Model,Target,RMSE,MAE,NSE,KGE,RMSE_lo,RMSE_hi,MAE_lo,MAE_hi
+Persistence,DO (mg/L),0.3389,0.2655,0.86,0.93,0.3101,0.3669,,
+Persistence,Temp (°C),1.3653,1.0736,0.861,0.93,1.2639,1.4722,,
+Climatology,DO (mg/L),0.3343,0.2712,0.87,0.853,0.2988,0.3689,,
+Climatology,Temp (°C),1.4441,1.1604,0.852,0.884,1.2673,1.6028,,
+Ridge Regression,DO (mg/L),0.3028,0.24,0.888,0.908,0.2756,0.3307,,
+Ridge Regression,Temp (°C),1.2612,1.0192,0.881,0.916,1.1763,1.3557,,
+LSTM (default),DO (mg/L),0.299,0.2363,0.892,0.918,0.2742,0.3229,0.2152,0.2564
+LSTM (default),Temp (°C),1.2525,1.0098,0.884,0.917,1.1518,1.3454,0.9272,1.0929
+LSTM (best),DO (mg/L),0.3028,0.2368,0.889,0.942,0.2729,0.3367,0.2142,0.2621
+LSTM (best),Temp (°C),1.3199,1.0651,0.87,0.901,1.2146,1.4235,0.972,1.1665
+LakeBeD-US LSTM (ref.),DO (mg/L),1.4,,,,,,,

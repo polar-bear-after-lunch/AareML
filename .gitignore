@@ -16,5 +16,8 @@ venv/
 .DS_Store
 Thumbs.db
 
+# Reports
+AareML-report-ru.pdf
+
 # Results (optional — uncomment to track)
 # results/

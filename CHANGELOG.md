@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.5] — 2026-04-11
+
+### New Features
+- **Cross-ecosystem experiment** — Downloaded LakeBeD-US Lake Mendota high-frequency data (101M rows) from Hugging Face, processed to daily surface observations (3,511 days, 2006–2023), and ran all three AareML baselines (persistence, climatology, Ridge) on the lake test set.
+- `results/lake_mendota_results.csv` — Full results table with RMSE, MAE, NSE.
+- `figures/06_lake_mendota_rmse_by_horizon.png` — Per-horizon RMSE for all three baselines on Lake Mendota.
+- `figures/06_river_vs_lake_comparison.png` — Direct River vs Lake RMSE comparison with LakeBeD-US LSTM reference line.
+- **Key finding:** Lake Ridge DO RMSE = 1.030 mg/L vs River Ridge = 0.303 mg/L (3.4× gap). The AareML Ridge baseline on lake data already beats the published LakeBeD-US LSTM (1.40 mg/L), suggesting Ridge regression is a surprisingly strong baseline when sufficient sensor history is available.
+
+---
+
 ## [v1.4] — 2026-04-08
 
 ### Developer Experience
@@ -74,3 +85,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `src/model.py` — RiverDataset, Seq2SeqLSTM, train_model, predict, checkpoint helpers.
 - `results/baseline_results.csv` — Real baseline results from notebook 02.
 - `figures/` — 17 PNG figures from notebooks 01–03.
+
+---
+
+## [v1.6] — 2026-04-11
+
+### New Content
+- **Notebook 06** `notebooks/06_cross_ecosystem_lake.ipynb` — Full reproducible cross-ecosystem experiment notebook (14 cells, executed cleanly). Loads pre-processed Lake Mendota data, runs all three baselines with 80/10/10 chronological split, generates comparison figures.
+- **Report Section 5.4** — "Cross-Ecosystem Experiment: Lake Mendota" added to results section with two descriptive paragraphs, Table 4 (Lake Mendota baseline results), and Figure 8 (river vs. lake RMSE comparison).
+- **Report Section 6.1 updated** — Discussion now cites 3.4× and 4.6× quantitative gaps with reference to notebook 06.
+- **Figure** `figures/06_mendota_timeseries.png` — Lake Mendota DO and temperature full time series.
+- **Du et al. (2023) reference** added to report (SAITS imputation paper).
+- **Effort log updated** — 14 sessions, 41.5 hours logged (34.6% of 120-hour budget).
+- **Russian report updated** with all new content translated.
