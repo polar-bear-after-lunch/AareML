@@ -12,6 +12,15 @@ from typing import Dict, List, Optional, Tuple
 
 from .config import LOOKBACK, HORIZON, N_FEAT, N_TGT, TARGETS, SEED
 
+# ── CPU performance settings ──────────────────────────────────────────────
+# Use all physical cores for intra-op parallelism (matrix multiplies etc.)
+import os as _os
+_n_cpu = _os.cpu_count() or 1
+torch.set_num_threads(_n_cpu)
+torch.set_num_interop_threads(max(1, _n_cpu // 2))
+# Enable oneDNN optimised kernels if available
+torch.backends.mkldnn.enabled = True
+
 
 # ── Dataset ───────────────────────────────────────────────────────────────
 
