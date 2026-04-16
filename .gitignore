@@ -3,6 +3,7 @@ data/lakebed-us/
 data/camels_ch_chem/
 data/camels_ch/
 data/*.zip
+data/*.parquet
 
 # Python
 __pycache__/
