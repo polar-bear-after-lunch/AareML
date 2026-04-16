@@ -1,0 +1,22 @@
+"lake_id","lake_name","institution","latitude","longitude","elevation_m","area_ha","mean_depth_m","max_depth_m","residence_time_yr","known_manipulations"
+"AL","Allequash Lake","NTL-LTER",46.038,-89.621,494.03,164.2,2.9,8,0.5,NA
+"BARC","Lake Barco","NEON",29.675982,-82.008414,26.98,12,2.14073333333333,6,3.3,NA
+"BM","Big Muskellunge Lake","NTL-LTER",46.021067,-89.611783,499.32,375.7,7.5,21.3,8,NA
+"BVR","Beaverdam Reservoir","Virginia Reservoirs LTREB",37.313,-79.816,584.3,39.397,3.44478164327233,14,0.9,"Managed reservoir. Frequent water level fluctuations."
+"CB","Crystal Bog","NTL-LTER",46.007583,-89.606183,501.49,0.6,1.7,2.5,2.6,NA
+"CR","Crystal Lake","NTL-LTER",46.00275,-89.612233,500.47,37.5,11.4,20.4,12.7,"Thermal manipulation [2012-2013], Invasive smelt removal [2002-2009], Cisco introduction [2020-present]"
+"CRAM","Crampton Lake","NEON",46.209675,-89.473688,510.55,26,3.42205384615385,19,4.9,NA
+"FCR","Falling Creek Reservoir","Virginia Reservoirs LTREB",37.30333,-79.8375,507.61,12.1371,2.54456477247448,9.3,0.68,"Managed reservoir. Frequent water level fluctuations and operation of hypolimnetic oxygenation and pulsed epilimnetic mixing engineering systems."
+"FI","Fish Lake","NTL-LTER",43.28733,-89.65173,262.05,80.4,6.6,18.9,NA,NA
+"GL4","Green Lake 4","NWT-LTER",40.05545,-105.62091,3560.76,5.3,4.1,13,0.0586301369863014,NA
+"LIRO","Little Rock Lake","NEON",45.998269,-89.704767,495.18,19,2.45661578947368,10,3.4,NA
+"ME","Lake Mendota","NTL-LTER",43.09885,-89.40545,258.95,3961.2,12.8,25.3,4.3,"Piscivore stocking [1987-1999]"
+"MO","Lake Monona","NTL-LTER",43.06337,-89.36086,257.42,1372.5,8.2,22.5,0.7,NA
+"PRLA","Prairie Lake","NEON",47.15909,-99.11388,562.77,23,1.69316956521739,4,3.8,NA
+"PRPO","Prairie Pothole","NEON",47.129839,-99.253147,586.87,11,1.44109090909091,4,3.2,NA
+"SP","Sparkling Lake","NTL-LTER",46.007733,-89.701183,494.16,63.7,10.9,20,10.4,"Invasive crayfish removal [2001-2008], Invasive smelt removal [2002-2009], Cisco introduction [2020-present]"
+"SUGG","Lake Suggs","NEON",29.68778,-82.017745,28.68,31,1.33985806451613,3,1.6,NA
+"TB","Trout Bog","NTL-LTER",46.04125,-89.686283,493.5,1,5.6,7.9,6.4,NA
+"TOOK","Toolik Lake","NEON",68.630692,-149.61064,715.3,148,8.5,25,1,NA
+"TR","Trout Lake","NTL-LTER",46.029267,-89.665017,491.71,1583,14.6,35.7,4.5,NA
+"WI","Lake Wingra","NTL-LTER",43.05258,-89.42499,258.39,138.5,2.7,4,0.44,"Carp removal [2007-2009]"

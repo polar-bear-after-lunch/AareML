@@ -1,0 +1,11 @@
+{
+  "method": "GradientSHAP (captum 0.8.0)",
+  "windows_explained": 500,
+  "target": "DO 1-day-ahead",
+  "worst_error_mg_l": 0.779,
+  "worst_window_start": "2017-05-11",
+  "best_error_mg_l": 0.0,
+  "best_window_start": "2017-06-13",
+  "catchment_surrogate": "skipped \u2014 multisite_results.csv not found at runtime",
+  "note": "Temperature SHAP not computed \u2014 wrapper hardcoded to DO t+1 only"
+}

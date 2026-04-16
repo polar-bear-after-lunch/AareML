@@ -1,95 +1,96 @@
 # AareML
 
-**Predicting River Water Quality in Swiss Catchments using Machine Learning**
+**Predicting River Water Quality in Swiss Catchments with LSTMs**
 
-CAS Advanced Machine Learning — Final Project | University of Bern | June 2026
+CAS in Advanced Machine Learning · University of Bern · June 2026
 
----
+[![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
 
 ## Overview
 
-AareML applies a sequence-to-sequence LSTM benchmark — originally defined on the [LakeBeD-US](https://essd.copernicus.org/articles/17/3141/2025/) lake water quality dataset — to Swiss river catchment data from [CAMELS-CH-Chem](https://pmc.ncbi.nlm.nih.gov/articles/PMC12287458/), the first European CAMELS extension incorporating water quality.
+AareML applies a sequence-to-sequence LSTM, modelled on the [LakeBeD-US benchmark](https://essd.copernicus.org/articles/17/3141/2025/) (McAfee et al., 2025), to predict dissolved oxygen (DO) and water temperature at 14-day horizons across 86 Swiss river gauges from the [CAMELS-CH-Chem dataset](https://zenodo.org/records/14980027) (Nascimento et al., 2025).
 
-**Core ML task:** Predict dissolved oxygen concentration and water temperature at a 14-day horizon from a 21-day lookback window using daily sensor measurements across 115 Swiss catchments.
+## Key Results
 
-**Central research question:**
-> Can the LakeBeD-US LSTM benchmark transfer from lakes to rivers, and what catchment characteristics drive variation in forecast skill across Swiss sites?
+| Model | DO RMSE | Temp RMSE | NSE |
+|-------|---------|-----------|-----|
+| Persistence | 0.339 mg/L | 1.365 °C | 0.860 |
+| Ridge Regression | 0.303 mg/L | 1.261 °C | 0.888 |
+| **LSTM (default)** | **0.299 mg/L** | **1.253 °C** | **0.892** |
+| LSTM (Optuna best) | 0.301 mg/L | 1.280 °C | 0.889 |
+| LakeBeD-US LSTM (ref.) | 1.400 mg/L | — | — |
 
----
+**Multi-site transfer** (12 gauges): mean DO RMSE = 0.425 mg/L (zero-shot), 0.386 mg/L (per-gauge retraining) — both 3.3–3.6× better than the LakeBeD-US lake reference.
 
-## Data
+**SHAP findings**: temperature[t−1] is the dominant driver (mean |SHAP|=0.644), ahead of DO itself. Effective LSTM memory: 3–4 days despite 21-day lookback.
 
-| Dataset | Source | Description |
-|---|---|---|
-| CAMELS-CH-Chem | [Zenodo](https://zenodo.org/records/14980027) | 40 water quality parameters, 115 Swiss catchments, 1981–2020 |
-| CAMELS-CH | [Zenodo](https://zenodo.org/records/7784633) | Hydro-meteorological time series, catchment attributes |
-| LakeBeD-US (CSE) | [Hugging Face](https://huggingface.co/datasets/lakebed-us) | Benchmark reference |
+## Setup
 
-> Data files are not committed to this repository. See `data/README.md` for download instructions.
+### 1. Clone the repository
+```bash
+git clone https://github.com/polar-bear-after-lunch/AareML.git
+cd AareML
+```
 
----
+### 2. Create environment
+```bash
+conda create -n aareml python=3.11 -y
+conda activate aareml
+conda install -c conda-forge llvmlite numba -y
+pip install -r requirements.txt
+```
 
-## Notebooks
+### 3. Download data (~360 MB)
+```bash
+python download_data.py
+```
+This downloads and prepares both datasets automatically:
+- **CAMELS-CH-Chem** (~165 MB) from [Zenodo](https://zenodo.org/records/14980027)
+- **LakeBeD-US Lake Mendota** (~194 MB) from [Hugging Face](https://huggingface.co/datasets/eco-kgml/LakeBeD-US-CSE)
 
-| Notebook | Description |
-|---|---|
-| `01_data_exploration.ipynb` | EDA, data quality, spatial & temporal coverage |
-| `02_baselines.ipynb` | Persistence, linear regression, Random Forest |
-| `03_lstm_single_site.ipynb` | Seq2seq LSTM benchmark replication |
-| `04_multisite_analysis.ipynb` | Cross-catchment evaluation (115 sites) |
-| `05_shap_interpretation.ipynb` | SHAP feature importance analysis |
-
----
+### 4. Run notebooks in order
+```
+01_data_exploration.ipynb      — EDA and data availability
+02_baselines.ipynb             — Persistence, Climatology, Ridge
+03_lstm_single_site.ipynb      — Seq2Seq LSTM + Optuna tuning
+04_multisite_analysis.ipynb    — Zero-shot transfer + per-gauge retraining
+05_shap_interpretation.ipynb   — GradientSHAP attribution
+06_cross_ecosystem_lake.ipynb  — River vs. Lake Mendota comparison
+```
 
 ## Repository Structure
 
 ```
 AareML/
-├── notebooks/          # Jupyter notebooks (numbered pipeline)
-├── src/                # Reusable Python modules (data loading, models, utils)
-├── data/               # Data directory (not tracked by git — see data/README.md)
-├── results/            # Model outputs, metrics CSVs
-├── figures/            # Generated plots and maps
-├── requirements.txt    # Python dependencies
-└── README.md
+├── notebooks/          — Jupyter notebooks (01–06)
+├── src/
+│   ├── config.py       — Shared configuration
+│   ├── data.py         — Data loading and preprocessing
+│   ├── metrics.py      — RMSE, MAE, NSE, KGE, bootstrap CI
+│   ├── model.py        — Seq2SeqLSTM, EA-LSTM, training utilities
+│   └── impute.py       — Self-attention imputer (SAITS-inspired)
+├── results/            — CSV results tables and checkpoints
+├── figures/            — Generated figures
+├── ubelix/             — SLURM job scripts for UBELIX HPC
+├── data/               — Data directory (excluded from git)
+├── download_data.py    — Data download script
+├── requirements.txt
+└── CHANGELOG.md
 ```
 
----
+## Data
 
-## Methods
+Data is excluded from this repository due to size. Use `python download_data.py` to fetch all required datasets. See [CHANGELOG.md](CHANGELOG.md) for version history.
 
-- **Model:** Sequence-to-sequence LSTM-RNN (encoder-decoder), replicating LakeBeD-US benchmark
-- **Imputation:** SAITS (self-attention-based imputation for time series)
-- **Hyperparameter tuning:** Optuna (tree-structured Parzen estimator)
-- **Baselines:** Persistence, OLS regression, Random Forest
-- **Interpretation:** SHAP values for feature importance across catchment types
+## Citation
 
----
+If you use this code, please cite the underlying datasets:
 
-## Requirements
+- Nascimento et al. (2025). CAMELS-CH-Chem. Zenodo. https://doi.org/10.5281/zenodo.14980027
+- McAfee et al. (2025). LakeBeD-US. ESSD. https://doi.org/10.5194/essd-17-3141-2025
 
-```
-numpy
-pandas
-matplotlib
-seaborn
-scikit-learn
-torch
-optuna
-shap
-geopandas
-pyarrow     # for Parquet files
-```
+## License
 
-Install with:
-```bash
-pip install -r requirements.txt
-```
+MIT License — see [LICENSE](LICENSE) for details.
 
----
-
-## References
-
-- McAfee et al. (2025). LakeBeD-US. *Earth System Science Data.* https://doi.org/10.5194/essd-17-3141-2025
-- Nascimento et al. (2025). CAMELS-CH-Chem. *Scientific Data.* https://doi.org/10.1038/s41597-025-05625-1
-- Höge et al. (2023). CAMELS-CH. *Earth System Science Data.* https://doi.org/10.5194/essd-15-5755-2023
+*AI assistance (Perplexity Computer) was used for code scaffolding, report drafting, and data exploration. All scientific interpretations are the author's own.*

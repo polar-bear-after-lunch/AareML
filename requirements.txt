@@ -5,6 +5,7 @@
 
 # Core
 numpy==1.26.4
+pyarrow==16.1.0             # required for reading LakeBeD-US parquet files
 pandas==2.2.2
 matplotlib==3.9.2
 seaborn==0.13.2
