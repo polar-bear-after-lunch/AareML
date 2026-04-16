@@ -1,5 +1,5 @@
 # Data files (too large for git)
-data/lake*
+data/lakebed-us/
 data/camels_ch_chem/
 data/camels_ch/
 data/*.zip
