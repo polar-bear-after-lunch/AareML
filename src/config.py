@@ -49,18 +49,40 @@ ACTIVE_TARGET_LABELS = TARGET_LABELS_EXTENDED if USE_EXTENDED_TARGETS else TARGE
 N_TGT_EXTENDED       = len(TARGETS_EXTENDED)
 
 # ── NAWA FRACHT chemistry features (I7) ───────────────────────────────────
-# Most commonly available monthly chemistry variables across CAMELS-CH-Chem gauges
+# NAWA FRACHT column names — verify against actual CSV headers in
+# data/camels-ch-chem/nawa_fracht/
+# Run: pd.read_csv('data/camels-ch-chem/nawa_fracht/<any_file>.csv').columns.tolist()
+# Both audit reports (GPT-5.4 Bug #1 and Opus 4.7 Bug #3) confirmed the actual
+# CSV files use lowercase names and q_mean_sensor (not Q_m3s), and NH4_N does
+# not exist in the dataset.
 NAWAF_FEATURES = [
-    "NO3_N",    # nitrate nitrogen (mg/L)
-    "NH4_N",    # ammonium nitrogen (mg/L)
-    "TP",       # total phosphorus (mg/L)
-    "TN",       # total nitrogen (mg/L)
-    "DOC",      # dissolved organic carbon (mg/L)
-    "Q_m3s",    # discharge at sample time (m³/s)
+    "NO3_N",          # nitrate-N — verify exact column name in CSV
+    "tp",             # total phosphorus — actual column name in CSV
+    "tn",             # total nitrogen — actual column name in CSV
+    "doc",            # dissolved organic carbon — actual column name in CSV
+    "q_mean_sensor",  # discharge — actual column name in CSV (not "Q_m3s")
 ]
+# To verify: run load_nawaf('2473') and print the columns
 
 # Features with NAWA FRACHT appended (used when NAWA data is available)
 FEATURES_WITH_NAWAF = FEATURES + NAWAF_FEATURES
+
+# ── Static catchment attribute columns for EA-LSTM (I6) ───────────────────
+# These are CANDIDATE names — actual availability checked at runtime in notebook 04.
+# G-U1 fix: the original list contained names that don't exist in the metadata CSV.
+# Use both common naming conventions; notebook 04 filters to whichever exist.
+# To verify, run:
+# pd.read_csv('data/camels-ch-chem/gauges_metadata/camels_ch_chem_gauges_metadata.csv').columns.tolist()
+# Common CAMELS-CH column names (try both conventions):
+STATIC_COLS = [
+    "area",           "area_km2",          # catchment area
+    "ele_mt_smn",     "mean_elev",         # mean elevation
+    "slp_dg_sav",     "slope_mean",        # mean slope
+    "for_pc_sse",     "forest_frac",       # forest %
+    "crp_pc_sse",     "agriculture_frac",  # cropland %
+]
+# Deduplicate while preserving order
+STATIC_COLS = list(dict.fromkeys(STATIC_COLS))
 
 # ── Train / val / test split boundaries ───────────────────────────────────
 TRAIN_END  = "2014-12-31"

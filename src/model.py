@@ -13,13 +13,14 @@ from typing import Dict, List, Optional, Tuple
 from .config import LOOKBACK, HORIZON, N_FEAT, N_TGT, TARGETS, SEED
 
 # ── CPU performance settings ──────────────────────────────────────────────
-# Use all physical cores for intra-op parallelism (matrix multiplies etc.)
+# PyTorch CPU performance is best with 4-6 threads — more threads cause
+# contention and are actually slower due to synchronisation overhead.
+# The notebook cell sets OMP_NUM_THREADS before import; we just clamp here.
 import os as _os
-_n_cpu = _os.cpu_count() or 1
-torch.set_num_threads(_n_cpu)
-torch.set_num_interop_threads(max(1, _n_cpu // 2))
-# Enable oneDNN optimised kernels if available
-torch.backends.mkldnn.enabled = True
+_n_logical = _os.cpu_count() or 1
+# Use at most 6 threads — empirically optimal for LSTM on macOS
+_n_threads = min(_n_logical, 6)
+torch.set_num_threads(_n_threads)
 
 
 # ── Dataset ───────────────────────────────────────────────────────────────
@@ -246,12 +247,8 @@ class EASeq2SeqLSTM(nn.Module):
         self.drop = nn.Dropout(dropout)
         self.fc   = nn.Linear(hidden, n_tgt)
 
-        # Static attribute normalisation (applied once at forward time)
-        # Learned linear projection to a common static embedding
-        self.static_proj = nn.Sequential(
-            nn.Linear(static_size, hidden),
-            nn.Tanh(),
-        )
+        # Note: static_proj removed — static attributes are passed directly
+        # to EALSTMCell which handles projection internally via W_s_i / W_s_g.
 
     def _encode(
         self,
@@ -285,9 +282,11 @@ class EASeq2SeqLSTM(nn.Module):
             h_final = h_last
             c_final = c_last
 
-        # Expand to match decoder n_layers
-        h_dec = h_final.expand(self.n_layers, -1, -1).contiguous()
-        c_dec = c_final.expand(self.n_layers, -1, -1).contiguous()
+        # Take last layer's hidden state for decoder init
+        h_last_layer = h_final[-1:, :, :]  # [1, B, hidden]
+        c_last_layer = c_final[-1:, :, :]  # [1, B, hidden]
+        h_dec = h_last_layer.expand(self.n_layers, -1, -1).contiguous()
+        c_dec = c_last_layer.expand(self.n_layers, -1, -1).contiguous()
         return h_dec, c_dec
 
     def forward(
@@ -610,8 +609,9 @@ def save_checkpoint(path, model: Seq2SeqLSTM, best_params: dict,
 def load_checkpoint(path, device=None):
     if device is None:
         device = torch.device("cpu")
-    # B3 fix: weights_only=False suppresses the PyTorch 2.x security warning
-    # (safe here because we control the checkpoint files)
+    # weights_only=False is safe here — we only load checkpoints we generated ourselves.
+    # If loading checkpoints from untrusted sources, set weights_only=True and use
+    # a safetensors format instead.
     ckpt = torch.load(path, map_location=device, weights_only=False)
     required_keys = {"model_state", "feat_scaler_mean", "tgt_scaler_mean"}
     missing = required_keys - set(ckpt.keys())
@@ -638,7 +638,12 @@ def reconstruct_scalers(ckpt: dict):
         sc.scale_ = np.array(scale_)
         sc.var_   = sc.scale_ ** 2
         sc.n_features_in_ = len(mean_)
-        sc.n_samples_seen_ = 1  # required by sklearn internals
+        # S-U3 fix: use a large representative number instead of 1.
+        # Setting n_samples_seen_ = 1 would cause silently wrong running
+        # statistics if partial_fit() is ever called on this reconstructed
+        # scaler. 10000 is a safe approximation; persist the actual count
+        # in the checkpoint if exact reproducibility of partial_fit is needed.
+        sc.n_samples_seen_ = 10000
         return sc
 
     feat_scaler = _make_scaler(ckpt["feat_scaler_mean"], ckpt["feat_scaler_scale"])

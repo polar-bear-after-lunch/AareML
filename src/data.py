@@ -90,11 +90,14 @@ def train_val_test_split(
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Chronological split into train / val / test.
-    Uses .iloc[1:] to avoid a one-row overlap at each boundary.
+    Uses strict-inequality slicing (day after boundary) to avoid
+    both overlap and silent off-by-one drops at split boundaries.
     """
     train = df.loc[:train_end]
-    val   = df.loc[train_end:val_end].iloc[1:]
-    test  = df.loc[val_end:].iloc[1:]
+    # O-U5 fix: use strict-inequality slicing instead of .iloc[1:] to avoid
+    # silently dropping the boundary day when it is absent from the index.
+    val   = df.loc[pd.Timestamp(train_end) + pd.Timedelta(days=1):val_end]
+    test  = df.loc[pd.Timestamp(val_end)   + pd.Timedelta(days=1):]
     assert len(train) > 0, f"train split is empty (train_end={train_end})"
     assert len(val)   > 0, f"val split is empty (val_end={val_end})"
     assert len(test)  > 0, "test split is empty"
@@ -269,8 +272,7 @@ def merge_nawaf_features(
     nawaf_daily = (
         nawaf_sel
         .reindex(daily.index)
-        .ffill()
-        .bfill()
+            .ffill()  # ffill only — bfill would leak future values
     )
     return pd.concat([daily, nawaf_daily], axis=1)
 

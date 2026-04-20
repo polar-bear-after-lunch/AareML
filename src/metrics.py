@@ -53,6 +53,9 @@ def nse(y_true: np.ndarray, y_pred: np.ndarray,
     Nash-Sutcliffe Efficiency per target (flattened over all windows+steps).
     NSE = 1 → perfect; NSE = 0 → as good as the mean; NSE < 0 → worse.
     """
+    assert y_true.shape == y_pred.shape, \
+        f"nse: shape mismatch y_true={y_true.shape} y_pred={y_pred.shape}"
+    assert y_true.ndim == 3, f"nse: expected 3D [N,H,T], got {y_true.ndim}D"
     result = {}
     for i, t in enumerate(targets):
         obs = y_true[:, :, i].ravel()
@@ -70,6 +73,9 @@ def kge(y_true: np.ndarray, y_pred: np.ndarray,
     KGE = 1 → perfect; KGE < -0.41 → worse than mean flow.
     Decomposes into correlation (r), bias ratio (β), variability ratio (γ).
     """
+    assert y_true.shape == y_pred.shape, \
+        f"kge: shape mismatch y_true={y_true.shape} y_pred={y_pred.shape}"
+    assert y_true.ndim == 3, f"kge: expected 3D [N,H,T], got {y_true.ndim}D"
     result = {}
     for i, t in enumerate(targets):
         obs = y_true[:, :, i].ravel()

@@ -157,7 +157,7 @@ class SATSImputer:
 
                 # Create artificial masks: hide 15% of observed timesteps per sample
                 # Use per-timestep mask (all features at a timestep masked together)
-                obs_ts  = ob[:, :, 0].bool()             # [B, L] timestep observed
+                obs_ts  = ob[:, :, :].all(dim=-1)        # [B, L] True if ALL features observed at that timestep
                 rand_m  = torch.rand(obs_ts.shape, device=self.device) > 0.15  # keep 85%
                 train_mask = obs_ts & rand_m             # timesteps model can attend to
                 target_mask = obs_ts & ~rand_m           # timesteps to reconstruct
@@ -210,7 +210,7 @@ class SATSImputer:
                              self._col_means[None, None, :])
 
         X_t   = torch.from_numpy(X_filled.astype(np.float32))
-        obs_t = torch.from_numpy(obs_mask[:, :, 0])  # [N, L]
+        obs_t = torch.from_numpy(obs_mask.all(axis=-1).astype('float32'))  # [N, L] all-features-observed
 
         results = []
         with torch.no_grad():

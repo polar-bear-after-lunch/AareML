@@ -98,3 +98,142 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Du et al. (2023) reference** added to report (SAITS imputation paper).
 - **Effort log updated** — 14 sessions, 41.5 hours logged (34.6% of 120-hour budget).
 - **Russian report updated** with all new content translated.
+
+---
+
+## [v1.7] — 2026-04-12
+
+### Results
+- Real LSTM single-site results (notebook 03, 20 Optuna trials, ~10h CPU):
+  - LSTM (default): DO RMSE = 0.299 mg/L, KGE = 0.918
+  - LSTM (best, hidden=256): DO RMSE = 0.301 mg/L, KGE = 0.927
+  - All models 4.7× better than LakeBeD-US LSTM reference (1.40 mg/L)
+- Fixed notebook 04 `gauge_id` KeyError and `DO_GAUGES` undefined error
+- Updated report Section 5.2 and abstract with real numbers
+
+---
+
+## [v1.8] — 2026-04-13
+
+### Quality
+- Applied 30 peer-review fixes including:
+  - Corrected abstract RMSE misattribution (default vs Optuna best)
+  - Fixed table numbering (Table 4 = full model comparison, Table 6 = Lake Mendota)
+  - Added CI overlap discussion — top 3 models statistically indistinguishable
+  - Expanded acronyms: LSTM, HBV, TPE, NAWA on first use
+  - Corrected Zhi et al. (2021): predicts DO not nitrate
+  - Added teacher forcing formula p(e) = max(0, 0.5 − e/N)
+  - Added statistical significance caveat
+  - Added confounders paragraph for cross-ecosystem comparison
+  - Two new limitation bullets: single seed, statistical significance
+
+---
+
+## [v1.9] — 2026-04-14
+
+### Results
+- Real multi-site results (notebook 04, 12 gauges):
+  - Zero-shot transfer: DO RMSE = 0.425 ± 0.083 mg/L (3.3× better than LakeBeD-US)
+  - Per-gauge retrain: DO RMSE = 0.386 ± 0.092 mg/L (3.6× better)
+  - Gauge latitude/northing: strongest catchment predictor (Spearman ρ = 0.78, p = 0.005)
+- Fixed `feat_scaler` undefined error in EA-LSTM cell (notebook 04)
+- Updated report Section 5.3 with full 24-row results table
+
+---
+
+## [v1.10] — 2026-04-15
+
+### Results
+- Real SHAP results (notebook 05, GradientSHAP, 500 windows):
+  - temp_sensor[t−1]: dominant driver (mean |SHAP| = 0.644)
+  - O2C_sensor[t−1]: second driver (mean |SHAP| = 0.527)
+  - Effective LSTM memory = 3–4 days despite 21-day lookback
+  - pH and EC contribute negligibly
+- Added report Section 5.4 (SHAP Attribution Results)
+- Added `download_data.py` — one script downloads all datasets (~360 MB)
+- Updated README with full setup instructions and results table
+- Added `data/lakebed-us/` to `.gitignore`
+
+---
+
+## [v1.11] — 2026-04-15
+
+### Added
+- `notebooks/07_lake_eda.ipynb` — Lake Mendota EDA mirroring notebook 01 structure:
+  - Full time series, seasonal cycles, distribution comparison
+  - Autocorrelation analysis confirming river DO is more autocorrelated at all lags 1–21 days
+  - Coverage comparison (river 97% vs lake 51%)
+  - Summary comparison table (12 properties)
+- Report Appendix D — Report Version History (6-entry scientific changelog)
+- Colab badge added to all 7 notebooks
+- tqdm progress bars added to long loops in notebooks 02, 04, 05, 06
+- CPU thread optimisation cell added to all notebooks
+
+---
+
+## [v1.12] — 2026-04-16
+
+### Added
+- Google Drive caching in all Colab setup cells — data persists across sessions
+- Adaptive Optuna trials: 50 on GPU, 20 on CPU (notebook 03)
+- Adaptive SHAP windows: 2000 on GPU, 500 on CPU (notebook 05)
+- GitHub repo link added to report Appendix B and C
+- `data/lakebed-us/` and `data/*.parquet` added to `.gitignore`
+
+### Fixed
+- `os.chdir('AareML')` unconditional in Colab cells → guarded with path check
+
+---
+
+## [v1.13] — 2026-04-19
+
+### Fixed (11 bugs)
+- Bug #1 (×7): `os.chdir('AareML')` now conditional in all Colab setup cells
+- Bug #2+3+10: Duplicated-index `train_means` in notebook 04 cells 9, 12, 14 — fixed with `pd.concat().groupby(level=0).first()`
+- Bug #4: Climatology DOY off-by-one in notebook 06 (`days=h+1` → `days=h`)
+- Bug #5: Notebook 05 scalers refitted instead of reconstructed from checkpoint — now uses `reconstruct_scalers(ckpt)`
+- Bug #6: Dead `tgt_idx` variable removed from `make_lake_windows` (notebook 06)
+- Bug #7: `feat_scaler` fit on windowed data in notebook 06 — now fit on raw daily training data
+- Bug #8: Int vs str index mismatch in EA-LSTM cell (notebook 04) — `meta.index.astype(str)` added
+- Bug #9: `'var' in dir()` → `'var' in globals()` in notebook 03
+- Bug #11: Duplicate `DEVICE` definition merged in notebook 03
+- CPU thread count clamped to 6 (empirically optimal for macOS) — was using all logical cores causing slowdown
+- Model tracking added to effort log — "Which model are you?" at session start
+
+---
+
+## [v1.14] — 2026-04-19
+
+### Fixed (3-model consensus bugs — Round 2 audit)
+- **C1** `src/impute.py` — `SATSImputer.transform()` used feature-0-only mask; now uses `.all(axis=-1)` matching `fit()` behaviour
+- **C2** `src/model.py` — Removed dead `static_proj` module from `EASeq2SeqLSTM` (was defined but never called, polluting optimizer state)
+- **C3** `notebooks/03` — Optuna `MedianPruner` now receives per-epoch intermediate values (was reported only once after full training, making pruner a no-op)
+- **C4** `notebooks/03` — Added clarifying comment to `scale_split` variables (incorrectly flagged as dead code — they feed DataLoaders below)
+- **C5** `src/data.py` — Removed `bfill()` from `merge_nawaf_features` — backward fill leaks future chemistry values; replaced with `ffill()` only
+- **C6** `notebooks/04` — Added comment explaining EA-LSTM uses focus-gauge scalers intentionally for zero-shot transfer consistency
+
+### Quality
+- 3-model independent bug audits (Sonnet 4.6, GPT-5.4, Opus 4.7) before and after fixes
+- Round 1: 11/33/30 bugs found → Round 2: 11/10/14 bugs (70%/53% reduction for GPT/Opus)
+- All 126 notebook cells + 5 src/ files pass syntax check
+
+---
+
+## [v1.15] — 2026-04-20
+
+### Fixed (remaining major + minor bugs)
+- **G-U1** `src/config.py` — `STATIC_COLS` now lists both naming conventions (CAMELS-CH and legacy) with runtime deduplication — avoids `KeyError` when metadata columns differ
+- **G-U2/U3** NB01, NB06, NB07 — `../figures` and `../data` paths now auto-detect repo root — works both locally and in Colab after `os.chdir`
+- **S-U1** NB05 Cell 14 — SHAP heatmap x-axis label was backwards (showed oldest lag as most recent) — flipped array and corrected labels to "t-1 = yesterday"
+- **S-U2** NB04 Cell 24 — `groupby` used land-cover value columns instead of `gauge_id` — fixed to `groupby('gauge_id')`
+- **O-U1** NB04 Cell 30 — EA-LSTM trained but never evaluated — added full per-gauge evaluation loop, saves `results/ea_lstm_results.csv`
+- **O-U2** NB04 — "transfer" strategy renamed `transfer_normed` with clarifying comment (per-gauge scalers, not true zero-shot)
+- **O-U3** NB05 — SHAP worst-window index now bounded to `[:n_explain]` to avoid showing wrong window
+- **O-U4** NB03 — Graceful fallback when `baseline_rmse_by_horizon.csv` not found
+- **O-U5** `src/data.py` — `train_val_test_split` uses strict-inequality slicing — no longer drops boundary day
+- **O-U7** NB03 — All hardcoded `"Gauge 2473"` strings replaced with `f"Gauge {FOCUS_GAUGE}"`
+- **S-U3** `src/model.py` — `reconstruct_scalers` sets `n_samples_seen_ = 10000` instead of `1`
+
+### Added
+- `tests/test_src.py` — 53 pytest tests covering all 5 src/ modules + 2 integration tests
+- All 53 tests pass (2 expected RuntimeWarnings for flat-prediction KGE edge case)
