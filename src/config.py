@@ -94,3 +94,16 @@ FOCUS_GAUGE = "2473"
 
 # ── Random seed ───────────────────────────────────────────────────────────
 SEED = 42
+
+# ── Temperature-only configuration (notebook 04b) ─────────────────────────
+# All 86 gauges have temperature data — enables true multi-site analysis
+# across the full CAMELS-CH-Chem network.
+FEATURES_TEMP = ["temp_sensor", "pH_sensor", "ec_sensor"]   # inputs (no DO as feature)
+TARGETS_TEMP  = ["temp_sensor"]                               # predict temperature only
+N_FEAT_TEMP   = len(FEATURES_TEMP)
+N_TGT_TEMP    = len(TARGETS_TEMP)
+
+TARGET_LABELS_TEMP = {"temp_sensor": "Temp (°C)"}
+
+# Minimum coverage threshold for temperature gauges (virtually all pass)
+TEMP_MIN_COVERAGE = 0.50   # 50% — generous since temp is well-observed

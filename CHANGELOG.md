@@ -237,3 +237,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - `tests/test_src.py` — 53 pytest tests covering all 5 src/ modules + 2 integration tests
 - All 53 tests pass (2 expected RuntimeWarnings for flat-prediction KGE edge case)
+
+---
+
+## [v1.16] — 2026-04-20
+
+### Added
+- `notebooks/04b_multisite_temperature.ipynb` — Temperature multi-site analysis across all 86 Swiss gauges (vs 12 for DO). Uses [temp, pH, EC] as features (no DO to avoid target leakage). Covers: gauge discovery, single-site LSTM training, zero-shot transfer to 80+ gauges, catchment attribute correlation, RMSE distribution.
+- `src/config.py` — Added `FEATURES_TEMP`, `TARGETS_TEMP`, `N_FEAT_TEMP`, `N_TGT_TEMP`, `TARGET_LABELS_TEMP`, `TEMP_MIN_COVERAGE` for temperature-only analysis.
+- Report Section 5.3b — Temperature Multi-Site Analysis placeholder (pending UBELIX execution).
+- Report Section 1 — Temperature critical thresholds added (18°C/21°C/25°C).
+- Report Section 6.1 — Three-mechanism explanation of river-lake predictability gap (autocorrelation structure, physical range, feature-space mismatch).
+- Report Appendix E — Glossary (25 terms: hydrology, ML, dataset/evaluation).

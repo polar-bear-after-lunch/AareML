@@ -19,6 +19,7 @@ NOTEBOOKS=(
     "notebooks/02_baselines.ipynb"
     "notebooks/03_lstm_single_site.ipynb"
     "notebooks/04_multisite_analysis.ipynb"
+    "notebooks/04b_multisite_temperature.ipynb"
     "notebooks/05_shap_interpretation.ipynb"
     "notebooks/06_cross_ecosystem_lake.ipynb"
     "notebooks/07_lake_eda.ipynb"
@@ -57,7 +58,8 @@ for NB in "${NOTEBOOKS[@]}"; do
     fi
 
     # Step 2: Execute
-    echo -n "  [2/2] Executing... " | tee -a "$LOG"
+    START_TS=$(date '+%Y-%m-%d %H:%M:%S')
+    echo -n "  [2/2] Executing (started $START_TS)... " | tee -a "$LOG"
     START=$(date +%s)
 
     if jupyter nbconvert \
@@ -69,15 +71,17 @@ for NB in "${NOTEBOOKS[@]}"; do
         "$NB" 2>"/tmp/${NAME%.ipynb}_err.txt"; then
 
         END=$(date +%s)
+        END_TS=$(date '+%H:%M:%S')
         ELAPSED=$((END - START))
         MINS=$((ELAPSED / 60))
         SECS=$((ELAPSED % 60))
-        echo "✓ ${MINS}m ${SECS}s" | tee -a "$LOG"
+        echo "✓ ${MINS}m ${SECS}s (finished $END_TS)" | tee -a "$LOG"
         PASSED=$((PASSED + 1))
     else
         END=$(date +%s)
+        END_TS=$(date '+%H:%M:%S')
         ELAPSED=$((END - START))
-        echo "✗ FAILED after ${ELAPSED}s" | tee -a "$LOG"
+        echo "✗ FAILED after ${ELAPSED}s (finished $END_TS)" | tee -a "$LOG"
         echo "  Error log: /tmp/${NAME%.ipynb}_err.txt" | tee -a "$LOG"
         # Print last 10 lines of error
         echo "  Last error lines:" | tee -a "$LOG"
