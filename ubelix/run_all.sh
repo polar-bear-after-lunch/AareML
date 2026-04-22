@@ -15,11 +15,15 @@
 
 set -e
 
+# Always run from the AareML root
+cd /storage/homefs/tn20y076/AareML
+
 echo "============================================="
 echo "  AareML — Submitting UBELIX Jobs"
+echo "  Working directory: $(pwd)"
 echo "============================================="
 
-mkdir -p logs
+mkdir -p results logs
 
 # ── Job 03: LSTM + Optuna (runs first) ───────────────────────────────────────
 echo ""
@@ -33,10 +37,10 @@ echo "Submitting job 04 (multi-site evaluation, depends on job $JOB_03)..."
 JOB_04=$(sbatch --parsable --dependency=afterok:$JOB_03 ubelix/job_04_multisite.sh)
 echo "  → Job ID: $JOB_04"
 
-# ── Job 05: SHAP (runs after 03 succeeds, parallel with 04) ───────────────────
+# ── Job 05: SHAP (runs after 04 succeeds, sequential to stay within GPU quota) ─
 echo ""
-echo "Submitting job 05 (SHAP attribution, depends on job $JOB_03)..."
-JOB_05=$(sbatch --parsable --dependency=afterok:$JOB_03 ubelix/job_05_shap.sh)
+echo "Submitting job 05 (SHAP attribution, depends on job $JOB_04)..."
+JOB_05=$(sbatch --parsable --dependency=afterok:$JOB_04 ubelix/job_05_shap.sh)
 echo "  → Job ID: $JOB_05"
 
 # ── Summary ──────────────────────────────────────────────────────────────────

@@ -15,9 +15,11 @@
 #SBATCH --time=02:00:00
 #SBATCH --mem-per-cpu=16G            # more RAM for loading 16 gauges
 #SBATCH --cpus-per-task=4
-#SBATCH --partition=gpu
-#SBATCH --gres=gpu:rtx3090:1
-#SBATCH --qos=job_gpu
+#SBATCH --partition=gpu-invest
+#SBATCH --qos=job_gpu_preemptable
+#SBATCH --account=gratis
+#SBATCH --gres=gpu:rtx4090:1
+#SBATCH --no-requeue            # do not auto-restart if preempted
 #SBATCH --mail-user=YOUR_EMAIL@unibe.ch   # ← replace with your email
 #SBATCH --mail-type=END,FAIL
 #SBATCH --output=logs/job_04_multisite_%j.out

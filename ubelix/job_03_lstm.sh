@@ -14,9 +14,11 @@
 #SBATCH --time=02:00:00              # 2 hours max (plenty of buffer)
 #SBATCH --mem-per-cpu=8G             # 8 GB RAM
 #SBATCH --cpus-per-task=4            # 4 CPU cores for data loading
-#SBATCH --partition=gpu              # GPU partition
-#SBATCH --gres=gpu:rtx3090:1        # 1x RTX 3090 (24 GB VRAM)
-#SBATCH --qos=job_gpu               # GPU quality of service
+#SBATCH --partition=gpu-invest
+#SBATCH --qos=job_gpu_preemptable
+#SBATCH --account=gratis
+#SBATCH --gres=gpu:rtx4090:1
+#SBATCH --no-requeue            # do not auto-restart if preempted
 #SBATCH --mail-user=YOUR_EMAIL@unibe.ch   # ← replace with your email
 #SBATCH --mail-type=END,FAIL        # notify on completion or failure
 #SBATCH --output=logs/job_03_lstm_%j.out

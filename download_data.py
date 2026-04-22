@@ -229,7 +229,7 @@ def main():
     total = time.time() - t_start
     print("\n" + "="*60)
     print(f"  All done in {total/60:.1f} min")
-    print("  You can now run the notebooks in order: 01 → 02 → 03 → 04 → 05 → 06")
+    print("  You can now run the notebooks in order: 01 → 02 → 03 → 04 → 04b → 05 → 06 → 07")
     print("="*60 + "\n")
 
 

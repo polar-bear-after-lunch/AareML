@@ -427,6 +427,8 @@ def train_ea_model(
             print(f"  Epoch {epoch:3d} | train={train_loss:.5f}  val={val_loss:.5f}  "
                   f"tf={tf:.2f}  lr={optimiser.param_groups[0]['lr']:.2e}")
 
+    if best_state is None:
+        raise RuntimeError("Training diverged: validation loss never improved. Check for NaN inputs or bad learning rate.")
     model.load_state_dict(best_state)
     return model, history
 
@@ -458,6 +460,8 @@ def train_model(
 
     assert len(dl_train.dataset) > 0, "train_model: training DataLoader is empty"
     assert len(dl_val.dataset)   > 0, "train_model: validation DataLoader is empty"
+    if len(dl_train) == 0:
+        raise ValueError(f"Training DataLoader is empty — dataset has {len(dl_train.dataset)} samples but batch_size={dl_train.batch_size} with drop_last=True yields 0 batches. Reduce batch_size or increase data.")
     assert epochs > 0,   f"train_model: epochs must be > 0, got {epochs}"
     assert patience > 0, f"train_model: patience must be > 0, got {patience}"
     if __debug__:
@@ -527,6 +531,8 @@ def train_model(
             print(f"  Epoch {epoch:3d} | train={train_loss:.5f}  val={val_loss:.5f}  "
                   f"tf={tf:.2f}  lr={optimiser.param_groups[0]['lr']:.2e}")
 
+    if best_state is None:
+        raise RuntimeError("Training diverged: validation loss never improved. Check for NaN inputs or bad learning rate.")
     model.load_state_dict(best_state)
     return model, history
 

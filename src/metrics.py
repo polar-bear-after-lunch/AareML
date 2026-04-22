@@ -84,7 +84,8 @@ def kge(y_true: np.ndarray, y_pred: np.ndarray,
         # (flat predictions produce nan correlation; use r=0, b=1, g=1 fallbacks)
         corr_mat = np.corrcoef(obs, sim)
         r = float(corr_mat[0, 1]) if np.isfinite(corr_mat[0, 1]) else 0.0
-        b = float(sim.mean() / obs.mean()) if obs.mean() != 0 else 1.0
+        eps = 1e-3
+        b = float(sim.mean() / obs.mean()) if abs(obs.mean()) > eps else 1.0
         if obs.std() > 0 and obs.mean() != 0 and sim.mean() != 0 and sim.std() > 0:
             g = float((sim.std() / sim.mean()) / (obs.std() / obs.mean()))
         else:
@@ -144,7 +145,9 @@ def block_bootstrap_ci(
     for _ in range(n_boot):
         # Draw block-start indices with replacement
         n_blocks = int(np.ceil(N / block_size))
-        starts   = rng.integers(0, max(1, N - block_size), size=n_blocks)
+        if N <= block_size:
+            block_size = max(1, N // 5)
+        starts   = rng.integers(0, max(1, N - block_size + 1), size=n_blocks)
         idx      = np.concatenate([
             np.arange(s, min(s + block_size, N)) for s in starts
         ])[:N]
