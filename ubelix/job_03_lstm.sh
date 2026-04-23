@@ -21,8 +21,8 @@
 #SBATCH --no-requeue            # do not auto-restart if preempted
 #SBATCH --mail-user=YOUR_EMAIL@unibe.ch   # ← replace with your email
 #SBATCH --mail-type=END,FAIL        # notify on completion or failure
-#SBATCH --output=logs/job_03_lstm_%j.out
-#SBATCH --error=logs/job_03_lstm_%j.err
+#SBATCH --output=/storage/homefs/tn20y076/AareML/logs/job_03_lstm_%j.out
+#SBATCH --error=/storage/homefs/tn20y076/AareML/logs/job_03_lstm_%j.err
 
 # ── Setup ────────────────────────────────────────────────────────────────────
 set -e

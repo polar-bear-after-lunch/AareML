@@ -22,8 +22,8 @@
 #SBATCH --no-requeue            # do not auto-restart if preempted
 #SBATCH --mail-user=YOUR_EMAIL@unibe.ch   # ← replace with your email
 #SBATCH --mail-type=END,FAIL
-#SBATCH --output=logs/job_04_multisite_%j.out
-#SBATCH --error=logs/job_04_multisite_%j.err
+#SBATCH --output=/storage/homefs/tn20y076/AareML/logs/job_04_multisite_%j.out
+#SBATCH --error=/storage/homefs/tn20y076/AareML/logs/job_04_multisite_%j.err
 
 # ── Setup ────────────────────────────────────────────────────────────────────
 set -e
@@ -36,11 +36,11 @@ echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader 2>/dev/null || ec
 module load Anaconda3
 eval "$(conda shell.bash hook)"
 conda activate aareml
-cd $SLURM_SUBMIT_DIR
+cd /storage/homefs/tn20y076/AareML
 
 # Check that notebook 03 checkpoint exists
-if [ ! -f "results/best_model.pt" ]; then
-    echo "ERROR: results/best_model.pt not found."
+if [ ! -f "results/lstm_single_site_best.pt" ]; then
+    echo "ERROR: results/lstm_single_site_best.pt not found."
     echo "Please run job_03_lstm.sh first."
     exit 1
 fi

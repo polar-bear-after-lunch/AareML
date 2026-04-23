@@ -23,5 +23,10 @@ rsync -avz --progress \
   "$REMOTE"figures/ \
   "$LOCAL_DIR/figures/"
 
+rsync -avz --progress \
+  -e "ssh -i ~/.ssh/id_ed25519" \
+  "$REMOTE"notebooks/ \
+  "$LOCAL_DIR/notebooks/"
+
 echo ""
 echo "Fetch complete."
