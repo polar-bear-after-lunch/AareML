@@ -5,6 +5,44 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.20] — 2026-04-23
+
+### Hyperparameter Improvements (3-model consensus: Sonnet, GPT-5.4, Opus)
+- **NB03** — Default model: 100→120 epochs, patience 12→15
+- **NB03** — Optuna: 50→75 trials, 30→40 epochs per trial, patience 5→8
+- **NB03** — Best model: 150→250 epochs, patience 15→25
+- **NB03** — Added `teacher_forcing_start` [0.3–0.7] to Optuna search space
+- **NB03** — Added 3-seed ensemble (seeds 0, 42, 123) for best model
+- **NB04** — Per-gauge retrain: 80→150 epochs, patience 10→20
+- **NB04b** — Reduced 100→60 epochs, patience 12→10 (transfer learning converges faster; prevents catastrophic forgetting)
+- **NB04b** — Results saved with version tag (`v1.20_60ep`) for comparison with original 100-epoch run
+
+### Quality Improvements
+- **`src/model.py`** — Added `ReduceLROnPlateau` (factor=0.5, patience=5) to `train_model` and `train_ea_model` — expected ~5–10% further RMSE reduction
+- **NB02** — Added per-gauge Ridge RMSE save to `results/baseline_per_gauge.csv` for use in NB04 significance test
+- **NB04** — Fixed `KeyError: 'gauge_id'` in Wilcoxon test cell — `baseline_results.csv` is model-level, now loads from `baseline_per_gauge.csv` with hardcoded fallback
+
+### Infrastructure
+- **NB01** — Fixed 4 figure filenames missing `f` prefix (`{FOCUS_GAUGE}` was literal in saved PNG filenames)
+- **`fetch_from_ubelix.sh`** — Now also fetches `notebooks/` folder so executed notebook outputs are pulled back locally
+- **`ubelix/job_04b_temp.sh`** — New SLURM job script for notebook 04b temperature multi-site
+- **`ubelix/run_all.sh`** — Full chain now 03 → 04 → 04b → 05 (was missing 04b)
+- **`ubelix/`** — All job scripts now use absolute path `/storage/homefs/tn20y076/AareML` as working directory
+
+---
+
+## [v1.19] — 2026-04-22
+
+### Bug Fixes
+- SLURM log paths changed to absolute (`/storage/homefs/tn20y076/AareML/logs/`) — relative paths caused logs to not be created
+- `job_04_multisite.sh`, `job_05_shap.sh` — Fixed checkpoint filename `best_model.pt` → `lstm_single_site_best.pt`
+- `fetch_from_ubelix.sh` — Added `notebooks/` to fetch list
+- NB01 — Fixed 4 figure filenames with literal `{FOCUS_GAUGE}` (missing `f` prefix)
+- `job_04b_temp.sh` — New SLURM script for temperature multi-site notebook
+- `run_all.sh` — Added 04b to job chain
+
+---
+
 ## [v1.18] — 2026-04-22
 
 ### Bug Fixes (Round 3 Audit — 13 fixes)

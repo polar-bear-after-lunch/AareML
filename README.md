@@ -12,17 +12,22 @@ AareML applies a sequence-to-sequence LSTM, modelled on the [LakeBeD-US benchmar
 
 ## Key Results
 
-| Model | DO RMSE | Temp RMSE | NSE |
+| Model | DO RMSE | Temp RMSE | KGE |
 |-------|---------|-----------|-----|
-| Persistence | 0.339 mg/L | 1.365 °C | 0.860 |
-| Ridge Regression | 0.303 mg/L | 1.261 °C | 0.888 |
-| **LSTM (default)** | **0.299 mg/L** | **1.253 °C** | **0.892** |
-| LSTM (Optuna best) | 0.301 mg/L | 1.280 °C | 0.889 |
+| Persistence | 0.339 mg/L | 1.365 °C | 0.930 |
+| Climatology | 0.334 mg/L | 1.444 °C | 0.853 |
+| Ridge Regression | 0.303 mg/L | 1.261 °C | 0.908 |
+| **LSTM (default)** | **0.307 mg/L** | **1.270 °C** | **0.854** |
+| **LSTM (best, Optuna)** | **0.302 mg/L** | **1.247 °C** | **0.945** |
 | LakeBeD-US LSTM (ref.) | 1.400 mg/L | — | — |
 
-**Multi-site transfer** (12 gauges): mean DO RMSE = 0.425 mg/L (zero-shot), 0.386 mg/L (per-gauge retraining) — both 3.3–3.6× better than the LakeBeD-US lake reference.
+**Multi-site DO transfer** (12 gauges): mean RMSE = 0.425 mg/L (zero-shot), 0.386 mg/L (per-gauge) — 3.3–3.6× better than the LakeBeD-US lake reference.
 
-**SHAP findings**: temperature[t−1] is the dominant driver (mean |SHAP|=0.644), ahead of DO itself. Effective LSTM memory: 3–4 days despite 21-day lookback.
+**Temperature multi-site** (80+ gauges): results from UBELIX run — see `results/04b_temp_transfer_v1.20.csv`.
+
+**SHAP findings**: `temp_sensor[t−1]` is the dominant driver (mean |SHAP| = 0.644), ahead of DO itself. Effective LSTM memory: 3–4 days despite 21-day lookback.
+
+**Cross-ecosystem**: Lake Mendota Ridge DO RMSE = 1.030 mg/L (3.4× higher than river Ridge), confirming river water quality is substantially more predictable than lake DO.
 
 ## Setup
 
@@ -44,50 +49,102 @@ pip install -r requirements.txt
 ```bash
 python download_data.py
 ```
-This downloads and prepares both datasets automatically:
+Downloads and prepares both datasets:
 - **CAMELS-CH-Chem** (~165 MB) from [Zenodo](https://zenodo.org/records/14980027)
 - **LakeBeD-US Lake Mendota** (~194 MB) from [Hugging Face](https://huggingface.co/datasets/eco-kgml/LakeBeD-US-CSE)
 
 ### 4. Run notebooks in order
 ```
-01_data_exploration.ipynb      — EDA and data availability
-02_baselines.ipynb             — Persistence, Climatology, Ridge
-03_lstm_single_site.ipynb      — Seq2Seq LSTM + Optuna tuning
-04_multisite_analysis.ipynb    — Zero-shot transfer + per-gauge retraining
-05_shap_interpretation.ipynb   — GradientSHAP attribution
-06_cross_ecosystem_lake.ipynb  — River vs. Lake Mendota comparison
+01_data_exploration.ipynb       — EDA and data availability
+02_baselines.ipynb              — Persistence, Climatology, Ridge
+03_lstm_single_site.ipynb       — Seq2Seq LSTM + Optuna tuning + 3-seed ensemble
+04_multisite_analysis.ipynb     — Zero-shot transfer + per-gauge retraining (DO)
+04b_multisite_temperature.ipynb — Temperature multi-site (80+ gauges)
+05_shap_interpretation.ipynb    — GradientSHAP attribution
+06_cross_ecosystem_lake.ipynb   — River vs. Lake Mendota comparison
+07_lake_eda.ipynb               — Lake Mendota EDA
+```
+
+### 5. Running on UBELIX HPC
+```bash
+# Sync code to UBELIX
+bash sync_to_ubelix.sh
+
+# On UBELIX — download data and set up environment (first time only)
+python download_data.py
+bash ubelix/setup_env.sh
+
+# Submit full job chain (03 → 04 → 04b → 05)
+cd ubelix
+sbatch run_all.sh
+
+# Fetch results back to Mac
+bash fetch_from_ubelix.sh
 ```
 
 ## Repository Structure
 
 ```
 AareML/
-├── notebooks/          — Jupyter notebooks (01–06)
+├── notebooks/
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_baselines.ipynb
+│   ├── 03_lstm_single_site.ipynb
+│   ├── 04_multisite_analysis.ipynb
+│   ├── 04b_multisite_temperature.ipynb
+│   ├── 05_shap_interpretation.ipynb
+│   ├── 06_cross_ecosystem_lake.ipynb
+│   └── 07_lake_eda.ipynb
 ├── src/
-│   ├── config.py       — Shared configuration
-│   ├── data.py         — Data loading and preprocessing
+│   ├── config.py       — Shared configuration (LOOKBACK=21, HORIZON=14)
+│   ├── data.py         — Data loading, preprocessing, windowing
 │   ├── metrics.py      — RMSE, MAE, NSE, KGE, bootstrap CI
-│   ├── model.py        — Seq2SeqLSTM, EA-LSTM, training utilities
+│   ├── model.py        — Seq2SeqLSTM, EA-LSTM, ReduceLROnPlateau, checkpoints
 │   └── impute.py       — Self-attention imputer (SAITS-inspired)
-├── results/            — CSV results tables and checkpoints
-├── figures/            — Generated figures
-├── ubelix/             — SLURM job scripts for UBELIX HPC
-├── data/               — Data directory (excluded from git)
-├── download_data.py    — Data download script
+├── ubelix/
+│   ├── run_all.sh          — Submit full job chain
+│   ├── job_03_lstm.sh      — SLURM: notebook 03
+│   ├── job_04_multisite.sh — SLURM: notebook 04
+│   ├── job_04b_temp.sh     — SLURM: notebook 04b
+│   ├── job_05_shap.sh      — SLURM: notebook 05
+│   ├── setup_env.sh        — Conda environment setup
+│   └── test_local.sh       — Smoke test (CPU, LOCAL_TEST mode)
+├── tests/
+│   └── test_src.py         — 53 pytest tests (all passing)
+├── results/            — CSV results, checkpoints, Optuna study
+├── figures/            — Generated figures (39 PNGs)
+├── data/               — Data directory (git-ignored)
+├── download_data.py    — Downloads CAMELS-CH-Chem + LakeBeD-US
+├── sync_to_ubelix.sh   — rsync Mac → UBELIX
+├── fetch_from_ubelix.sh — rsync UBELIX → Mac (results + notebooks)
+├── run_all_notebooks.sh — Run all notebooks locally with timestamps
 ├── requirements.txt
 └── CHANGELOG.md
 ```
 
+## Testing
+
+```bash
+cd AareML
+python -m pytest tests/test_src.py -v
+# 53 tests, all passing
+```
+
 ## Data
 
-Data is excluded from this repository due to size. Use `python download_data.py` to fetch all required datasets. See [CHANGELOG.md](CHANGELOG.md) for version history.
+Data is excluded from this repository due to size. Use `python download_data.py` to fetch all datasets (~360 MB total). The script downloads, extracts, and preprocesses everything automatically.
+
+## Version History
+
+See [CHANGELOG.md](CHANGELOG.md) for the full version history (v1.0–v1.20).
+Current version: **v1.20** (April 2026)
 
 ## Citation
 
 If you use this code, please cite the underlying datasets:
 
-- Nascimento et al. (2025). CAMELS-CH-Chem. Zenodo. https://doi.org/10.5281/zenodo.14980027
-- McAfee et al. (2025). LakeBeD-US. ESSD. https://doi.org/10.5194/essd-17-3141-2025
+- Nascimento et al. (2025). CAMELS-CH-Chem. *Zenodo*. https://doi.org/10.5281/zenodo.14980027
+- McAfee et al. (2025). LakeBeD-US. *ESSD*, 17, 3141–3170. https://doi.org/10.5194/essd-17-3141-2025
 
 ## License
 
