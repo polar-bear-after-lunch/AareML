@@ -1,0 +1,16 @@
+gauge_id,n_windows,rmse_temp,mae_temp,nse_temp,strategy
+2009,1427,1.1176,0.8837,0.733,zero_shot_temp
+2016,1427,2.9017,2.0773,0.751,zero_shot_temp
+2018,1427,3.1735,2.2967,0.715,zero_shot_temp
+2044,1427,2.8539,2.1494,0.775,zero_shot_temp
+2068,1427,1.3643,1.0678,0.86,zero_shot_temp
+2085,1427,2.5662,1.8697,0.766,zero_shot_temp
+2130,1427,3.2784,2.3268,0.72,zero_shot_temp
+2135,1427,2.2857,1.6052,0.793,zero_shot_temp
+2143,1427,3.1112,2.1802,0.766,zero_shot_temp
+2174,1427,2.8871,2.0429,0.717,zero_shot_temp
+2243,1427,3.6784,2.5912,0.684,zero_shot_temp
+2410,1427,1.5037,1.255,0.483,zero_shot_temp
+2415,1427,3.1477,2.4767,0.686,zero_shot_temp
+2462,1427,1.6213,1.2286,0.771,zero_shot_temp
+2613,1427,3.3546,2.3743,0.704,zero_shot_temp
