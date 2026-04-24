@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.21] — 2026-04-24
+
+### Model Improvement
+- **`src/model.py`** — Replaced `nn.MSELoss` with combined NSE+MSE loss (`alpha=0.5`) in `train_model`. The NSE component (`mse / var(target)`) penalises distributional mismatch, expected to improve KGE and reduce the RMSE gap vs Ridge regression.
+
+### Report v1.9
+- Updated single-site results from v1.20 run (LSTM best DO RMSE=0.319, KGE=0.942)
+- Updated multi-site DO means (transfer=0.427, per-gauge=0.388, EA-LSTM=0.417 mg/L)
+- Corrected gauge 2068 temperature RMSE (3.16 → 1.36°C)
+- Added `04_multisite_map.png` and `04_multisite_rmse_comparison.png` to Section 5.3
+- Added KGE trade-off explanation sentence in Section 5.2
+
+---
+
 ## [v1.20] — 2026-04-23
 
 ### Hyperparameter Improvements (3-model consensus: Sonnet, GPT-5.4, Opus)

@@ -474,7 +474,19 @@ def train_model(
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimiser, mode='min', factor=0.5, patience=5, verbose=False
     )
-    criterion = nn.MSELoss()
+
+    def nse_mse_loss(pred: torch.Tensor, target: torch.Tensor,
+                     alpha: float = 0.5) -> torch.Tensor:
+        """
+        Combined NSE + MSE loss.
+        alpha=0.5 balances distributional fit (NSE) and point accuracy (MSE).
+        NSE loss = 1 - NSE, so lower is better and range is (-inf, 1].
+        Using mean across targets so multi-target models are weighted equally.
+        """
+        mse = torch.mean((pred - target) ** 2)
+        var = torch.var(target, unbiased=False).clamp(min=1e-8)
+        nse_loss = mse / var  # equivalent to 1 - NSE (without the constant 1)
+        return alpha * nse_loss + (1.0 - alpha) * mse
 
     best_val   = np.inf
     best_state = None
@@ -491,7 +503,7 @@ def train_model(
             xb, yb = xb.to(device), yb.to(device)
             optimiser.zero_grad()
             pred = model(xb, teacher_forcing_ratio=tf, y_target=yb)
-            loss = criterion(pred, yb)
+            loss = nse_mse_loss(pred, yb)
             loss.backward()
             nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimiser.step()
@@ -504,7 +516,7 @@ def train_model(
         with torch.no_grad():
             for xb, yb in dl_val:
                 xb, yb = xb.to(device), yb.to(device)
-                val_loss += criterion(model(xb), yb).item() * len(xb)
+                val_loss += nse_mse_loss(model(xb), yb).item() * len(xb)
         val_loss /= len(dl_val.dataset)
 
         assert np.isfinite(train_loss), \
