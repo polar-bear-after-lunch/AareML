@@ -34,6 +34,9 @@ geopandas==0.14.4
 jupyter==1.1.1
 nbconvert==7.16.4
 
+# USGS data access (notebook 08 — cross-continental transfer)
+dataretrieval>=1.0.0
+
 # llvmlite / numba (required by shap — install via conda to avoid cmake build)
 # conda install -c conda-forge llvmlite numba
 # numba==0.60.0

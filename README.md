@@ -49,9 +49,11 @@ pip install -r requirements.txt
 ```bash
 python download_data.py
 ```
-Downloads and prepares both datasets:
+Downloads and prepares:
 - **CAMELS-CH-Chem** (~165 MB) from [Zenodo](https://zenodo.org/records/14980027)
 - **LakeBeD-US Lake Mendota** (~194 MB) from [Hugging Face](https://huggingface.co/datasets/eco-kgml/LakeBeD-US-CSE)
+
+> **Note:** USGS data for notebook 08 is downloaded automatically at runtime via the `dataretrieval` package — no manual step needed.
 
 ### 4. Run notebooks in order
 ```
@@ -134,10 +136,12 @@ python -m pytest tests/test_src.py -v
 
 Data is excluded from this repository due to size. Use `python download_data.py` to fetch all datasets (~360 MB total). The script downloads, extracts, and preprocesses everything automatically.
 
+USGS continuous monitoring data (notebook 08) is fetched at runtime via the `dataretrieval` Python package — no manual download required. An internet connection is needed when running notebook 08.
+
 ## Version History
 
 See [CHANGELOG.md](CHANGELOG.md) for the full version history (v1.0–v1.20).
-Current version: **v1.20** (April 2026)
+Current version: **v1.22** (April 2026)
 
 ## Citation
 
