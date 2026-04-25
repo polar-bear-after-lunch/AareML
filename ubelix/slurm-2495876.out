@@ -1,0 +1,11 @@
+=============================================
+  AareML — Submitting UBELIX Jobs
+  Working directory: /storage/homefs/tn20y076/AareML
+=============================================
+
+Submitting job 03 (LSTM single-site + Optuna)...
+sbatch: error: --------------------------------------------------
+sbatch: error: This job generates no costs!
+sbatch: error: --------------------------------------------------
+sbatch: error: QOSMaxGRESPerUser
+sbatch: error: Batch job submission failed: Job violates accounting/QOS policy (job submit limit, user's size and/or time limits)

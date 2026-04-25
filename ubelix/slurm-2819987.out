@@ -1,0 +1,51 @@
+=============================================
+  AareML — Submitting UBELIX Jobs
+  Working directory: /storage/homefs/tn20y076/AareML
+=============================================
+
+Submitting job 03 (LSTM single-site + Optuna)...
+sbatch: --------------------------------------------------
+sbatch: This job generates no costs!
+sbatch: --------------------------------------------------
+  → Job ID: 2819988
+
+Submitting job 04 (multi-site evaluation, depends on job 2819988)...
+sbatch: --------------------------------------------------
+sbatch: This job generates no costs!
+sbatch: --------------------------------------------------
+  → Job ID: 2819989
+
+Submitting job 04b (temperature multi-site, depends on job 2819989)...
+sbatch: --------------------------------------------------
+sbatch: This job generates no costs!
+sbatch: --------------------------------------------------
+  → Job ID: 2819990
+
+Submitting job 05 (SHAP attribution, depends on job 2819990)...
+sbatch: --------------------------------------------------
+sbatch: This job generates no costs!
+sbatch: --------------------------------------------------
+  → Job ID: 2819991
+
+Submitting job 08 (USGS cross-continental transfer, depends on job 2819991)...
+sbatch: --------------------------------------------------
+sbatch: This job generates no costs!
+sbatch: --------------------------------------------------
+  → Job ID: 2819992
+
+=============================================
+  All jobs submitted
+=============================================
+
+  Job 03  (LSTM):            2819988
+  Job 04  (Multi-site DO):   2819989   [waits for 2819988]
+  Job 04b (Temp multi-site): 2819990  [waits for 2819989]
+  Job 05  (SHAP):            2819991   [waits for 2819990]
+  Job 08  (USGS transfer):   2819992   [waits for 2819991]
+
+  Monitor:   squeue --me
+  Cancel:    scancel 2819988 2819989 2819990 2819991 2819992
+  Logs:      tail -f logs/job_03_lstm_2819988.out
+
+You will receive an email when each job finishes.
+Total expected time: ~20 min (03) + ~30 min (04) + ~2h (04b) + ~20 min (05) + ~30 min (08)

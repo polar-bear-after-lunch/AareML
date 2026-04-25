@@ -1,0 +1,185 @@
+[NbConvertApp] Converting notebook notebooks/04_multisite_analysis.ipynb to notebook
+/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate(nb)
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# ── Statistical significance test: LSTM vs Ridge across gauges ────────────
+from scipy import stats
+import json as _json
+
+# Build per-gauge RMSE dicts from the actual computed result DataFrames
+# transfer_df and loo_df are computed in earlier cells of this notebook
+
+# LSTM zero-shot transfer per-gauge RMSEs (from transfer_df computed above)
+lstm_per_gauge = (
+    transfer_df[transfer_df['strategy'] == 'transfer_normed']
+    .set_index('gauge_id')['rmse_do']
+    .to_dict()
+)
+
+# LSTM per-gauge retrain RMSEs (from loo_df computed above)
+lstm_retrain = (
+    loo_df.set_index('gauge_id')['rmse_do']
+    .to_dict()
+)
+
+# Load Ridge baseline results from saved CSV (notebook 02 output)
+_ridge_path = RESULTS_DIR / 'baseline_results.csv'
+if _ridge_path.exists():
+    _ridge_df = pd.read_csv(_ridge_path)
+    _ridge_df['gauge_id'] = _ridge_df['gauge_id'].astype(str)
+    ridge_per_gauge = _ridge_df.set_index('gauge_id')['rmse_do'].to_dict()
+else:
+    # Fall back to hardcoded values if baseline CSV not available
+    ridge_per_gauge = {
+        '2009': 0.2348, '2016': 0.5084, '2044': 0.5162,
+        '2085': 0.3661, '2143': 0.4333, '2174': 0.3780,
+        '2410': 0.4179, '2415': 0.3850, '2462': 0.2642,
+        '2473': 0.3028, '2613': 0.4443,
+    }
+    print('Warning: baseline_results.csv not found — using hardcoded Ridge RMSEs')
+
+# Use only gauges present in all three dicts
+common = sorted(set(ridge_per_gauge) & set(lstm_per_gauge) & set(lstm_retrain))
+ridge_vals   = [ridge_per_gauge[g]  for g in common]
+lstm_vals    = [lstm_per_gauge[g]   for g in common]
+retrain_vals = [lstm_retrain[g]     for g in common]
+
+# Wilcoxon signed-rank test: zero-shot LSTM vs Ridge
+stat_zs, p_zs = stats.wilcoxon(lstm_vals, ridge_vals, alternative='two-sided')
+# Wilcoxon: per-gauge retrain vs Ridge
+stat_rt, p_rt = stats.wilcoxon(retrain_vals, ridge_vals, alternative='two-sided')
+
+print('=' * 65)
+print('STATISTICAL SIGNIFICANCE — Wilcoxon Signed-Rank Test')
+print('=' * 65)
+print(f'Gauges compared: {len(common)}')
+print()
+print(f'LSTM (zero-shot) vs Ridge:')
+print(f'  Mean RMSE diff : {(sum(lstm_vals)-sum(ridge_vals))/len(common):+.4f} mg/L')
+print(f'  Wilcoxon stat  : {stat_zs:.3f}')
+print(f'  p-value        : {p_zs:.4f}  {"** significant (p<0.05)" if p_zs<0.05 else "(not significant)"}')
+print()
+print(f'LSTM (per-gauge retrain) vs Ridge:')
+print(f'  Mean RMSE diff : {(sum(retrain_vals)-sum(ridge_vals))/len(common):+.4f} mg/L')
+print(f'  Wilcoxon stat  : {stat_rt:.3f}')
+print(f'  p-value        : {p_rt:.4f}  {"** significant (p<0.05)" if p_rt<0.05 else "(not significant)"}')
+print()
+print('Note: Wilcoxon signed-rank test on 11 paired gauge-level RMSEs.')
+print('Null hypothesis: no difference between LSTM and Ridge RMSE distributions.')
+
+# Save results
+sig_results = {
+    'n_gauges': len(common),
+    'lstm_zeroshot_vs_ridge': {'stat': float(stat_zs), 'p': float(p_zs), 'significant': bool(p_zs < 0.05)},
+    'lstm_retrain_vs_ridge':  {'stat': float(stat_rt), 'p': float(p_rt), 'significant': bool(p_rt < 0.05)},
+}
+import json as _json2
+with open(str(RESULTS_DIR / 'significance_tests.json'), 'w') as _f:
+    _json2.dump(sig_results, _f, indent=2)
+print(f'\nSaved: results/significance_tests.json')
+
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mKeyError[39m                                  Traceback (most recent call last)
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/pandas/core/indexes/base.py:3805[39m, in [36mIndex.get_loc[39m[34m(self, key)[39m
+[32m   3804[39m [38;5;28;01mtry[39;00m:
+[32m-> [39m[32m3805[39m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[43m.[49m[43m_engine[49m[43m.[49m[43mget_loc[49m[43m([49m[43mcasted_key[49m[43m)[49m
+[32m   3806[39m [38;5;28;01mexcept[39;00m [38;5;167;01mKeyError[39;00m [38;5;28;01mas[39;00m err:
+
+[36mFile [39m[32mindex.pyx:167[39m, in [36mpandas._libs.index.IndexEngine.get_loc[39m[34m()[39m
+
+[36mFile [39m[32mindex.pyx:196[39m, in [36mpandas._libs.index.IndexEngine.get_loc[39m[34m()[39m
+
+[36mFile [39m[32mpandas/_libs/hashtable_class_helper.pxi:7081[39m, in [36mpandas._libs.hashtable.PyObjectHashTable.get_item[39m[34m()[39m
+
+[36mFile [39m[32mpandas/_libs/hashtable_class_helper.pxi:7089[39m, in [36mpandas._libs.hashtable.PyObjectHashTable.get_item[39m[34m()[39m
+
+[31mKeyError[39m: 'gauge_id'
+
+The above exception was the direct cause of the following exception:
+
+[31mKeyError[39m                                  Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[17][39m[32m, line 25[39m
+[32m     23[39m [38;5;28;01mif[39;00m _ridge_path.exists():
+[32m     24[39m     _ridge_df = pd.read_csv(_ridge_path)
+[32m---> [39m[32m25[39m     _ridge_df[[33m'[39m[33mgauge_id[39m[33m'[39m] = [43m_ridge_df[49m[43m[[49m[33;43m'[39;49m[33;43mgauge_id[39;49m[33;43m'[39;49m[43m][49m.astype([38;5;28mstr[39m)
+[32m     26[39m     ridge_per_gauge = _ridge_df.set_index([33m'[39m[33mgauge_id[39m[33m'[39m)[[33m'[39m[33mrmse_do[39m[33m'[39m].to_dict()
+[32m     27[39m [38;5;28;01melse[39;00m:
+[32m     28[39m     [38;5;66;03m# Fall back to hardcoded values if baseline CSV not available[39;00m
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/pandas/core/frame.py:4102[39m, in [36mDataFrame.__getitem__[39m[34m(self, key)[39m
+[32m   4100[39m [38;5;28;01mif[39;00m [38;5;28mself[39m.columns.nlevels > [32m1[39m:
+[32m   4101[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._getitem_multilevel(key)
+[32m-> [39m[32m4102[39m indexer = [38;5;28;43mself[39;49m[43m.[49m[43mcolumns[49m[43m.[49m[43mget_loc[49m[43m([49m[43mkey[49m[43m)[49m
+[32m   4103[39m [38;5;28;01mif[39;00m is_integer(indexer):
+[32m   4104[39m     indexer = [indexer]
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/pandas/core/indexes/base.py:3812[39m, in [36mIndex.get_loc[39m[34m(self, key)[39m
+[32m   3807[39m     [38;5;28;01mif[39;00m [38;5;28misinstance[39m(casted_key, [38;5;28mslice[39m) [38;5;129;01mor[39;00m (
+[32m   3808[39m         [38;5;28misinstance[39m(casted_key, abc.Iterable)
+[32m   3809[39m         [38;5;129;01mand[39;00m [38;5;28many[39m([38;5;28misinstance[39m(x, [38;5;28mslice[39m) [38;5;28;01mfor[39;00m x [38;5;129;01min[39;00m casted_key)
+[32m   3810[39m     ):
+[32m   3811[39m         [38;5;28;01mraise[39;00m InvalidIndexError(key)
+[32m-> [39m[32m3812[39m     [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m(key) [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01merr[39;00m
+[32m   3813[39m [38;5;28;01mexcept[39;00m [38;5;167;01mTypeError[39;00m:
+[32m   3814[39m     [38;5;66;03m# If we have a listlike key, _check_indexing_error will raise[39;00m
+[32m   3815[39m     [38;5;66;03m#  InvalidIndexError. Otherwise we fall through and re-raise[39;00m
+[32m   3816[39m     [38;5;66;03m#  the TypeError.[39;00m
+[32m   3817[39m     [38;5;28mself[39m._check_indexing_error(key)
+
+[31mKeyError[39m: 'gauge_id'
+

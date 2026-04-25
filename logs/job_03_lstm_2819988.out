@@ -1,0 +1,10 @@
+Job started: Sat Apr 25 07:04:01 AM CEST 2026
+Node: gnode39
+GPU: NVIDIA GeForce RTX 4090
+
+Running notebook 03: LSTM Single-Site + Optuna...
+
+Notebook 03 complete.
+Results saved to: results/
+Figures saved to: figures/
+Job finished: Sat Apr 25 07:38:57 AM CEST 2026

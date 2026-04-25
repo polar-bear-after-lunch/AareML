@@ -1,0 +1,44 @@
+=============================================
+  AareML — Submitting UBELIX Jobs
+  Working directory: /storage/homefs/tn20y076/AareML
+=============================================
+
+Submitting job 03 (LSTM single-site + Optuna)...
+sbatch: --------------------------------------------------
+sbatch: This job generates no costs!
+sbatch: --------------------------------------------------
+  → Job ID: 2790477
+
+Submitting job 04 (multi-site evaluation, depends on job 2790477)...
+sbatch: --------------------------------------------------
+sbatch: This job generates no costs!
+sbatch: --------------------------------------------------
+  → Job ID: 2790478
+
+Submitting job 04b (temperature multi-site, depends on job 2790478)...
+sbatch: --------------------------------------------------
+sbatch: This job generates no costs!
+sbatch: --------------------------------------------------
+  → Job ID: 2790479
+
+Submitting job 05 (SHAP attribution, depends on job 2790479)...
+sbatch: --------------------------------------------------
+sbatch: This job generates no costs!
+sbatch: --------------------------------------------------
+  → Job ID: 2790480
+
+=============================================
+  All jobs submitted
+=============================================
+
+  Job 03  (LSTM):            2790477
+  Job 04  (Multi-site DO):   2790478   [waits for 2790477]
+  Job 04b (Temp multi-site): 2790479  [waits for 2790478]
+  Job 05  (SHAP):            2790480   [waits for 2790479]
+
+  Monitor:   squeue --me
+  Cancel:    scancel 2790477 2790478 2790479 2790480
+  Logs:      tail -f logs/job_03_lstm_2790477.out
+
+You will receive an email when each job finishes.
+Total expected time: ~20 min (03) + ~30 min (04) + ~2h (04b) + ~20 min (05)

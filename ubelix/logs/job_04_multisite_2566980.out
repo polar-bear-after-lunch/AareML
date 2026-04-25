@@ -1,0 +1,5 @@
+Job started: Wed Apr 22 01:48:49 PM CEST 2026
+Node: gnode39
+GPU: NVIDIA GeForce RTX 4090
+ERROR: results/lstm_single_site_best.pt not found.
+Please run job_03_lstm.sh first.

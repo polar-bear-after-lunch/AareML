@@ -1,0 +1,8 @@
+=============================================
+  AareML — Submitting UBELIX Jobs
+  Working directory: /storage/homefs/tn20y076/AareML
+=============================================
+
+Submitting job 03 (LSTM single-site + Optuna)...
+sbatch: error: QoS "job_gpu" not available for account "gratis"
+sbatch: error: Batch job submission failed: Unspecified error

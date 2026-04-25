@@ -1,0 +1,6 @@
+=============================================
+  AareML — Submitting UBELIX Jobs
+=============================================
+
+Submitting job 03 (LSTM single-site + Optuna)...
+sbatch: error: Unable to open file ubelix/job_03_lstm.sh

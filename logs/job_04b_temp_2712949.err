@@ -1,0 +1,107 @@
+[NbConvertApp] Converting notebook notebooks/04b_multisite_temperature.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+meta = load_metadata()
+all_gauge_ids = meta['gauge_id'].astype(str).tolist() if 'gauge_id' in meta.columns else meta.index.astype(str).tolist()
+print(f'Total gauges in metadata: {len(all_gauge_ids)}')
+
+temp_gauges = []
+coverage_dict = {}
+
+print('Scanning all gauges for temperature coverage...')
+for gid in tqdm(all_gauge_ids, desc='Gauges'):
+    try:
+        raw  = load_gauge(gid)
+        data = preprocess(raw)
+        cov  = data['temp_sensor'].notna().mean()
+        coverage_dict[gid] = float(cov)
+        if cov >= TEMP_MIN_COVERAGE:
+            # Check enough test windows
+            train_g, _, test = train_val_test_split(data)
+            means = (pd.concat([train_g[FEATURES_TEMP].mean(), train_g[TARGETS_TEMP].mean()])
+                     .groupby(level=0).first())
+            try:
+                X_te, y_te, _ = make_windows(test, means,
+                                             features=FEATURES_TEMP, targets=TARGETS_TEMP)
+                if len(X_te) >= 50:
+                    temp_gauges.append(gid)
+            except ValueError:
+                pass
+    except Exception:
+        pass
+
+temp_gauges = [g for g in temp_gauges if g != FOCUS_GAUGE]
+
+print(f'
+Gauges with ≥{TEMP_MIN_COVERAGE:.0%} temp coverage: {sum(1 for v in coverage_dict.values() if v >= TEMP_MIN_COVERAGE)}')
+print(f'Gauges with ≥50 valid test windows: {len(temp_gauges)}')
+print(f'Gauge IDs: {temp_gauges}')
+
+# Coverage distribution
+cov_series = pd.Series(coverage_dict)
+print(f'
+Temperature coverage across all gauges:')
+print(f'  Mean: {cov_series.mean():.1%}')
+print(f'  Median: {cov_series.median():.1%}')
+print(f'  Min: {cov_series.min():.1%}')
+print(f'  Gauges with >90% coverage: {(cov_series > 0.9).sum()}')
+------------------
+
+
+  [36mCell[39m[36m [39m[32mIn[5][39m[32m, line 32[39m
+[31m    [39m[31mprint(f'[39m
+          ^
+[31mSyntaxError[39m[31m:[39m unterminated string literal (detected at line 32)
+
+

@@ -1,0 +1,2 @@
+Model,Target,RMSE,MAE,NSE,KGE,RMSE_lo,RMSE_hi,MAE_lo,MAE_hi
+LSTM (temp),Temp (°C),1.2249,0.9883,0.887,0.885,1.1297,1.3182,0.9116,1.0748

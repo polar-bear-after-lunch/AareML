@@ -1,0 +1,8 @@
+=============================================
+  AareML — Submitting UBELIX Jobs
+  Working directory: /storage/homefs/tn20y076/AareML
+=============================================
+
+Submitting job 03 (LSTM single-site + Optuna)...
+sbatch: error: You must specify a GPU type, e.g. --gpus-per-node=rtx3090:1
+sbatch: error: Batch job submission failed: Unspecified error

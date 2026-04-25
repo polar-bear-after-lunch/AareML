@@ -1,0 +1,26 @@
+# Data files (too large for git — use download_data.py to fetch)
+data/camels_ch_chem/
+data/camels_ch/
+data/camels-ch-chem/
+data/lakebed-us/
+data/*.zip
+data/*.parquet
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+*.egg-info/
+.env
+venv/
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Results (optional — uncomment to track)
+# results/
+
+# Optuna study database (auto-regenerated, can get large)
+results/optuna_study.db
