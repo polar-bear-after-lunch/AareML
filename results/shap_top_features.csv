@@ -1,0 +1,6 @@
+rank,feature,lag,feature_lag,mean_abs_shap
+1,temp_sensor,1,temp_sensor[t-1],0.644
+2,O2C_sensor,1,O2C_sensor[t-1],0.5265
+3,temp_sensor,2,temp_sensor[t-2],0.3828
+4,O2C_sensor,3,O2C_sensor[t-3],0.1315
+5,temp_sensor,4,temp_sensor[t-4],0.1119

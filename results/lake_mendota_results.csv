@@ -1,8 +1,8 @@
 Model,Target,RMSE,MAE,NSE
 Persistence,DO (mg/L),1.21,0.897,0.475
 Persistence,TEMP (°C),2.55,1.759,0.821
-Climatology,DO (mg/L),1.268,0.961,0.424
-Climatology,TEMP (°C),3.11,1.837,0.734
-Ridge,DO (mg/L),1.069,0.809,0.59
-Ridge,TEMP (°C),2.252,1.519,0.86
+Climatology,DO (mg/L),1.272,0.97,0.42
+Climatology,TEMP (°C),3.074,1.842,0.74
+Ridge,DO (mg/L),1.03,0.785,0.62
+Ridge,TEMP (°C),2.244,1.533,0.861
 LakeBeD-US LSTM (ref.),DO (mg/L),1.4,,

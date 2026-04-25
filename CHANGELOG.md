@@ -5,15 +5,6 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [v1.22] — 2026-04-24
-
-### New Notebook
-- **`notebooks/08_usgs_transfer.ipynb`** — Cross-continental zero-shot transfer: Swiss LSTM checkpoint applied to 5 US rivers (Potomac, Willamette, Mississippi, Fox, Missouri) via USGS NWIS continuous monitoring data. Features mapped from USGS parameter codes to AareML naming convention; missing pH/EC channels zero-padded (conservative lower bound). Saves `results/usgs_transfer_results.csv` and figures `08_usgs_transfer.png`, `08_usgs_horizon_rmse.png`.
-- **`src/config.py`** — Added `USGS_SITES`, `USGS_COL_MAP`, `USGS_FEATURES`, `USGS_TARGET`
-- **`run_all_notebooks.sh`** — Added notebook 08 to run sequence
-
----
-
 ## [v1.21] — 2026-04-24
 
 ### Model Improvement
