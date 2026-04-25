@@ -46,6 +46,7 @@ pip install -r requirements.txt --quiet
 echo ""
 echo "[6/6] Registering Jupyter kernel..."
 pip install ipykernel --quiet
+pip install dataretrieval --quiet  # USGS data access for notebook 08
 python -m ipykernel install --user --name aareml --display-name "Python (aareml)"
 
 # ── Verify ───────────────────────────────────────────────────────────────────
