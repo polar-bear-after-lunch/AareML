@@ -362,3 +362,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `src/model.py` — RiverDataset, Seq2SeqLSTM, train_model, predict, checkpoint helpers.
 - `results/baseline_results.csv` — Real baseline results from notebook 02.
 - `figures/` — 17 PNG figures from notebooks 01–03.
+
+---
+
+## [v1.24] — 2026-04-30
+
+### New Content
+- **`notebooks/09_canton_zurich_analysis.ipynb`** — Canton Zurich DO analysis: 6 gauges, national canton ranking, threshold analysis, seasonal patterns, trend analysis, DO stress index, river heat map
+- **`figures/09_zh_river_heat_map.png`** — Publication-quality map of Canton Zurich rivers color-coded by DO stress index
+- **`AareML-canton-zurich.pdf`** — Standalone 12-page chapter: national context, data analysis, what is being done, what could be done, recommendations
+
+### Report v1.12
+- Full factual audit completed (16 fixes): split dates, teacher forcing, loss function, GPU training, SAITS imputation, EA-LSTM status, 3-seed ensemble, TreeSHAP status
+- Limitations section corrected (GPU not CPU, 3-seed ensemble documented)
+
+### Logo
+- AareML fish logo created (v3, teal) — fish swimming above bar chart river
+- Added to plain-language booklet cover
+
+### Plain-language booklets updated
+- LSTM explanation page added (21-day timeline visual, autocomplete analogy, Henry's Law discovery)
+- KGE vs RMSE explainer added with visual analogies
+- US rivers cross-continental page added
+- Russian translation updated
+
+### Funding research
+- Researched SOR4D call (not eligible — ODA countries only)
+- Swiss funding opportunities research initiated (SNSF BRIDGE, Innosuisse, Gebert Rüf, Eawag)
