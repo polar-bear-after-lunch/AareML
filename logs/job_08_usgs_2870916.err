@@ -1,0 +1,133 @@
+[NbConvertApp] Converting notebook notebooks/08_usgs_transfer.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import os
+import sys
+import warnings
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+from pathlib import Path
+from tqdm.auto import tqdm
+
+import torch
+from sklearn.preprocessing import StandardScaler
+
+# ── Repo root on sys.path ──────────────────────────────────────────────────
+REPO_ROOT = Path('.').resolve()
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from src.config import (
+    FIGURES_DIR, RESULTS_DIR,
+    LOOKBACK, HORIZON, FEATURES, TARGETS,
+    N_FEAT, N_TGT, SEED,
+    TRAIN_END, VAL_END,
+)
+from src.model import (
+    Seq2SeqLSTM, RiverDataset,
+    load_checkpoint, reconstruct_scalers, predict,
+)
+from src.metrics import all_metrics
+
+# ── Device ─────────────────────────────────────────────────────────────────
+DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f'Device : {DEVICE}')
+
+# ── LOCAL_TEST flag — reduces sites in CPU-only environments ───────────────
+LOCAL_TEST = (DEVICE.type == 'cpu')
+print(f'LOCAL_TEST : {LOCAL_TEST}')
+
+# ── Reproducibility ────────────────────────────────────────────────────────
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+
+# ── Hyperparameters (must match Swiss checkpoint) ──────────────────────────
+LOOKBACK = 21
+HORIZON  = 14
+
+# ── Plot style ─────────────────────────────────────────────────────────────
+plt.rcParams.update({
+    'figure.dpi': 120,
+    'axes.spines.top':   False,
+    'axes.spines.right': False,
+    'font.size': 11,
+})
+
+FIGURES_DIR.mkdir(exist_ok=True)
+RESULTS_DIR.mkdir(exist_ok=True)
+print('Config loaded.')
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mModuleNotFoundError[39m                       Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[2][39m[32m, line 19[39m
+[32m     16[39m [38;5;28;01mif[39;00m [38;5;28mstr[39m(REPO_ROOT) [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m sys.path:
+[32m     17[39m     sys.path.insert([32m0[39m, [38;5;28mstr[39m(REPO_ROOT))
+[32m---> [39m[32m19[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01msrc[39;00m[34;01m.[39;00m[34;01mconfig[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m (
+[32m     20[39m     FIGURES_DIR, RESULTS_DIR,
+[32m     21[39m     LOOKBACK, HORIZON, FEATURES, TARGETS,
+[32m     22[39m     N_FEAT, N_TGT, SEED,
+[32m     23[39m     TRAIN_END, VAL_END,
+[32m     24[39m )
+[32m     25[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01msrc[39;00m[34;01m.[39;00m[34;01mmodel[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m (
+[32m     26[39m     Seq2SeqLSTM, RiverDataset,
+[32m     27[39m     load_checkpoint, reconstruct_scalers, predict,
+[32m     28[39m )
+[32m     29[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01msrc[39;00m[34;01m.[39;00m[34;01mmetrics[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m all_metrics
+
+[31mModuleNotFoundError[39m: No module named 'src'
+
