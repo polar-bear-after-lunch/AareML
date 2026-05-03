@@ -1,5 +1,5 @@
 Model,Dataset,RMSE (mg/L),NSE,KGE
-River LSTM zero-shot → lake,LakeBeD-US — Lake Mendota (FALLBACK — Sw,2.545,-0.559,0.381
-Lake-retrained LSTM,LakeBeD-US — Lake Mendota (FALLBACK — Sw,1.672,0.305,0.683
+River LSTM zero-shot → lake,Bärenbold et al. (2026) — Swiss Lakes (E,3.188,-3.788,-0.379
+Lake-retrained LSTM,Bärenbold et al. (2026) — Swiss Lakes (E,0.768,0.7,0.796
 LakeBeD-US LSTM benchmark,Lake Mendota (McAfee et al. 2025),1.4,—,—
 River AareML (reference),CAMELS-CH-Chem gauge 2473,0.319,0.878,0.942
