@@ -375,7 +375,7 @@ def train_ea_model(
     model = model.to(device)
     optimiser = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimiser, mode='min', factor=0.5, patience=5, verbose=False
+        optimiser, mode='min', factor=0.5, patience=5
     )
     criterion = nn.MSELoss()
 
@@ -472,7 +472,7 @@ def train_model(
     model = model.to(device)
     optimiser = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimiser, mode='min', factor=0.5, patience=5, verbose=False
+        optimiser, mode='min', factor=0.5, patience=5
     )
 
     def nse_mse_loss(pred: torch.Tensor, target: torch.Tensor,
