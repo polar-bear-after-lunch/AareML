@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.27] — 2026-05-03
+
+### Report v1.14
+- Fish fun fact boxes on every other page (10 fish, pages 2–20)
+- All 10 fish illustrated with AI-generated field guide illustrations
+- Each box includes species name, Latin name, DO fact, and citation
+- Section 5.7 updated with real Bärenbold 2026 Swiss lakes results (RMSE=0.768 mg/L, 1.82× better than LakeBeD-US)
+- Swiss lakes: zero-shot river→lake fails (NSE=-3.788); lake-retrained beats benchmark
+- Abstract, conclusion, references updated with Swiss lake findings
+
+---
+
 ## [v1.26] — 2026-05-03
 
 ### Final UBELIX Run Results
