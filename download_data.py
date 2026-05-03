@@ -217,8 +217,8 @@ def download_swiss_lakes():
     SWISS_LAKE_DIR.mkdir(parents=True, exist_ok=True)
 
     # Try the Eawag open data portal
-    url = "https://opendata.eawag.ch/dataset/3b9b8bc3-f7bb-4e59-8b08-079b073d7dc9/resource/a1f7bb98-5af2-4947-b77e-c9d8b1bb3b4f/download/swiss_lakes_long_term.zip"
-    dest = SWISS_LAKE_DIR / "swiss_lakes_long_term.zip"
+    url = "https://opendata.eawag.ch/dataset/fb94526c-45eb-4666-8a7d-d016505c474d/resource/bf1657f3-2096-4b19-a2c5-45f858858777/download/longterm-swiss-lake-monitoring-data.zip"
+    dest = SWISS_LAKE_DIR / "longterm-swiss-lake-monitoring-data.zip"
 
     if any(SWISS_LAKE_DIR.glob("*.csv")) or any(SWISS_LAKE_DIR.glob("*.parquet")):
         print(f"  Swiss lakes data already present in {SWISS_LAKE_DIR} — skipping download.")

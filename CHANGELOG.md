@@ -5,6 +5,48 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.26] — 2026-05-03
+
+### Final UBELIX Run Results
+- **LSTM best DO RMSE = 0.302 mg/L** — now marginally outperforms Ridge (0.303 mg/L); NSE+MSE loss confirmed effective
+- **LSTM best KGE = 0.940** — consistently superior to Ridge (0.908)
+- **Notebook 10** (Swiss Lakes) — zero-shot river→lake RMSE=2.545 mg/L (NSE=-0.559); lake-retrained RMSE=1.672 mg/L; Bärenbold 2026 download failed on UBELIX — used Lake Mendota fallback
+- **Report v1.13** — updated with final numbers, Section 5.7 Swiss lakes added
+
+### Infrastructure
+- UBELIX can now push directly to GitHub (PAT configured)
+- `download_data.py` — fixed missing `SWISS_LAKE_DIR` constant
+- SHAP n_explain_max reduced 2000→500 to avoid GPU OOM on RTX 4090
+- `job_10_lakes.sh` added to SLURM chain (03→04→04b→05→08→10)
+
+---
+
+## [v1.25] — 2026-05-02
+
+### New Content
+- **`notebooks/10_swiss_lakes_lstm.ipynb`** — Swiss lakes EDA + LSTM (Bärenbold et al. 2026, 21 lakes); zero-shot transfer analysis; lake-specific retraining
+- **`figures/transfer_learning_diagram.png`** — Transfer learning flow: Swiss river → Swiss rivers → US rivers → Swiss lakes → Lake Mendota
+- **`AareML-presentation.pptx`** — 19-slide presentation for May 22 CAS seminar
+- **`figures/aareml_logo.png`** — AareML fish logo (teal, bar chart river)
+
+### Fixes
+- Presentation: replaced large teal block badges with compact number badges
+- `src/model.py`: removed `verbose` from `ReduceLROnPlateau` (deprecated in PyTorch 2.x)
+- `download_data.py`: added `--swiss-lakes` flag and `download_swiss_lakes()` function
+
+---
+
+## [v1.24] — 2026-04-30
+
+### New Content
+- **`notebooks/09_canton_zurich_analysis.ipynb`** — Canton Zurich DO analysis: national canton ranking, threshold analysis, seasonal patterns, DO stress index
+- **`figures/09_zh_river_heat_map.png`** — Canton Zurich river stress map
+- **`AareML-canton-zurich.pdf`** — 12-page standalone chapter with national context
+- **Plain-language booklets** — LSTM explanation page, KGE/RMSE explainer, US rivers page, Russian translation updated
+- **Fish logo** created (v3, teal, bar chart river)
+
+---
+
 ## [v1.23] — 2026-04-25
 
 ### New Results
