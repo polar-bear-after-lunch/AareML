@@ -1,13 +1,13 @@
 {
   "n_gauges": 11,
   "lstm_zeroshot_vs_ridge": {
-    "stat": 3.0,
-    "p": 0.0048828125,
+    "stat": 4.0,
+    "p": 0.0068359375,
     "significant": true
   },
   "lstm_retrain_vs_ridge": {
-    "stat": 24.0,
-    "p": 0.46484375,
+    "stat": 32.0,
+    "p": 0.9658203125,
     "significant": false
   }
 }
