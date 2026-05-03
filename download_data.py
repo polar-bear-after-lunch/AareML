@@ -28,7 +28,8 @@ from pathlib import Path
 ROOT        = Path(__file__).parent
 DATA_DIR    = ROOT / "data"
 CAMELS_DIR  = DATA_DIR / "camels-ch-chem"
-LAKE_DIR    = DATA_DIR / "lakebed-us"
+LAKE_DIR       = DATA_DIR / "lakebed-us"
+SWISS_LAKE_DIR = DATA_DIR / "swiss-lakes"
 
 # ── URLs ───────────────────────────────────────────────────────────────────
 CAMELS_URL  = "https://zenodo.org/api/records/14980027/files/camels-ch-chem.zip/content"
