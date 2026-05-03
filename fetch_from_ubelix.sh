@@ -6,6 +6,7 @@
 set -euo pipefail
 
 LOCAL_DIR="/Users/amber/VS Code/polar-bear-after-lunch/AareML"
+# submit02 and submit03 share the same home directory
 REMOTE="ubelix:~/AareML/"
 
 echo "Fetching results from UBELIX..."

@@ -23,6 +23,11 @@ Thumbs.db
 # Results (optional — uncomment to track)
 # results/
 
+# Private/personal files — never commit
+outreach_emails.md
+researcher_bios.md
+researchers_to_contact.md
+
 # Optuna study database (auto-regenerated, can get large)
 results/optuna_study.db
 

@@ -23,6 +23,7 @@ NOTEBOOKS=(
     "notebooks/05_shap_interpretation.ipynb"
     "notebooks/06_cross_ecosystem_lake.ipynb"
     "notebooks/07_lake_eda.ipynb"
+    "notebooks/08_usgs_transfer.ipynb"
 )
 
 LOG="results/notebook_run_log.txt"

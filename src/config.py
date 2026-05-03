@@ -95,6 +95,32 @@ FOCUS_GAUGE = "2473"
 # ── Random seed ───────────────────────────────────────────────────────────
 SEED = 42
 
+# ── USGS NWIS cross-continental transfer (notebook 08) ───────────────────
+# Five US rivers spanning diverse climates and geographies.
+# Selected to maximise geographic diversity with continuous DO + temp records.
+USGS_SITES = {
+    "01646500": "Potomac River at Little Falls, MD",
+    "14211720": "Willamette River at Portland, OR",
+    "07374000": "Mississippi River at Baton Rouge, LA",
+    "04085427": "Fox River at Green Bay, WI",
+    "06934500": "Missouri River at Hermann, MO",
+}
+
+# USGS parameter code → AareML column name mapping
+# 00300 = dissolved oxygen (mg/L), 00010 = water temperature (°C)
+# 00400 = pH, 00095 = specific conductance (µS/cm)
+USGS_COL_MAP = {
+    "00300_Mean": "O2C_sensor",
+    "00010_Mean": "temp_sensor",
+    "00400_Mean": "pH_sensor",
+    "00095_Mean": "EC_sensor",
+}
+
+# Features reliably available at most USGS continuous monitoring sites.
+# DO + temperature are the most consistently instrumented pair.
+USGS_FEATURES = ["temp_sensor", "O2C_sensor"]   # 2 reliable features
+USGS_TARGET   = ["O2C_sensor"]                   # predict dissolved oxygen
+
 # ── Temperature-only configuration (notebook 04b) ─────────────────────────
 # All 86 gauges have temperature data — enables true multi-site analysis
 # across the full CAMELS-CH-Chem network.

@@ -5,6 +5,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.23] — 2026-04-25
+
+### New Results
+- **Notebook 08** — Cross-continental zero-shot transfer to 4 US rivers (Willamette OR, Fox River WI, Mississippi LA, Missouri MO). Mean RMSE = 1.527 mg/L. Willamette achieves 1.007 mg/L — approaches LakeBeD-US LSTM reference (1.40 mg/L).
+- **Statistical significance confirmed** — Wilcoxon signed-rank test: LSTM zero-shot vs Ridge p=0.005 (significant); per-gauge retrain p=0.465 (not significant).
+- **Temperature multi-site** — Updated results from v1.22 run with ReduceLROnPlateau; mean RMSE 2.59°C across 15 gauges.
+
+### Bug Fixes
+- **Notebook 05** — Fixed `model.train()` indentation error in SHAP cell (cuDNN RNN backward pass requires training mode)
+- **Notebook 08** — Fixed `REPO_ROOT` hardcoded to `/storage/homefs/tn20y076/AareML` for UBELIX compatibility
+- **All notebooks** — Added cell `id` fields to fix `MissingIDFieldWarning` (nbformat 5.1+ requirement)
+
+### Infrastructure
+- **GitHub direct push** — Connected GitHub to Perplexity Computer for direct code pushes without Mac roundtrip
+- **UBELIX git setup** — `git pull` now works on UBELIX (`pull.rebase false`, `core.editor true`)
+- **`ubelix/setup_env.sh`** — Added `dataretrieval` package for notebook 08
+- **`ubelix/job_08_usgs.sh`** — New SLURM job script for notebook 08
+- **`ubelix/run_all.sh`** — Added job 08 to chain (03 → 04 → 04b → 05 → 08)
+
+### Report v1.10
+- Section 5.6 added: Cross-Continental Zero-Shot Transfer
+- Section 5.3 updated: statistical significance (p=0.005)
+- Abstract updated with USGS results
+- Change highlights on new sections
+
+---
+
+## [v1.22] — 2026-04-24
+
+### New Notebook
+- **`notebooks/08_usgs_transfer.ipynb`** — Cross-continental zero-shot transfer: Swiss LSTM checkpoint applied to 5 US rivers (Potomac, Willamette, Mississippi, Fox, Missouri) via USGS NWIS continuous monitoring data. Features mapped from USGS parameter codes to AareML naming convention; missing pH/EC channels zero-padded (conservative lower bound). Saves `results/usgs_transfer_results.csv` and figures `08_usgs_transfer.png`, `08_usgs_horizon_rmse.png`.
+- **`src/config.py`** — Added `USGS_SITES`, `USGS_COL_MAP`, `USGS_FEATURES`, `USGS_TARGET`
+- **`run_all_notebooks.sh`** — Added notebook 08 to run sequence
+
+---
+
 ## [v1.21] — 2026-04-24
 
 ### Model Improvement
@@ -326,3 +362,30 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `src/model.py` — RiverDataset, Seq2SeqLSTM, train_model, predict, checkpoint helpers.
 - `results/baseline_results.csv` — Real baseline results from notebook 02.
 - `figures/` — 17 PNG figures from notebooks 01–03.
+
+---
+
+## [v1.24] — 2026-04-30
+
+### New Content
+- **`notebooks/09_canton_zurich_analysis.ipynb`** — Canton Zurich DO analysis: 6 gauges, national canton ranking, threshold analysis, seasonal patterns, trend analysis, DO stress index, river heat map
+- **`figures/09_zh_river_heat_map.png`** — Publication-quality map of Canton Zurich rivers color-coded by DO stress index
+- **`AareML-canton-zurich.pdf`** — Standalone 12-page chapter: national context, data analysis, what is being done, what could be done, recommendations
+
+### Report v1.12
+- Full factual audit completed (16 fixes): split dates, teacher forcing, loss function, GPU training, SAITS imputation, EA-LSTM status, 3-seed ensemble, TreeSHAP status
+- Limitations section corrected (GPU not CPU, 3-seed ensemble documented)
+
+### Logo
+- AareML fish logo created (v3, teal) — fish swimming above bar chart river
+- Added to plain-language booklet cover
+
+### Plain-language booklets updated
+- LSTM explanation page added (21-day timeline visual, autocomplete analogy, Henry's Law discovery)
+- KGE vs RMSE explainer added with visual analogies
+- US rivers cross-continental page added
+- Russian translation updated
+
+### Funding research
+- Researched SOR4D call (not eligible — ODA countries only)
+- Swiss funding opportunities research initiated (SNSF BRIDGE, Innosuisse, Gebert Rüf, Eawag)

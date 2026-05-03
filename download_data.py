@@ -197,6 +197,52 @@ def download_lake():
         sys.exit(1)
 
 
+# ── Swiss Lakes (Bärenbold et al. 2026) ──────────────────────────────────────────────
+
+def download_swiss_lakes():
+    """
+    Download the Bärenbold et al. (2026) harmonised Swiss lakes dataset.
+    21 Swiss lakes, temperature + DO + conductivity + Secchi depth,
+    1938/1980s–2023, at bi-weekly to monthly resolution.
+    Source: Eawag Open Data Portal
+    DOI: https://doi.org/10.25678/0009KJ
+    """
+    print("\n" + "="*60)
+    print("  3/3  Swiss Lakes (Bärenbold et al. 2026)")
+    print("       Source: Eawag Open Data Portal")
+    print("       Reference: Bärenbold et al. (2026), ESSD")
+    print("="*60)
+
+    SWISS_LAKE_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Try the Eawag open data portal
+    url = "https://opendata.eawag.ch/dataset/3b9b8bc3-f7bb-4e59-8b08-079b073d7dc9/resource/a1f7bb98-5af2-4947-b77e-c9d8b1bb3b4f/download/swiss_lakes_long_term.zip"
+    dest = SWISS_LAKE_DIR / "swiss_lakes_long_term.zip"
+
+    if any(SWISS_LAKE_DIR.glob("*.csv")) or any(SWISS_LAKE_DIR.glob("*.parquet")):
+        print(f"  Swiss lakes data already present in {SWISS_LAKE_DIR} — skipping download.")
+        return
+
+    print(f"  Downloading Swiss Lakes dataset...")
+    print(f"  URL:  {url}")
+    print(f"  Dest: {dest}")
+
+    try:
+        _wget(url, dest)
+        print("  Extracting...")
+        import zipfile
+        with zipfile.ZipFile(dest, 'r') as z:
+            z.extractall(SWISS_LAKE_DIR)
+        dest.unlink()
+        n_files = len(list(SWISS_LAKE_DIR.rglob("*.csv")))
+        print(f"  Swiss Lakes ready: {n_files} CSV files in {SWISS_LAKE_DIR}")
+    except Exception as e:
+        print(f"  WARNING: Could not download Swiss Lakes dataset: {e}")
+        print(f"  You can download it manually from:")
+        print(f"  https://opendata.eawag.ch/dataset/long-term-temperature-oxygen-and-water-clarity-trends-in-swiss-lakes")
+        print(f"  Place the extracted files in: {SWISS_LAKE_DIR}")
+
+
 # ── Main ───────────────────────────────────────────────────────────────────
 
 def main():
@@ -205,14 +251,17 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
-    parser.add_argument("--camels", action="store_true",
+    parser.add_argument("--camels",       action="store_true",
                         help="Download CAMELS-CH-Chem only")
-    parser.add_argument("--lake",   action="store_true",
+    parser.add_argument("--lake",          action="store_true",
                         help="Download LakeBeD-US Lake Mendota only")
+    parser.add_argument("--swiss-lakes",   action="store_true",
+                        help="Download Bärenbold et al. 2026 Swiss Lakes dataset only")
     args = parser.parse_args()
 
-    do_camels = args.camels or (not args.camels and not args.lake)
-    do_lake   = args.lake   or (not args.camels and not args.lake)
+    do_camels      = args.camels or      (not args.camels and not args.lake and not args.swiss_lakes)
+    do_lake        = args.lake   or      (not args.camels and not args.lake and not args.swiss_lakes)
+    do_swiss_lakes = args.swiss_lakes or (not args.camels and not args.lake and not args.swiss_lakes)
 
     print("\nAareML — Data Download & Preparation")
     print(f"Data directory: {DATA_DIR.resolve()}")
@@ -225,11 +274,13 @@ def main():
         download_camels()
     if do_lake:
         download_lake()
+    if do_swiss_lakes:
+        download_swiss_lakes()
 
     total = time.time() - t_start
     print("\n" + "="*60)
     print(f"  All done in {total/60:.1f} min")
-    print("  You can now run the notebooks in order: 01 → 02 → 03 → 04 → 04b → 05 → 06 → 07")
+    print("  You can now run the notebooks in order: 01 → 02 → 03 → 04 → 04b → 05 → 06 → 07 → 08 → 09 → 10")
     print("="*60 + "\n")
 
 
