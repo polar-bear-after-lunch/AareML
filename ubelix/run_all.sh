@@ -54,6 +54,12 @@ echo "Submitting job 08 (USGS cross-continental transfer, depends on job $JOB_05
 JOB_08=$(sbatch --parsable --dependency=afterok:$JOB_05 ubelix/job_08_usgs.sh)
 echo "  → Job ID: $JOB_08"
 
+# ── Job 10: Swiss Lakes (runs after 08 succeeds) ──────────────────────────
+echo ""
+echo "Submitting job 10 (Swiss lakes EDA + LSTM, depends on job $JOB_08)..."
+JOB_10=$(sbatch --parsable --dependency=afterok:$JOB_08 ubelix/job_10_lakes.sh)
+echo "  → Job ID: $JOB_10"
+
 # ── Summary ──────────────────────────────────────────────────────────────────
 echo ""
 echo "============================================="
@@ -65,10 +71,11 @@ echo "  Job 04  (Multi-site DO):   $JOB_04   [waits for $JOB_03]"
 echo "  Job 04b (Temp multi-site): $JOB_04B  [waits for $JOB_04]"
 echo "  Job 05  (SHAP):            $JOB_05   [waits for $JOB_04B]"
 echo "  Job 08  (USGS transfer):   $JOB_08   [waits for $JOB_05]"
+echo "  Job 10  (Swiss lakes):     $JOB_10   [waits for $JOB_08]"
 echo ""
 echo "  Monitor:   squeue --me"
-echo "  Cancel:    scancel $JOB_03 $JOB_04 $JOB_04B $JOB_05 $JOB_08"
+echo "  Cancel:    scancel $JOB_03 $JOB_04 $JOB_04B $JOB_05 $JOB_08 $JOB_10"
 echo "  Logs:      tail -f logs/job_03_lstm_${JOB_03}.out"
 echo ""
 echo "You will receive an email when each job finishes."
-echo "Total expected time: ~20 min (03) + ~30 min (04) + ~2h (04b) + ~20 min (05) + ~30 min (08)"
+echo "Total expected time: ~20 min (03) + ~30 min (04) + ~2h (04b) + ~20 min (05) + ~30 min (08) + ~1h (10)"
