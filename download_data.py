@@ -229,7 +229,7 @@ def download_swiss_lakes():
     print(f"  Dest: {dest}")
 
     try:
-        _wget(url, dest)
+        download(url, dest, f"wget → {dest.name}")
         print("  Extracting...")
         import zipfile
         with zipfile.ZipFile(dest, 'r') as z:
