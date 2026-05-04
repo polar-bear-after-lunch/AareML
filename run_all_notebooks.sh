@@ -24,6 +24,8 @@ NOTEBOOKS=(
     "notebooks/06_cross_ecosystem_lake.ipynb"
     "notebooks/07_lake_eda.ipynb"
     "notebooks/08_usgs_transfer.ipynb"
+    "notebooks/09_canton_zurich_analysis.ipynb"
+    "notebooks/10_swiss_lakes_lstm.ipynb"
 )
 
 LOG="results/notebook_run_log.txt"
@@ -60,7 +62,8 @@ for NB in "${NOTEBOOKS[@]}"; do
 
     # Step 2: Execute
     START_TS=$(date '+%Y-%m-%d %H:%M:%S')
-    echo -n "  [2/2] Executing (started $START_TS)... " | tee -a "$LOG"
+    echo "  [2/2] Started processing: $START_TS" | tee -a "$LOG"
+    echo -n "         Executing... " | tee -a "$LOG"
     START=$(date +%s)
 
     if jupyter nbconvert \

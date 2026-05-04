@@ -78,6 +78,9 @@ class AttentionImputer(nn.Module):
         return x_imp
 
 
+# NOTE: SATSImputer defined below is NOT used in the AareML pipeline.
+# Actual imputation: linear interpolation (gaps ≤7 days) + training-mean fill.
+# Retained for reference only.
 class SATSImputer:
     """
     Scikit-learn-style wrapper around AttentionImputer.
