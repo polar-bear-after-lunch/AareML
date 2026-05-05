@@ -145,11 +145,10 @@ def block_bootstrap_ci(
     for _ in range(n_boot):
         # Draw block-start indices with replacement
         n_blocks = int(np.ceil(N / block_size))
-        if N <= block_size:
-            block_size = max(1, N // 5)
-        starts   = rng.integers(0, max(1, N - block_size + 1), size=n_blocks)
+        _bs = block_size if N > block_size else max(1, N // 5)
+        starts   = rng.integers(0, max(1, N - _bs + 1), size=n_blocks)
         idx      = np.concatenate([
-            np.arange(s, min(s + block_size, N)) for s in starts
+            np.arange(s, min(s + _bs, N)) for s in starts
         ])[:N]
         scores = metric_fn(y_true[idx], y_pred[idx], targets)
         for t in targets:
