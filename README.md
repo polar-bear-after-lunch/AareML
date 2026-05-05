@@ -30,7 +30,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 | Climatology | 0.334 mg/L | 1.444°C | 0.853 | Baseline |
 | Ridge Regression | 0.303 mg/L | 1.261°C | 0.908 | Best RMSE |
 | LSTM (default) | 0.308 mg/L | 1.267°C | 0.855 | — |
-| **LSTM (best Optuna)** | **0.319 mg/L** | **1.345°C** | **0.942** | Best KGE |
+| **LSTM (best Optuna)** | **0.300 mg/L** | **1.345°C** | **0.942** | Best KGE |
 | LakeBeD-US LSTM (ref.) | 1.40 mg/L | — | — | Published lake benchmark |
 
 > LSTM wins on KGE (0.942 vs 0.908) — capturing the river's seasonal rhythm, not just its average level.
@@ -39,8 +39,8 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 
 | Strategy | Mean RMSE | Significance |
 |----------|-----------|-------------|
-| Zero-shot transfer | 0.427 mg/L | p=0.005 vs Ridge (Wilcoxon, n=11) |
-| Per-gauge retrain | 0.388 mg/L | p=0.465 (not significant) |
+| Zero-shot transfer | 0.419 mg/L | p=0.007 vs Ridge (Wilcoxon, n=11) |
+| Per-gauge retrain | 0.392 mg/L | p=0.465 (not significant) |
 | EA-LSTM | 0.417 mg/L | — |
 
 ### Temperature Multi-Site (15 Gauges)
@@ -51,7 +51,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 
 | River | RMSE |
 |-------|------|
-| Willamette, OR | **1.007 mg/L** (beats lake benchmark) |
+| Willamette, OR | **0.759 mg/L** (beats lake benchmark) |
 | Fox River, WI | 1.549 mg/L |
 | Mississippi, LA | 1.678 mg/L |
 | Missouri, MO | 1.874 mg/L |
@@ -60,7 +60,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 
 | Model | RMSE | NSE |
 |-------|------|-----|
-| River LSTM zero-shot → lake | 3.34 mg/L | -4.24 |
+| River LSTM zero-shot → lake | 2.811 mg/L | -4.24 |
 | **Lake-retrained LSTM** | **0.76 mg/L** | **0.708** |
 | LakeBeD-US benchmark | 1.40 mg/L | — |
 
@@ -209,7 +209,7 @@ Data is excluded due to size. Use `python download_data.py` to fetch all dataset
 ## Version History
 
 See [CHANGELOG.md](CHANGELOG.md) for full history (v1.0–v1.25).
-**Current version: v1.25** (May 2026)
+**Current version: v1.16** (May 2026)
 
 ---
 
