@@ -15,6 +15,7 @@
 #SBATCH --partition=gpu-invest
 #SBATCH --qos=job_gpu_preemptable
 #SBATCH --account=gratis
+#SBATCH --gres=gpu:rtx4090:1
 #SBATCH --no-requeue
 #SBATCH --mail-user=YOUR_EMAIL@unibe.ch
 #SBATCH --mail-type=END,FAIL
