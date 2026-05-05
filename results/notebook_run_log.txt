@@ -1,0 +1,41 @@
+=============================================
+  AareML — Notebook Run Log
+  2026-05-04 22:04:24
+  Dry run: false
+=============================================
+
+─────────────────────────────────────────────
+  01_data_exploration.ipynb
+  [1/2] Clearing outputs... done
+  [2/2] Started processing: 2026-05-04 22:04:35
+         Executing... ✓ 4m 45s (finished 22:09:20)
+
+─────────────────────────────────────────────
+  02_baselines.ipynb
+  [1/2] Clearing outputs... done
+  [2/2] Started processing: 2026-05-04 22:09:22
+         Executing... ✗ FAILED after 19s (finished 22:09:41)
+  Error log: /tmp/02_baselines_err.txt
+  Last error lines:
+    [31mNameError[39m                                 Traceback (most recent call last)
+    [36mCell[39m[36m [39m[32mIn[10][39m[32m, line 17[39m
+    [32m     15[39m [38;5;66;03m# Save per-gauge Ridge RMSE for use in notebook 04 significance test[39;00m
+    [32m     16[39m ridge_rows = []
+    [32m---> [39m[32m17[39m [38;5;28;01mfor[39;00m gid, gdf [38;5;129;01min[39;00m [43mgauge_data[49m.items():
+    [32m     18[39m     _, _, test_g = train_val_test_split(gdf)
+    [32m     19[39m     X_te = test_g[FEATURES].values
+    
+    [31mNameError[39m: name 'gauge_data' is not defined
+    
+
+─────────────────────────────────────────────
+  03_lstm_single_site.ipynb
+  [1/2] Clearing outputs... done
+  [2/2] Started processing: 2026-05-04 22:09:43
+         Executing... ✓ 7m 58s (finished 22:17:41)
+
+─────────────────────────────────────────────
+  04_multisite_analysis.ipynb
+  [1/2] Clearing outputs... done
+  [2/2] Started processing: 2026-05-04 22:17:44
+         Executing... 

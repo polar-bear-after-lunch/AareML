@@ -1,0 +1,287 @@
+[NbConvertApp] Converting notebook notebooks/05_shap_interpretation.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# ── Wrapper: model predicts step 0 (1-day-ahead) of DO target only ────────
+class DO1DayWrapper(torch.nn.Module):
+    """Wraps the seq2seq model, returning only the 1-day-ahead DO scalar."""
+    def __init__(self, base_model):
+        super().__init__()
+        self.base = base_model
+
+    def forward(self, x):
+        out = self.base(x)          # [batch, horizon, n_tgt]
+        return out[:, 0, 0]         # 1-day-ahead DO
+
+
+wrapper = DO1DayWrapper(model).eval().to(DEVICE)
+
+# Background: 200 random training windows
+X_train_np, _, _ = make_windows(train, train_means)
+X_train_s, _     = scale_windows_fn(X_train_np, np.zeros((len(X_train_np), HORIZON, N_TGT)))
+bg_idx  = np.random.default_rng(SEED).choice(len(X_train_s), size=200, replace=False)
+bg_tensor = torch.tensor(X_train_s[bg_idx]).to(DEVICE)
+
+# Inputs: first 500 test windows
+# Scale SHAP windows to available hardware — more = more stable attributions
+n_explain_max = 2000 if DEVICE.type == 'cuda' else (10 if LOCAL_TEST else 500)
+n_explain = min(n_explain_max, len(Xs_test))
+print(f'SHAP windows: {n_explain} ({"GPU" if DEVICE.type == "cuda" else "CPU"})')
+inp_tensor = torch.tensor(Xs_test[:n_explain]).to(DEVICE)
+
+print(f'Computing SHAP for {n_explain} windows (~{n_explain//10} sec on CPU)...')
+if HAS_CAPTUM:
+    # GradientShap requires training mode for cuDNN RNN backward pass
+    model.train()
+    gs = GradientShap(wrapper)
+    shap_vals = gs.attribute(inp_tensor, bg_tensor, target=None,
+                             n_samples=50, stdevs=0.01)
+    shap_np = shap_vals.cpu().detach().numpy()  # [n_explain, LOOKBACK, N_FEAT]
+    print(f'SHAP values computed: {shap_np.shape}')
+else:
+    # Gradient × input fallback
+    inp_tensor.requires_grad_(True)
+    out = wrapper(inp_tensor)
+    out.sum().backward()
+    shap_np = (inp_tensor.grad * inp_tensor).cpu().detach().numpy()
+    inp_tensor.requires_grad_(False)
+    print(f'Gradient×input attribution: {shap_np.shape}')
+
+------------------
+
+----- stdout -----
+[data] make_windows: 12099 windows, X=(12099, 21, 4), y=(12099, 14, 2), date range 1981-01-22 → 2014-12-18
+SHAP windows: 1348 (GPU)
+Computing SHAP for 1348 windows (~134 sec on CPU)...
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mOutOfMemoryError[39m                          Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[8][39m[32m, line 33[39m
+[32m     31[39m model.train()
+[32m     32[39m gs = GradientShap(wrapper)
+[32m---> [39m[32m33[39m shap_vals = [43mgs[49m[43m.[49m[43mattribute[49m[43m([49m[43minp_tensor[49m[43m,[49m[43m [49m[43mbg_tensor[49m[43m,[49m[43m [49m[43mtarget[49m[43m=[49m[38;5;28;43;01mNone[39;49;00m[43m,[49m
+[32m     34[39m [43m                         [49m[43mn_samples[49m[43m=[49m[32;43m50[39;49m[43m,[49m[43m [49m[43mstdevs[49m[43m=[49m[32;43m0.01[39;49m[43m)[49m
+[32m     35[39m shap_np = shap_vals.cpu().detach().numpy()  [38;5;66;03m# [n_explain, LOOKBACK, N_FEAT][39;00m
+[32m     36[39m [38;5;28mprint[39m([33mf[39m[33m'[39m[33mSHAP values computed: [39m[38;5;132;01m{[39;00mshap_np.shape[38;5;132;01m}[39;00m[33m'[39m)
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/captum/log/__init__.py:42[39m, in [36mlog_usage.<locals>._log_usage.<locals>.wrapper[39m[34m(*args, **kwargs)[39m
+[32m     40[39m [38;5;129m@wraps[39m(func)
+[32m     41[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mwrapper[39m(*args, **kwargs):
+[32m---> [39m[32m42[39m     [38;5;28;01mreturn[39;00m [43mfunc[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/captum/attr/_core/gradient_shap.py:269[39m, in [36mGradientShap.attribute[39m[34m(self, inputs, baselines, n_samples, stdevs, target, additional_forward_args, return_convergence_delta)[39m
+[32m    266[39m nt = NoiseTunnel(input_min_baseline_x_grad)
+[32m    268[39m [38;5;66;03m# NOTE: using attribute.__wrapped__ to not log[39;00m
+[32m--> [39m[32m269[39m attributions = [43mnt[49m[43m.[49m[43mattribute[49m[43m.[49m[43m__wrapped__[49m[43m([49m
+[32m    270[39m [43m    [49m[43mnt[49m[43m,[49m[43m  [49m[38;5;66;43;03m# self[39;49;00m
+[32m    271[39m [43m    [49m[43minputs[49m[43m,[49m
+[32m    272[39m [43m    [49m[43mnt_type[49m[43m=[49m[33;43m"[39;49m[33;43msmoothgrad[39;49m[33;43m"[39;49m[43m,[49m
+[32m    273[39m [43m    [49m[43mnt_samples[49m[43m=[49m[43mn_samples[49m[43m,[49m
+[32m    274[39m [43m    [49m[43mstdevs[49m[43m=[49m[43mstdevs[49m[43m,[49m
+[32m    275[39m [43m    [49m[43mdraw_baseline_from_distrib[49m[43m=[49m[38;5;28;43;01mTrue[39;49;00m[43m,[49m
+[32m    276[39m [43m    [49m[43mbaselines[49m[43m=[49m[43mbaselines[49m[43m,[49m
+[32m    277[39m [43m    [49m[43mtarget[49m[43m=[49m[43mtarget[49m[43m,[49m
+[32m    278[39m [43m    [49m[43madditional_forward_args[49m[43m=[49m[43madditional_forward_args[49m[43m,[49m
+[32m    279[39m [43m    [49m[43mreturn_convergence_delta[49m[43m=[49m[43mreturn_convergence_delta[49m[43m,[49m
+[32m    280[39m [43m[49m[43m)[49m
+[32m    282[39m [38;5;28;01mreturn[39;00m attributions
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/captum/attr/_core/noise_tunnel.py:365[39m, in [36mNoiseTunnel.attribute[39m[34m(self, inputs, nt_type, nt_samples, nt_samples_batch_size, stdevs, draw_baseline_from_distrib, **kwargs)[39m
+[32m    359[39m [38;5;28;01mfor[39;00m _ [38;5;129;01min[39;00m [38;5;28mrange[39m(nt_samples_partition):
+[32m    360[39m     inputs_with_noise = add_noise_to_inputs(nt_samples_batch_size)
+[32m    361[39m     (
+[32m    362[39m         attributions_partial,
+[32m    363[39m         is_attrib_tuple,
+[32m    364[39m         delta_partial,
+[32m--> [39m[32m365[39m     ) = [43mcompute_partial_attribution[49m[43m([49m[43minputs_with_noise[49m[43m,[49m[43m [49m[43mkwargs_copy[49m[43m)[49m
+[32m    367[39m     [38;5;28;01mif[39;00m [38;5;28mlen[39m(sum_attributions) == [32m0[39m:
+[32m    368[39m         sum_attributions = [[38;5;28;01mNone[39;00m] * [38;5;28mlen[39m(attributions_partial)
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/captum/attr/_core/noise_tunnel.py:253[39m, in [36mNoiseTunnel.attribute.<locals>.compute_partial_attribution[39m[34m(inputs_with_noise_partition, kwargs_partition)[39m
+[32m    247[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mcompute_partial_attribution[39m(
+[32m    248[39m     inputs_with_noise_partition: Tuple[Tensor, ...], kwargs_partition: Any
+[32m    249[39m ) -> Tuple[Tuple[Tensor, ...], [38;5;28mbool[39m, Union[[38;5;28;01mNone[39;00m, Tensor]]:
+[32m    250[39m     [38;5;66;03m# smoothgrad_Attr(x) = 1 / n * sum(Attr(x + N(0, sigma^2))[39;00m
+[32m    251[39m     [38;5;66;03m# NOTE: using __wrapped__ such that it does not log the inner logs[39;00m
+[32m--> [39m[32m253[39m     attributions = [43mattr_func[49m[43m.[49m[43m__wrapped__[49m[43m([49m[43m  [49m[38;5;66;43;03m# type: ignore[39;49;00m
+[32m    254[39m [43m        [49m[38;5;28;43mself[39;49m[43m.[49m[43mattribution_method[49m[43m,[49m[43m  [49m[38;5;66;43;03m# self[39;49;00m
+[32m    255[39m [43m        [49m[43minputs_with_noise_partition[49m
+[32m    256[39m [43m        [49m[38;5;28;43;01mif[39;49;00m[43m [49m[43mis_inputs_tuple[49m
+[32m    257[39m [43m        [49m[38;5;28;43;01melse[39;49;00m[43m [49m[43minputs_with_noise_partition[49m[43m[[49m[32;43m0[39;49m[43m][49m[43m,[49m
+[32m    258[39m [43m        [49m[43m*[49m[43m*[49m[43mkwargs_partition[49m[43m,[49m
+[32m    259[39m [43m    [49m[43m)[49m
+[32m    260[39m     delta = [38;5;28;01mNone[39;00m
+[32m    262[39m     [38;5;28;01mif[39;00m [38;5;28mself[39m.is_delta_supported [38;5;129;01mand[39;00m return_convergence_delta:
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/captum/attr/_core/gradient_shap.py:366[39m, in [36mInputBaselineXGradient.attribute[39m[34m(self, inputs, baselines, target, additional_forward_args, return_convergence_delta)[39m
+[32m    356[39m rand_coefficient = torch.tensor(
+[32m    357[39m     np.random.uniform([32m0.0[39m, [32m1.0[39m, inputs[[32m0[39m].shape[[32m0[39m]),
+[32m    358[39m     device=inputs[[32m0[39m].device,
+[32m    359[39m     dtype=inputs[[32m0[39m].dtype,
+[32m    360[39m )
+[32m    362[39m input_baseline_scaled = [38;5;28mtuple[39m(
+[32m    363[39m     _scale_input([38;5;28minput[39m, baseline, rand_coefficient)
+[32m    364[39m     [38;5;28;01mfor[39;00m [38;5;28minput[39m, baseline [38;5;129;01min[39;00m [38;5;28mzip[39m(inputs, baselines)
+[32m    365[39m )
+[32m--> [39m[32m366[39m grads = [38;5;28;43mself[39;49m[43m.[49m[43mgradient_func[49m[43m([49m
+[32m    367[39m [43m    [49m[38;5;28;43mself[39;49m[43m.[49m[43mforward_func[49m[43m,[49m[43m [49m[43minput_baseline_scaled[49m[43m,[49m[43m [49m[43mtarget[49m[43m,[49m[43m [49m[43madditional_forward_args[49m
+[32m    368[39m [43m[49m[43m)[49m
+[32m    370[39m [38;5;28;01mif[39;00m [38;5;28mself[39m.multiplies_by_inputs:
+[32m    371[39m     input_baseline_diffs = [38;5;28mtuple[39m(
+[32m    372[39m         [38;5;28minput[39m - baseline [38;5;28;01mfor[39;00m [38;5;28minput[39m, baseline [38;5;129;01min[39;00m [38;5;28mzip[39m(inputs, baselines)
+[32m    373[39m     )
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/captum/_utils/gradient.py:112[39m, in [36mcompute_gradients[39m[34m(forward_fn, inputs, target_ind, additional_forward_args)[39m
+[32m     94[39m [38;5;250m[39m[33mr[39m[33;03m"""[39;00m
+[32m     95[39m [33;03mComputes gradients of the output with respect to inputs for an[39;00m
+[32m     96[39m [33;03marbitrary forward function.[39;00m
+[32m   (...)[39m[32m    108[39m [33;03m                arguments) if no additional arguments are required[39;00m
+[32m    109[39m [33;03m"""[39;00m
+[32m    110[39m [38;5;28;01mwith[39;00m torch.autograd.set_grad_enabled([38;5;28;01mTrue[39;00m):
+[32m    111[39m     [38;5;66;03m# runs forward pass[39;00m
+[32m--> [39m[32m112[39m     outputs = [43m_run_forward[49m[43m([49m[43mforward_fn[49m[43m,[49m[43m [49m[43minputs[49m[43m,[49m[43m [49m[43mtarget_ind[49m[43m,[49m[43m [49m[43madditional_forward_args[49m[43m)[49m
+[32m    113[39m     [38;5;28;01massert[39;00m outputs[[32m0[39m].numel() == [32m1[39m, (
+[32m    114[39m         [33m"[39m[33mTarget not provided when necessary, cannot[39m[33m"[39m
+[32m    115[39m         [33m"[39m[33m take gradient with respect to multiple outputs.[39m[33m"[39m
+[32m    116[39m     )
+[32m    117[39m     [38;5;66;03m# torch.unbind(forward_out) is a list of scalar tensor tuples and[39;00m
+[32m    118[39m     [38;5;66;03m# contains batch_size * #steps elements[39;00m
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/captum/_utils/common.py:531[39m, in [36m_run_forward[39m[34m(forward_func, inputs, target, additional_forward_args)[39m
+[32m    528[39m inputs = _format_inputs(inputs)
+[32m    529[39m additional_forward_args = _format_additional_forward_args(additional_forward_args)
+[32m--> [39m[32m531[39m output = [43mforward_func[49m[43m([49m
+[32m    532[39m [43m    [49m[43m*[49m[43m([49m[43m*[49m[43minputs[49m[43m,[49m[43m [49m[43m*[49m[43madditional_forward_args[49m[43m)[49m
+[32m    533[39m [43m    [49m[38;5;28;43;01mif[39;49;00m[43m [49m[43madditional_forward_args[49m[43m [49m[38;5;129;43;01mis[39;49;00m[43m [49m[38;5;129;43;01mnot[39;49;00m[43m [49m[38;5;28;43;01mNone[39;49;00m
+[32m    534[39m [43m    [49m[38;5;28;43;01melse[39;49;00m[43m [49m[43minputs[49m
+[32m    535[39m [43m[49m[43m)[49m
+[32m    536[39m [38;5;28;01mreturn[39;00m _select_targets(output, target)
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/torch/nn/modules/module.py:1532[39m, in [36mModule._wrapped_call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1530[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._compiled_call_impl(*args, **kwargs)  [38;5;66;03m# type: ignore[misc][39;00m
+[32m   1531[39m [38;5;28;01melse[39;00m:
+[32m-> [39m[32m1532[39m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[43m.[49m[43m_call_impl[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/torch/nn/modules/module.py:1541[39m, in [36mModule._call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1536[39m [38;5;66;03m# If we don't have any hooks, we want to skip the rest of the logic in[39;00m
+[32m   1537[39m [38;5;66;03m# this function, and just call forward.[39;00m
+[32m   1538[39m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m ([38;5;28mself[39m._backward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._backward_pre_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_pre_hooks
+[32m   1539[39m         [38;5;129;01mor[39;00m _global_backward_pre_hooks [38;5;129;01mor[39;00m _global_backward_hooks
+[32m   1540[39m         [38;5;129;01mor[39;00m _global_forward_hooks [38;5;129;01mor[39;00m _global_forward_pre_hooks):
+[32m-> [39m[32m1541[39m     [38;5;28;01mreturn[39;00m [43mforward_call[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+[32m   1543[39m [38;5;28;01mtry[39;00m:
+[32m   1544[39m     result = [38;5;28;01mNone[39;00m
+
+[36mCell[39m[36m [39m[32mIn[8][39m[32m, line 9[39m, in [36mDO1DayWrapper.forward[39m[34m(self, x)[39m
+[32m      8[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mforward[39m([38;5;28mself[39m, x):
+[32m----> [39m[32m9[39m     out = [38;5;28;43mself[39;49m[43m.[49m[43mbase[49m[43m([49m[43mx[49m[43m)[49m          [38;5;66;03m# [batch, horizon, n_tgt][39;00m
+[32m     10[39m     [38;5;28;01mreturn[39;00m out[:, [32m0[39m, [32m0[39m]
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/torch/nn/modules/module.py:1532[39m, in [36mModule._wrapped_call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1530[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._compiled_call_impl(*args, **kwargs)  [38;5;66;03m# type: ignore[misc][39;00m
+[32m   1531[39m [38;5;28;01melse[39;00m:
+[32m-> [39m[32m1532[39m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[43m.[49m[43m_call_impl[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/torch/nn/modules/module.py:1541[39m, in [36mModule._call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1536[39m [38;5;66;03m# If we don't have any hooks, we want to skip the rest of the logic in[39;00m
+[32m   1537[39m [38;5;66;03m# this function, and just call forward.[39;00m
+[32m   1538[39m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m ([38;5;28mself[39m._backward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._backward_pre_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_pre_hooks
+[32m   1539[39m         [38;5;129;01mor[39;00m _global_backward_pre_hooks [38;5;129;01mor[39;00m _global_backward_hooks
+[32m   1540[39m         [38;5;129;01mor[39;00m _global_forward_hooks [38;5;129;01mor[39;00m _global_forward_pre_hooks):
+[32m-> [39m[32m1541[39m     [38;5;28;01mreturn[39;00m [43mforward_call[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+[32m   1543[39m [38;5;28;01mtry[39;00m:
+[32m   1544[39m     result = [38;5;28;01mNone[39;00m
+
+[36mFile [39m[32m~/AareML/notebooks/../src/model.py:116[39m, in [36mSeq2SeqLSTM.forward[39m[34m(self, x, teacher_forcing_ratio, y_target)[39m
+[32m     99[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mforward[39m(
+[32m    100[39m     [38;5;28mself[39m,
+[32m    101[39m     x: torch.Tensor,
+[32m    102[39m     teacher_forcing_ratio: [38;5;28mfloat[39m = [32m0.0[39m,
+[32m    103[39m     y_target: Optional[torch.Tensor] = [38;5;28;01mNone[39;00m,
+[32m    104[39m ) -> torch.Tensor:
+[32m    105[39m [38;5;250m    [39m[33;03m"""[39;00m
+[32m    106[39m [33;03m    Parameters[39;00m
+[32m    107[39m [33;03m    ----------[39;00m
+[32m   (...)[39m[32m    114[39m [33;03m    [batch, horizon, n_tgt][39;00m
+[32m    115[39m [33;03m    """[39;00m
+[32m--> [39m[32m116[39m     _, (h, c) = [38;5;28;43mself[39;49m[43m.[49m[43mencoder[49m[43m([49m[43mx[49m[43m)[49m
+[32m    118[39m     batch = x.size([32m0[39m)
+[32m    119[39m     dec_in = torch.zeros(batch, [32m1[39m, [38;5;28mself[39m.n_tgt, device=x.device)
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/torch/nn/modules/module.py:1532[39m, in [36mModule._wrapped_call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1530[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._compiled_call_impl(*args, **kwargs)  [38;5;66;03m# type: ignore[misc][39;00m
+[32m   1531[39m [38;5;28;01melse[39;00m:
+[32m-> [39m[32m1532[39m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[43m.[49m[43m_call_impl[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/torch/nn/modules/module.py:1541[39m, in [36mModule._call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1536[39m [38;5;66;03m# If we don't have any hooks, we want to skip the rest of the logic in[39;00m
+[32m   1537[39m [38;5;66;03m# this function, and just call forward.[39;00m
+[32m   1538[39m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m ([38;5;28mself[39m._backward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._backward_pre_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_pre_hooks
+[32m   1539[39m         [38;5;129;01mor[39;00m _global_backward_pre_hooks [38;5;129;01mor[39;00m _global_backward_hooks
+[32m   1540[39m         [38;5;129;01mor[39;00m _global_forward_hooks [38;5;129;01mor[39;00m _global_forward_pre_hooks):
+[32m-> [39m[32m1541[39m     [38;5;28;01mreturn[39;00m [43mforward_call[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+[32m   1543[39m [38;5;28;01mtry[39;00m:
+[32m   1544[39m     result = [38;5;28;01mNone[39;00m
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/torch/nn/modules/rnn.py:911[39m, in [36mLSTM.forward[39m[34m(self, input, hx)[39m
+[32m    908[39m         hx = [38;5;28mself[39m.permute_hidden(hx, sorted_indices)
+[32m    910[39m [38;5;28;01mif[39;00m batch_sizes [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m:
+[32m--> [39m[32m911[39m     result = [43m_VF[49m[43m.[49m[43mlstm[49m[43m([49m[38;5;28;43minput[39;49m[43m,[49m[43m [49m[43mhx[49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[43m.[49m[43m_flat_weights[49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[43m.[49m[43mbias[49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[43m.[49m[43mnum_layers[49m[43m,[49m
+[32m    912[39m [43m                      [49m[38;5;28;43mself[39;49m[43m.[49m[43mdropout[49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[43m.[49m[43mtraining[49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[43m.[49m[43mbidirectional[49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[43m.[49m[43mbatch_first[49m[43m)[49m
+[32m    913[39m [38;5;28;01melse[39;00m:
+[32m    914[39m     result = _VF.lstm([38;5;28minput[39m, batch_sizes, hx, [38;5;28mself[39m._flat_weights, [38;5;28mself[39m.bias,
+[32m    915[39m                       [38;5;28mself[39m.num_layers, [38;5;28mself[39m.dropout, [38;5;28mself[39m.training, [38;5;28mself[39m.bidirectional)
+
+[31mOutOfMemoryError[39m: CUDA out of memory. Tried to allocate 14.89 GiB. GPU 
+

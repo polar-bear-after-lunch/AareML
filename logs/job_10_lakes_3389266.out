@@ -1,0 +1,14 @@
+Job started: Sun May  3 01:18:05 PM CEST 2026
+Node: gnode39
+GPU: NVIDIA GeForce RTX 4090
+Downloading Swiss lakes dataset...
+
+AareML — Data Download & Preparation
+Data directory: /storage/homefs/tn20y076/AareML/data
+Datasets: 
+
+============================================================
+  3/3  Swiss Lakes (Bärenbold et al. 2026)
+       Source: Eawag Open Data Portal
+       Reference: Bärenbold et al. (2026), ESSD
+============================================================

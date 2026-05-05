@@ -1,0 +1,32 @@
+Job started: Sun May  3 08:19:40 PM CEST 2026
+Node: gnode35
+GPU: NVIDIA GeForce RTX 4090
+Downloading Swiss lakes dataset...
+
+AareML — Data Download & Preparation
+Data directory: /storage/homefs/tn20y076/AareML/data
+Datasets: 
+
+============================================================
+  3/3  Swiss Lakes (Bärenbold et al. 2026)
+       Source: Eawag Open Data Portal
+       Reference: Bärenbold et al. (2026), ESSD
+============================================================
+  Downloading Swiss Lakes dataset...
+  URL:  https://opendata.eawag.ch/dataset/3b9b8bc3-f7bb-4e59-8b08-079b073d7dc9/resource/a1f7bb98-5af2-4947-b77e-c9d8b1bb3b4f/download/swiss_lakes_long_term.zip
+  Dest: /storage/homefs/tn20y076/AareML/data/swiss-lakes/swiss_lakes_long_term.zip
+  WARNING: Could not download Swiss Lakes dataset: name '_wget' is not defined
+  You can download it manually from:
+  https://opendata.eawag.ch/dataset/long-term-temperature-oxygen-and-water-clarity-trends-in-swiss-lakes
+  Place the extracted files in: /storage/homefs/tn20y076/AareML/data/swiss-lakes
+
+============================================================
+  All done in 0.0 min
+  You can now run the notebooks in order: 01 → 02 → 03 → 04 → 04b → 05 → 06 → 07 → 08 → 09 → 10
+============================================================
+
+
+Running notebook 10: Swiss Lakes EDA + LSTM...
+
+Notebook 10 complete.
+Job finished: Sun May  3 08:22:16 PM CEST 2026

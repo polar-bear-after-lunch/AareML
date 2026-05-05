@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/AareML/download_data.py", line 288, in <module>
+    main()
+  File "/storage/homefs/tn20y076/AareML/download_data.py", line 278, in main
+    download_swiss_lakes()
+  File "/storage/homefs/tn20y076/AareML/download_data.py", line 216, in download_swiss_lakes
+    SWISS_LAKE_DIR.mkdir(parents=True, exist_ok=True)
+    ^^^^^^^^^^^^^^
+NameError: name 'SWISS_LAKE_DIR' is not defined

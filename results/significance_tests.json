@@ -6,8 +6,8 @@
     "significant": true
   },
   "lstm_retrain_vs_ridge": {
-    "stat": 32.0,
-    "p": 0.9658203125,
+    "stat": 28.0,
+    "p": 0.7001953125,
     "significant": false
   }
 }

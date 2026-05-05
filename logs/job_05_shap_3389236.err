@@ -1,0 +1,108 @@
+[NbConvertApp] Converting notebook notebooks/05_shap_interpretation.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# ── Wrapper: model predicts step 0 (1-day-ahead) of DO target only ────────
+class DO1DayWrapper(torch.nn.Module):
+    """Wraps the seq2seq model, returning only the 1-day-ahead DO scalar."""
+    def __init__(self, base_model):
+        super().__init__()
+        self.base = base_model
+
+    def forward(self, x):
+        out = self.base(x)          # [batch, horizon, n_tgt]
+        return out[:, 0, 0]         # 1-day-ahead DO
+
+
+wrapper = DO1DayWrapper(model).eval().to(DEVICE)
+
+# Background: 200 random training windows
+X_train_np, _, _ = make_windows(train, train_means)
+X_train_s, _     = scale_windows_fn(X_train_np, np.zeros((len(X_train_np), HORIZON, N_TGT)))
+bg_idx  = np.random.default_rng(SEED).choice(len(X_train_s), size=200, replace=False)
+bg_tensor = torch.tensor(X_train_s[bg_idx]).to(DEVICE)
+
+# Inputs: first 500 test windows
+# Scale SHAP windows to available hardware — more = more stable attributions
+n_explain_max = 500 if DEVICE.type == 'cuda' else (10 if LOCAL_TEST else 500)  # 500 uses ~3.7 GiB on RTX 4090 (safe below 24 GB limit)
+n_explain = min(n_explain_max, len(Xs_test))
+print(f'SHAP windows: {n_explain} ({"GPU" if DEVICE.type == "cuda" else "CPU"})')
+inp_tensor = torch.tensor(Xs_test[:n_explain]).to(DEVICE)
+
+print(f'Computing SHAP for {n_explain} windows (~{n_explain//10} sec on CPU)...')
+if HAS_CAPTUM:
+    # GradientShap requires training mode for cuDNN RNN backward pass
+model.train()
+gs = GradientShap(wrapper)
+    shap_vals = gs.attribute(inp_tensor, bg_tensor, target=None,
+                             n_samples=50, stdevs=0.01)
+    shap_np = shap_vals.cpu().detach().numpy()  # [n_explain, LOOKBACK, N_FEAT]
+    print(f'SHAP values computed: {shap_np.shape}')
+else:
+    # Gradient × input fallback
+    inp_tensor.requires_grad_(True)
+    out = wrapper(inp_tensor)
+    out.sum().backward()
+    shap_np = (inp_tensor.grad * inp_tensor).cpu().detach().numpy()
+    inp_tensor.requires_grad_(False)
+    print(f'Gradient×input attribution: {shap_np.shape}')
+
+------------------
+
+
+  [36mCell[39m[36m [39m[32mIn[8][39m[32m, line 31[39m
+[31m    [39m[31mmodel.train()[39m
+    ^
+[31mIndentationError[39m[31m:[39m expected an indented block after 'if' statement on line 29
+
+
