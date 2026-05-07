@@ -134,6 +134,75 @@ class Seq2SeqLSTM(nn.Module):
         return torch.cat(outputs, dim=1)            # [batch, horizon, n_tgt]
 
 
+
+# ── Seq2Seq GRU (for ablation study — same interface as Seq2SeqLSTM) ──────────
+
+class Seq2SeqGRU(nn.Module):
+    """
+    Encoder-decoder GRU — drop-in replacement for Seq2SeqLSTM.
+
+    Identical interface to Seq2SeqLSTM; GRU hidden state is a single tensor
+    (not a tuple), so the forward pass is slightly different internally.
+    Used in the ablation study (notebook 11) to compare GRU vs LSTM.
+    """
+
+    def __init__(self, n_feat: int = N_FEAT, n_tgt: int = N_TGT,
+                 hidden: int = 64, n_layers: int = 2, dropout: float = 0.2):
+        super().__init__()
+        self.n_tgt   = n_tgt
+        self.horizon = HORIZON
+
+        enc_drop = dropout if n_layers > 1 else 0.0
+        self.encoder = nn.GRU(
+            input_size=n_feat, hidden_size=hidden,
+            num_layers=n_layers, dropout=enc_drop, batch_first=True,
+        )
+        self.decoder = nn.GRU(
+            input_size=n_tgt, hidden_size=hidden,
+            num_layers=n_layers, dropout=enc_drop, batch_first=True,
+        )
+        self.drop = nn.Dropout(dropout)
+        self.fc   = nn.Linear(hidden, n_tgt)
+
+    def forward(
+        self,
+        x: torch.Tensor,
+        teacher_forcing_ratio: float = 0.0,
+        y_target: Optional[torch.Tensor] = None,
+        **kwargs,                                   # absorb unused LSTM kwargs
+    ) -> torch.Tensor:
+        """
+        Parameters
+        ----------
+        x                     : [batch, lookback, n_feat]
+        teacher_forcing_ratio : probability of using ground truth as decoder input
+        y_target              : [batch, horizon, n_tgt] — required if tf_ratio > 0
+
+        Returns
+        -------
+        [batch, horizon, n_tgt]
+        """
+        _, h = self.encoder(x)                      # GRU: hidden only (no cell state)
+
+        batch = x.size(0)
+        dec_in = torch.zeros(batch, 1, self.n_tgt, device=x.device)
+
+        outputs = []
+        for t in range(self.horizon):
+            out, h = self.decoder(dec_in, h)        # GRU: single hidden tensor
+            pred = self.fc(self.drop(out))          # [batch, 1, n_tgt]
+            outputs.append(pred)
+
+            use_tf = (
+                teacher_forcing_ratio > 0.0
+                and y_target is not None
+                and torch.rand(1).item() < teacher_forcing_ratio
+            )
+            dec_in = y_target[:, t : t + 1, :] if use_tf else pred.detach()
+
+        return torch.cat(outputs, dim=1)            # [batch, horizon, n_tgt]
+
+
 # ── Entity-Aware LSTM (I6) ─────────────────────────────────────────────────
 
 class EALSTMCell(nn.Module):
