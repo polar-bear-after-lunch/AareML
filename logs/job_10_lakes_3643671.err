@@ -1,0 +1,217 @@
+[NbConvertApp] Converting notebook notebooks/10_swiss_lakes_lstm.ipynb to notebook
+/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate(nb)
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# ── Multi-lake evaluation: loop over all lakes in lake_dfs ──────────────────
+# Evaluates zero-shot transfer AND lake-retrained LSTM on ALL available lakes.
+# Results aggregated into all_lake_results for the comparison table.
+
+import json as _json
+_bp_path = RESULTS_DIR / "best_params.json"
+if _bp_path.exists():
+    _bp = _json.load(open(_bp_path))
+    _lk_h, _lk_l, _lk_dr = _bp.get("hidden",256), _bp.get("n_layers",1), _bp.get("dropout",0.115)
+else:
+    _lk_h, _lk_l, _lk_dr = 256, 1, 0.115
+
+all_lake_rows = []
+lakes_to_eval = list(lake_dfs.keys()) if USING_SWISS else [FOCUS_LAKE]
+print(f"Evaluating {len(lakes_to_eval)} lakes...")
+
+for _lake_name in tqdm(lakes_to_eval, desc="Lakes"):
+    try:
+        # ── Prepare this lake's data ─────────────────────────────────────────
+        if USING_SWISS:
+            _raw = lake_dfs[_lake_name]
+            _surface = _raw[_raw.get("depth", _raw.index if "depth" not in _raw.columns else _raw["depth"]).isin([0,1,2]) if "depth" in _raw.columns else slice(None)].copy()
+            # Daily resample
+            _daily = _raw[["oxygen","temp","cond25"]].resample("D").mean() if USING_SWISS else mendota[["do","temp"]].copy()
+            _ml = _daily.rename(columns={"oxygen":"O2C_sensor","temp":"temp_sensor","cond25":"ec_sensor"})
+        else:
+            _ml = lake_ml.copy()
+
+        # Fill missing features
+        for _col in ["pH_sensor","ec_sensor"]:
+            if _col not in _ml.columns:
+                _ml[_col] = np.nan
+
+        # Reorder to FEATURES convention
+        _feat_cols = [c for c in ["O2C_sensor","temp_sensor","pH_sensor","ec_sensor"] if c in _ml.columns]
+        _tgt_cols  = ["O2C_sensor"]
+        _ml = _ml.reindex(columns=_feat_cols + [c for c in _tgt_cols if c not in _feat_cols], fill_value=np.nan)
+        _ml_filled = _ml.interpolate("linear", limit=7).ffill().bfill()
+
+        # Check coverage
+        if _ml_filled["O2C_sensor"].notna().mean() < 0.1:
+            continue
+
+        # Split
+        _has_post17 = (_ml_filled.index > "2017-01-01").any()
+        if _has_post17:
+            _tr = _ml_filled[_ml_filled.index <= TRAIN_END]
+            _va = _ml_filled[(_ml_filled.index > TRAIN_END) & (_ml_filled.index <= VAL_END)]
+            _te = _ml_filled[_ml_filled.index > VAL_END]
+        else:
+            _n = len(_ml_filled)
+            _tr = _ml_filled.iloc[:int(_n*0.70)]
+            _va = _ml_filled.iloc[int(_n*0.70):int(_n*0.85)]
+            _te = _ml_filled.iloc[int(_n*0.85):]
+
+        if len(_te) < LOOKBACK + HORIZON:
+            continue
+
+        # Scalers
+        _feat_sc_lk = StandardScaler().fit(_tr[_feat_cols].fillna(_tr[_feat_cols].mean()))
+        _tgt_sc_lk  = StandardScaler().fit(_tr[_tgt_cols].fillna(_tr[_tgt_cols].mean()))
+
+        # Windows
+        _tmeans = pd.concat([_tr[_feat_cols].mean(), _tr[_tgt_cols].mean()]).groupby(level=0).first()
+        _Xte, _yte, _ = make_windows(_te, _tmeans)
+        if len(_Xte) < 10:
+            continue
+        _N, _L, _F = _Xte.shape
+        _, _H, _T = _yte.shape
+
+        # ── Zero-shot ────────────────────────────────────────────────────────
+        if river_model is not None:
+            _F_river = river_feat_scaler.n_features_in_
+            if _F < _F_river:
+                _Xp = np.concatenate([_Xte, np.zeros((_N, _L, _F_river - _F))], axis=2)
+            else:
+                _Xp = _Xte[:, :, :_F_river]
+            _Xs = river_feat_scaler.transform(_Xp.reshape(-1, _F_river)).reshape(_N, _L, _F_river).astype(np.float32)
+            _T_river = river_tgt_scaler.n_features_in_
+            if _T < _T_river:
+                _yp = np.concatenate([_yte, np.zeros((_N, _H, _T_river - _T))], axis=2)
+            else:
+                _yp = _yte[:, :, :_T_river]
+            _ys = river_tgt_scaler.transform(_yp.reshape(-1, _T_river)).reshape(_N, _H, _T_river).astype(np.float32)
+            _ds_zs = RiverDataset(_Xs, _ys)
+            _pred_zs = predict(river_model, _ds_zs, river_tgt_scaler, device=DEVICE)[:, :, :_T]
+            _zs_rmse = float(np.sqrt(np.mean((_pred_zs - _yte)**2)))
+            _zs_nse  = float(1 - np.sum((_pred_zs - _yte)**2) / np.sum((_yte - _yte.mean())**2))
+        else:
+            _zs_rmse, _zs_nse = np.nan, np.nan
+
+        # ── Lake retrain ─────────────────────────────────────────────────────
+        torch.manual_seed(SEED); np.random.seed(SEED)
+        _Xtr, _ytr, _ = make_windows(_tr, _tmeans)
+        _Xva, _yva, _ = make_windows(_va, _tmeans)
+        if len(_Xtr) < 20 or len(_Xva) < 5:
+            _lk_rmse, _lk_nse = np.nan, np.nan
+        else:
+            _Xtr_s = _feat_sc_lk.transform(_Xtr.reshape(-1,_F)).reshape(len(_Xtr),_L,_F).astype(np.float32)
+            _ytr_s = _tgt_sc_lk.transform(_ytr.reshape(-1,_T)).reshape(len(_Xtr),_H,_T).astype(np.float32)
+            _Xva_s = _feat_sc_lk.transform(_Xva.reshape(-1,_F)).reshape(len(_Xva),_L,_F).astype(np.float32)
+            _yva_s = _tgt_sc_lk.transform(_yva.reshape(-1,_T)).reshape(len(_Xva),_H,_T).astype(np.float32)
+            _Xte_s = _feat_sc_lk.transform(_Xte.reshape(-1,_F)).reshape(_N,_L,_F).astype(np.float32)
+
+            _lk_m = Seq2SeqLSTM(n_feat=_F, n_tgt=_T, hidden=_lk_h, n_layers=_lk_l, dropout=_lk_dr)
+            _ds_tr = RiverDataset(_Xtr_s, _ytr_s)
+            _ds_va = RiverDataset(_Xva_s, _yva_s)
+            _dl_tr = DataLoader(_ds_tr, batch_size=64, shuffle=True)
+            _dl_va = DataLoader(_ds_va, batch_size=256, shuffle=False)
+            _lk_m, _ = train_model(_lk_m, _dl_tr, _dl_va, lr=1e-3,
+                                    epochs=EPOCHS, patience=10,
+                                    teacher_forcing_start=0.5, device=DEVICE, verbose=False)
+            _pred_lk = predict(_lk_m, RiverDataset(_Xte_s, np.zeros_like(_Xte_s[:,:,:_T])),
+                               _tgt_sc_lk, device=DEVICE)
+            _lk_rmse = float(np.sqrt(np.mean((_pred_lk - _yte)**2)))
+            _lk_nse  = float(1 - np.sum((_pred_lk - _yte)**2) / np.sum((_yte - _yte.mean())**2))
+
+        all_lake_rows.append({
+            "lake": _lake_name, "n_test_windows": _N,
+            "zero_shot_rmse": round(_zs_rmse, 4) if not np.isnan(_zs_rmse) else None,
+            "zero_shot_nse":  round(_zs_nse,  4) if not np.isnan(_zs_nse)  else None,
+            "retrained_rmse": round(_lk_rmse, 4) if not np.isnan(_lk_rmse) else None,
+            "retrained_nse":  round(_lk_nse,  4) if not np.isnan(_lk_nse)  else None,
+        })
+        print(f"  {_lake_name}: ZS={_zs_rmse:.3f}  LK={_lk_rmse:.3f}")
+    except Exception as _ex:
+        print(f"  {_lake_name}: skipped ({_ex})")
+
+all_lake_df = pd.DataFrame(all_lake_rows)
+all_lake_df.to_csv(RESULTS_DIR / "swiss_lake_all_results.csv", index=False)
+print(f"\nEvaluated {len(all_lake_df)} lakes")
+print(f"Zero-shot mean RMSE: {all_lake_df['zero_shot_rmse'].mean():.3f} mg/L")
+print(f"Retrained  mean RMSE: {all_lake_df['retrained_rmse'].mean():.3f} mg/L")
+
+# Use aggregate metrics for the comparison table
+zs_rmse = float(all_lake_df["zero_shot_rmse"].mean())
+zs_nse  = float(all_lake_df["zero_shot_nse"].mean())
+lk_rmse = float(all_lake_df["retrained_rmse"].mean())
+lk_nse  = float(all_lake_df["retrained_nse"].mean())
+# Retain focus lake KGE from earlier if available
+zs_kge = zero_shot_metrics["O2C_sensor"]["KGE"] if zero_shot_metrics else float("nan")
+lk_kge = float("nan")  # not computed across all lakes for brevity
+
+------------------
+
+----- stdout -----
+Evaluating 21 lakes...
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mNameError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[16][39m[32m, line 17[39m
+[32m     14[39m lakes_to_eval = [38;5;28mlist[39m(lake_dfs.keys()) [38;5;28;01mif[39;00m USING_SWISS [38;5;28;01melse[39;00m [FOCUS_LAKE]
+[32m     15[39m [38;5;28mprint[39m([33mf[39m[33m"[39m[33mEvaluating [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m(lakes_to_eval)[38;5;132;01m}[39;00m[33m lakes...[39m[33m"[39m)
+[32m---> [39m[32m17[39m [38;5;28;01mfor[39;00m _lake_name [38;5;129;01min[39;00m [43mtqdm[49m(lakes_to_eval, desc=[33m"[39m[33mLakes[39m[33m"[39m):
+[32m     18[39m     [38;5;28;01mtry[39;00m:
+[32m     19[39m         [38;5;66;03m# ── Prepare this lake's data ─────────────────────────────────────────[39;00m
+[32m     20[39m         [38;5;28;01mif[39;00m USING_SWISS:
+
+[31mNameError[39m: name 'tqdm' is not defined
+

@@ -6,3 +6,4 @@ Climatology,TEMP (°C),3.11,1.837,0.734
 Ridge,DO (mg/L),1.069,0.809,0.59
 Ridge,TEMP (°C),2.252,1.519,0.86
 LakeBeD-US LSTM (ref.),DO (mg/L),1.4,,
+AareML LSTM zero-shot,DO (mg/L),2.962,2.561,-2.145
