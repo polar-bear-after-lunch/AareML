@@ -1,0 +1,136 @@
+[NbConvertApp] Converting notebook notebooks/01_data_exploration.ipynb to notebook
+/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate(nb)
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# ── Export: Canton DO Ranking (input for notebook 09) ────────────────────────
+# Uses daily_data already loaded above. Keys are int gauge IDs.
+# Saves results/canton_do_ranking.csv
+
+GAUGE_CANTON = {
+    2009:'VS', 2011:'BE', 2016:'AG', 2018:'BE', 2033:'BE', 2044:'ZH',
+    2068:'TI', 2084:'SO', 2085:'BE', 2099:'ZH', 2109:'TG', 2143:'TG',
+    2161:'TG', 2167:'SG', 2174:'GE', 2176:'ZH', 2181:'ZH', 2256:'LU',
+    2290:'LU', 2347:'FR', 2369:'FR', 2374:'VD', 2392:'GE', 2410:'ZH',
+    2415:'GR', 2457:'GR', 2462:'VS', 2473:'BE', 2485:'NE', 2604:'JU',
+    2613:'BL', 2617:'BS', 2635:'SH',
+}
+
+gauge_rows = []
+for gid, df in daily_data.items():
+    if 'O2C_sensor' not in df.columns:
+        continue
+    do = df['O2C_sensor'].dropna()
+    if len(do) < 100:
+        continue
+    canton = GAUGE_CANTON.get(int(gid), 'UNK')
+    if canton == 'UNK':
+        continue
+    gauge_rows.append({
+        'gauge_id': int(gid),
+        'canton': canton,
+        'n_valid_do': len(do),
+        'do_mean': round(float(do.mean()), 4),
+        'do_min': round(float(do.min()), 4),
+        'n_lt4': int((do < 4).sum()),
+        'n_lt6': int((do < 6).sum()),
+        'n_lt8': int((do < 8).sum()),
+        'pct_lt4': round(float((do < 4).mean() * 100), 4),
+        'pct_lt6': round(float((do < 6).mean() * 100), 4),
+        'pct_lt8': round(float((do < 8).mean() * 100), 4),
+    })
+
+print(f"Gauges with canton mapping: {len(gauge_rows)} / {len(daily_data)}")
+
+gauge_df = pd.DataFrame(gauge_rows)
+canton_df = gauge_df.groupby('canton', as_index=False).agg(
+    n_gauges=('gauge_id', 'count'),
+    total_do_days=('n_valid_do', 'sum'),
+    mean_do_mean=('do_mean', 'mean'),
+    worst_do_min=('do_min', 'min'),
+    total_breach_4=('n_lt4', 'sum'),
+    total_breach_6=('n_lt6', 'sum'),
+    total_breach_8=('n_lt8', 'sum'),
+    overall_pct_4=('pct_lt4', 'mean'),
+    overall_pct_6=('pct_lt6', 'mean'),
+    overall_pct_8=('pct_lt8', 'mean'),
+    mean_pct_below_4=('pct_lt4', 'mean'),
+    mean_pct_below_6=('pct_lt6', 'mean'),
+    mean_pct_below_8=('pct_lt8', 'mean'),
+)
+canton_df = canton_df.sort_values('overall_pct_8', ascending=False).reset_index(drop=True)
+canton_df.insert(0, 'rank', range(1, len(canton_df) + 1))
+
+RESULTS_DIR.mkdir(exist_ok=True)
+canton_df.to_csv(RESULTS_DIR / 'canton_do_ranking.csv', index=False)
+print(f"Saved canton_do_ranking.csv: {len(canton_df)} cantons")
+print(canton_df[['rank', 'canton', 'n_gauges', 'overall_pct_8', 'mean_do_mean']].to_string(index=False))
+
+------------------
+
+----- stdout -----
+Gauges with canton mapping: 13 / 86
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mNameError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[29][39m[32m, line 59[39m
+[32m     56[39m canton_df = canton_df.sort_values([33m'[39m[33moverall_pct_8[39m[33m'[39m, ascending=[38;5;28;01mFalse[39;00m).reset_index(drop=[38;5;28;01mTrue[39;00m)
+[32m     57[39m canton_df.insert([32m0[39m, [33m'[39m[33mrank[39m[33m'[39m, [38;5;28mrange[39m([32m1[39m, [38;5;28mlen[39m(canton_df) + [32m1[39m))
+[32m---> [39m[32m59[39m [43mRESULTS_DIR[49m.mkdir(exist_ok=[38;5;28;01mTrue[39;00m)
+[32m     60[39m canton_df.to_csv(RESULTS_DIR / [33m'[39m[33mcanton_do_ranking.csv[39m[33m'[39m, index=[38;5;28;01mFalse[39;00m)
+[32m     61[39m [38;5;28mprint[39m([33mf[39m[33m"[39m[33mSaved canton_do_ranking.csv: [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m(canton_df)[38;5;132;01m}[39;00m[33m cantons[39m[33m"[39m)
+
+[31mNameError[39m: name 'RESULTS_DIR' is not defined
+

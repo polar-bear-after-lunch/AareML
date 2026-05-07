@@ -1,0 +1,7 @@
+gauge_id,gauge_name,river,canton,lon,lat,do_data_available,data_source,n_valid_do,record_start,record_end,do_mean_mgl,do_min_mgl,do_max_mgl,n_days_lt4_mgl,n_days_lt6_mgl,n_days_lt8_mgl,pct_days_lt4_mgl,pct_days_lt6_mgl,pct_days_lt8_mgl,worst_month,worst_month_do_mgl,trend,trend_delta_mgl,do_stress_index
+2044,Andelfingen,Thur,ZH,8.68,47.6,True,daily_sensor (O2C_sensor),11134,1986-01-29,2020-12-31,10.747,6.03,15.08,0.0,0.0,127.0,0.0,0.0,1.141,Jul,9.068,improving,0.05,66.1
+2099,"Zürich, Unterhard",Limmat,ZH,8.53,47.39,True,nawa_trend (O2_lab),120,2011-01-05,2020-12-09,10.157,7.7,13.8,0.0,0.0,1.0,0.0,0.0,0.833,Aug,9.182,worsening,-0.087,58.3
+2176,"Zürich, Sihlhölzli",Sihl,ZH,8.53,47.37,True,nawa_trend (O2_lab),119,2011-01-19,2020-12-09,11.39,7.7,14.7,0.0,0.0,1.0,0.0,0.0,0.84,Jun,9.57,improving,0.387,46.5
+2288,"Neuhausen, Flurlingerbrücke",Rhine,ZH,8.63,47.68,True,nawa_trend (O2_lab),120,2011-01-04,2020-12-03,10.528,8.1,12.6,0.0,0.0,0.0,0.0,0.0,0.0,Sep,9.022,worsening,-0.252,11.0
+2392,Rheinau,Rhine,ZH,8.6,47.64,False,N/A,0,N/A,N/A,,,,,,,,,,,,,,
+2415,Rheinsfelden,Glatt,ZH,8.48,47.57,True,daily_sensor (O2C_sensor),11660,1981-01-01,2020-12-31,10.196,7.06,13.92,0.0,0.0,102.0,0.0,0.0,0.875,Jul,8.671,improving,0.298,55.3
