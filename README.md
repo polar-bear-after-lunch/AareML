@@ -39,7 +39,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 
 | Strategy | Mean RMSE | Significance |
 |----------|-----------|-------------|
-| Zero-shot transfer | 0.419 mg/L | p=0.007 vs Ridge (Wilcoxon, n=11) |
+| Zero-shot transfer | 0.464 mg/L | p=0.024 vs Ridge (Wilcoxon, n=11) |
 | Per-gauge retrain | 0.392 mg/L | p=0.465 (not significant) |
 | EA-LSTM | 0.417 mg/L | — |
 
@@ -51,7 +51,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 
 | River | RMSE |
 |-------|------|
-| Willamette, OR | **0.759 mg/L** (beats lake benchmark) |
+| Willamette, OR | **0.996 mg/L** (beats lake benchmark) |
 | Fox River, WI | 1.549 mg/L |
 | Mississippi, LA | 1.678 mg/L |
 | Missouri, MO | 1.874 mg/L |
@@ -60,7 +60,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 
 | Model | RMSE | NSE |
 |-------|------|-----|
-| River LSTM zero-shot → lake | 2.811 mg/L | -4.24 |
+| River LSTM zero-shot → lake | 3.980 mg/L | -4.24 |
 | **Lake-retrained LSTM** | **0.76 mg/L** | **0.708** |
 | LakeBeD-US benchmark | 1.40 mg/L | — |
 
@@ -209,7 +209,7 @@ Data is excluded due to size. Use `python download_data.py` to fetch all dataset
 ## Version History
 
 See [CHANGELOG.md](CHANGELOG.md) for full history (v1.0–v1.25).
-**Current version: v1.16** (May 2026)
+**Current version: v1.17** (May 2026)
 
 ---
 
