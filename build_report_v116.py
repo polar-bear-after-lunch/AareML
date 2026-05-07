@@ -695,7 +695,7 @@ story.append(p(
     "a ReduceLROnPlateau scheduler (patience=5, factor=0.5), and early stopping "
     "(patience=25, up to 250 epochs for the final model). The training loss combines normalised MSE and NSE: "
     "L = 0.5\u00b7(MSE/Var(y)) + 0.5\u00b7MSE, "
-    "encouraging both point accuracy and distributional fit. Optuna minimises validation MSE "
+    "balancing point accuracy and sequence fidelity. Note that since targets are standardised before training, the Var(y) term \u22481 in standardised space, so the combined loss is effectively a scaled MSE. Optuna minimises validation MSE "
     "in standardised target space."
 ))
 story.append(p(
@@ -714,7 +714,7 @@ arch_rows = [
     [p("Learning rate (tuned)","table_cell"),   p("10<super>−4</super> – 10<super>−2</super> (log)","table_cell")],
     [p("Batch size (tuned)","table_cell"),      p("{32, 64, 128}","table_cell")],
     [p("Teacher forcing ratio (tuned)","table_cell"), p("Optuna | [0.3, 0.7]","table_cell")],
-    [p("Loss","table_cell"),                    p("NSE+MSE combined (\u03b1=0.5): L = 0.5\u00b7MSE/Var(y) + 0.5\u00b7MSE (standardised targets)","table_cell")],
+    [p("Loss","table_cell"),                    p("Combined loss: L = 0.5\u00b7MSE/Var(y) + 0.5\u00b7MSE on standardised targets. Note: since targets are standardised, Var(y)\u22481, so this is effectively a scaled MSE encouraging both point accuracy and sequence fidelity.","table_cell")],
     [p("Optimiser","table_cell"),               p("AdamW, weight decay=10<super>−4</super>","table_cell")],
     [p("Tuning","table_cell"),                  p("Optuna TPE (Tree-structured Parzen Estimator), 75 trials","table_cell_c")],
 ]
@@ -1352,7 +1352,7 @@ story.append(p(
     "<b>Lake-retrained LSTM achieves RMSE = 0.768 mg/L</b> on 21 Swiss lakes "
     "(NSE = 0.700, KGE = 0.796), which is <b>1.82\u00d7 better than the LakeBeD-US published "
     "benchmark</b> of 1.40 mg/L. This demonstrates that the AareML seq2seq LSTM architecture "
-    "\u2014 with Optuna-tuned hyperparameters and the NSE+MSE combined loss \u2014 "
+    "\u2014 with Optuna-tuned hyperparameters and a combined MSE-based training loss \u2014 "
     "generalises effectively to lake systems when trained on lake data, outperforming the "
     "US lake benchmark on a 21-lake Swiss dataset. The Swiss lake result (0.768 mg/L) is "
     "substantially higher than the Swiss river result (0.300 mg/L), confirming that lake "
