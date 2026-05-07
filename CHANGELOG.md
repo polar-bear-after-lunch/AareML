@@ -5,6 +5,40 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.17] — 2026-05-07
+
+### Full clean rerun — all audit fixes applied (SLURM 3643661–3643671)
+
+#### Results (authoritative — from CSVs)
+- **LSTM best DO RMSE = 0.300 mg/L** (KGE = 0.936) — beats Ridge (0.303, KGE 0.908) on both metrics
+- **Zero-shot transfer:** 0.464 mg/L mean (n=11), Wilcoxon p=0.024 (significant)
+- **Per-gauge retrain:** 0.393 mg/L · **EA-LSTM:** 0.431 mg/L
+- **USGS cross-continental:** 1.376 mg/L mean · Willamette 0.996 mg/L
+- **Swiss lake zero-shot (21 lakes):** 3.980 mg/L, NSE=−6.486 — real 21-lake average
+- **Swiss lake retrained:** 0.768 mg/L (1.82× better than LakeBeD-US benchmark)
+- **Lake Mendota river zero-shot (nb06):** 2.962 mg/L, NSE=−2.145 (new — real transfer)
+- **Canton DO ranking:** 9 cantons, 13 DO gauges (real data from nb01)
+- **baseline_per_gauge.csv:** generated for first time (BUG-2 fixed)
+- **SHAP:** temp[t-1] dominant (|SHAP|=0.644), O2C[t-1] second (0.527)
+
+#### Code fixes applied
+- **BUG-2 (nb02):** per-gauge Ridge loop used raw rows + undefined ridge_model → fixed with make_windows() + ridge_models[h][DO_IDX]
+- **BUG-5 (metrics.py):** block_bootstrap_ci mutated block_size in loop → fixed with local _bs
+- **BUG-7 (nb04):** EA-LSTM zero-vector static fallback → now skips gauge
+- **nb03:** 3-seed ensemble (0/42/123) correctly wired to all metric computations
+- **nb04:** gauge_scaler_cache replaces undefined gauge_scalers; per-gauge target scaler for EA-LSTM
+- **nb05/nb04:** hard FileNotFoundError on missing checkpoint (no silent fallback)
+- **nb06:** real river LSTM zero-shot transfer to Lake Mendota (loads checkpoint)
+- **nb09:** real annual means and July histogram from load_gauge() (not np.random.normal)
+- **nb10:** LOCAL_TEST=False; 21-lake loop; best_params.json for architecture; RuntimeError guard before save
+- **nb01:** complete 115/115 gauge-canton mapping (all 25 Swiss cantons) → canton_do_ranking.csv
+
+#### Tests
+- **test_extended.py:** 35 new tests (train_model, nse_mse_loss, ensemble seeds, checkpoint round-trip, block_bootstrap_ci edge cases, per-gauge Ridge, canton mapping, gauge_scaler_cache, data pipeline)
+- Total: 53 + 35 = **88 tests passing**
+
+---
+
 ## [v1.27] — 2026-05-03
 
 ### Report v1.14

@@ -9,7 +9,7 @@
 CAS in Advanced Machine Learning · University of Bern · June 2026
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-53%20passing-brightgreen.svg)](tests/test_src.py)
+[![Tests](https://img.shields.io/badge/tests-88%20passing-brightgreen.svg)](tests/)
 [![GitHub](https://img.shields.io/badge/GitHub-polar--bear--after--lunch%2FAareML-teal.svg)](https://github.com/polar-bear-after-lunch/AareML)
 
 ---
@@ -29,19 +29,19 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 | Persistence | 0.339 mg/L | 1.365°C | 0.930 | Baseline |
 | Climatology | 0.334 mg/L | 1.444°C | 0.853 | Baseline |
 | Ridge Regression | 0.303 mg/L | 1.261°C | 0.908 | Best RMSE |
-| LSTM (default) | 0.308 mg/L | 1.267°C | 0.855 | — |
-| **LSTM (best Optuna)** | **0.300 mg/L** | **1.345°C** | **0.942** | Best KGE |
+| LSTM (default) | 0.309 mg/L | 1.270°C | 0.850 | — |
+| **LSTM (best Optuna, 3-seed ensemble)** | **0.300 mg/L** | **1.256°C** | **0.936** | Beats Ridge on RMSE and KGE |
 | LakeBeD-US LSTM (ref.) | 1.40 mg/L | — | — | Published lake benchmark |
 
-> LSTM wins on KGE (0.942 vs 0.908) — capturing the river's seasonal rhythm, not just its average level.
+> LSTM beats Ridge on both RMSE (0.300 vs 0.303 mg/L) and KGE (0.936 vs 0.908) simultaneously — no trade-off.
 
 ### Multi-Site DO Transfer (12 Swiss Gauges)
 
 | Strategy | Mean RMSE | Significance |
 |----------|-----------|-------------|
-| Zero-shot transfer | 0.464 mg/L | p=0.024 vs Ridge (Wilcoxon, n=11) |
-| Per-gauge retrain | 0.392 mg/L | p=0.465 (not significant) |
-| EA-LSTM | 0.417 mg/L | — |
+| Zero-shot transfer | **0.464 mg/L** | p=0.024 vs Ridge (Wilcoxon, n=11) ✓ |
+| Per-gauge retrain | **0.393 mg/L** | — |
+| EA-LSTM | **0.431 mg/L** | — |
 
 ### Temperature Multi-Site (15 Gauges)
 - Mean RMSE: **2.59°C** · Mean NSE: **0.730**
@@ -51,24 +51,25 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 
 | River | RMSE |
 |-------|------|
-| Willamette, OR | **0.996 mg/L** (beats lake benchmark) |
-| Fox River, WI | 1.549 mg/L |
-| Mississippi, LA | 1.678 mg/L |
-| Missouri, MO | 1.874 mg/L |
+| Willamette, OR | **0.996 mg/L** |
+| Fox River, WI | 1.445 mg/L |
+| Mississippi, LA | 1.464 mg/L |
+| Missouri, MO | 1.598 mg/L |
+
 
 ### Swiss Lakes (Bärenbold et al. 2026 — 21 Lakes)
 
 | Model | RMSE | NSE |
 |-------|------|-----|
-| River LSTM zero-shot → lake | 3.980 mg/L | -4.24 |
-| **Lake-retrained LSTM** | **0.76 mg/L** | **0.708** |
+| River LSTM zero-shot → lake | 3.980 mg/L | -6.486 |
+| **Lake-retrained LSTM** | **0.768 mg/L** | **0.700** |
 | LakeBeD-US benchmark | 1.40 mg/L | — |
 
 > Lake-retrained AareML **1.8× better** than published benchmark. Zero-shot river→lake transfer fails — lakes require domain-specific training.
 
 ### SHAP Attribution
 - `temp_sensor[t-1]`: dominant driver (mean |SHAP| = 0.644)
-- `O2C_sensor[t-1]`: second (0.527)
+- `O2C_sensor[t-1]`: second (|SHAP| = 0.527)
 - Effective LSTM memory: 3–4 days despite 21-day lookback
 - The AI rediscovered Henry's Law purely from data
 
@@ -149,7 +150,7 @@ AareML/
 │   ├── data.py        — Data loading, preprocessing, windowing
 │   ├── metrics.py     — RMSE, MAE, NSE, KGE, bootstrap CI
 │   ├── model.py       — Seq2SeqLSTM, EA-LSTM, NSE+MSE loss, checkpoints
-│   └── impute.py      — SAITS self-attention imputer
+│   └── impute.py      — Imputation utilities (linear-interp + training-mean fill)
 ├── ubelix/
 │   ├── run_all.sh          — Submit full job chain (03→04→04b→05→08→10)
 │   ├── job_03_lstm.sh
@@ -161,7 +162,8 @@ AareML/
 │   ├── setup_env.sh        — Conda env setup
 │   └── test_local.sh       — Smoke test (CPU)
 ├── tests/
-│   └── test_src.py         — 53 pytest tests (all passing)
+│   ├── test_src.py         — 53 pytest tests (all passing)
+│   └── test_extended.py    — 35 additional tests (all passing)
 ├── figures/
 │   ├── aareml_logo.png     — Project logo
 │   ├── 09_zh_river_heat_map.png
@@ -172,7 +174,7 @@ AareML/
 ├── download_data.py        — Downloads all datasets
 ├── sync_to_ubelix.sh       — rsync Mac → UBELIX
 ├── fetch_from_ubelix.sh    — rsync UBELIX → Mac
-├── AareML-report.pdf       — Full technical report (v1.12, 31 pages)
+├── AareML-report.pdf       — Full technical report (v1.17, 33 pages)
 ├── AareML-canton-zurich.pdf — Canton Zurich standalone chapter
 ├── AareML-plain-language.pdf      — Plain-language summary (English)
 ├── AareML-plain-language-ru.pdf   — Plain-language summary (Russian)
@@ -188,7 +190,7 @@ AareML/
 ```bash
 cd AareML
 python -m pytest tests/test_src.py -v
-# 53 tests, all passing
+# 53 + 35 = 88 tests, all passing
 ```
 
 ---
@@ -208,7 +210,7 @@ Data is excluded due to size. Use `python download_data.py` to fetch all dataset
 
 ## Version History
 
-See [CHANGELOG.md](CHANGELOG.md) for full history (v1.0–v1.25).
+See [CHANGELOG.md](CHANGELOG.md) for full history.
 **Current version: v1.17** (May 2026)
 
 ---
