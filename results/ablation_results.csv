@@ -1,0 +1,11 @@
+Ablation,Condition,RMSE_DO,RMSE_temp,NSE_DO,NSE_temp,KGE_DO,KGE_temp,Mean_RMSE
+A1: Architecture,A1_LSTM,0.29,1.2179,0.898,0.89,0.92,0.905,0.7539
+A1: Architecture,A1_GRU,0.2928,1.2179,0.896,0.89,0.916,0.907,0.7553
+A2: Teacher Forcing,A2_TF=0.0  (no teacher forcing),0.3023,1.2644,0.89,0.883,0.899,0.884,0.7834
+A2: Teacher Forcing,A2_TF=0.5  (Optuna best / baseline),0.29,1.2179,0.898,0.89,0.92,0.905,0.7539
+A2: Teacher Forcing,A2_TF=1.0  (full teacher forcing),0.2952,1.2205,0.894,0.89,0.916,0.909,0.7578
+A3: Loss Function,A3_Loss=MSE only,0.2912,1.2341,0.897,0.887,0.916,0.906,0.7627
+A3: Loss Function,"A3_Loss=NSE+MSE  (alpha=0.5, baseline)",0.29,1.2179,0.898,0.89,0.92,0.905,0.7539
+A4: Lookback Window,A4_Lookback= 7d,0.2997,1.2598,0.894,0.884,0.889,0.884,0.7798
+A4: Lookback Window,A4_Lookback=14d,0.2944,1.2471,0.897,0.886,0.911,0.901,0.7707
+A4: Lookback Window,A4_Lookback=21d  (baseline),0.29,1.2179,0.898,0.89,0.92,0.905,0.7539
