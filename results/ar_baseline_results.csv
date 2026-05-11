@@ -1,0 +1,8 @@
+Model,RMSE,NSE,KGE
+Persistence,0.4119,0.736,0.865
+Climatology,0.4088,0.74,0.681
+AR(7),0.3883,0.765,0.904
+VAR(3),0.5849,0.468,0.517
+Ridge (nb02),0.303,,0.908
+LSTM default (nb03),0.309,,0.85
+LSTM best (nb03),0.3,,0.936
