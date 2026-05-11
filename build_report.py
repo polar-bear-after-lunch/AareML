@@ -422,7 +422,7 @@ story.append(sp(4))
 from datetime import datetime as _dt
 _now = _dt.now().strftime("%d %b %Y, %H:%M")
 story.append(p("April 2026  ·  Deadline: 15 June 2026", "meta"))
-story.append(p(f"Report version: 1.21  ·  Last updated: {_now}", "meta"))
+story.append(p(f"Report version: 1.22  ·  Last updated: {_now}", "meta"))
 story.append(anchor("s_abstract"))
 story.append(sp(32))
 
@@ -438,7 +438,7 @@ abstract_table = Table(
         "and evaluate its zero-shot transfer to 12 Swiss gauges (mean DO RMSE = 0.464 mg/L, 3.0\u00d7 lower RMSE than the LakeBeD-US LSTM reference; per-gauge retraining achieves 0.393 mg/L). "
         "A Wilcoxon signed-rank test across 11 gauges confirms a <b>statistically significant improvement (p=0.024)</b> "
         "for zero-shot transfer over Ridge regression. "
-        "GradientSHAP attribution identifies temperature[t−1] as the dominant driver (mean |SHAP|=0.644), "
+        "GradientSHAP attribution identifies temperature[t−1] as the strongest predictor (mean |SHAP|=0.644), "
         "ahead of DO itself, with the LSTM exhibiting an effective memory of 3–4 days despite a 21-day lookback. "
         "Baseline DO RMSE on gauge 2473 ranges from 0.30–0.34 mg/L, already well below the "
         "LakeBeD-US lake reference of 1.40 mg/L, suggesting rivers are more predictable than "
@@ -734,8 +734,13 @@ story.append(p(
     "<b>train</b> data start (~1981) through 2014-12-31 (windows from 2006 for 4-feature availability), "
     "<b>validation</b> 2014–2016 (~1,096 days), "
     "<b>test</b> 2017–2020 (~1,461 days). "
-    "All scalers are fitted on training data only and applied identically to "
-    "validation and test splits. NaN imputation uses a two-step strategy: "
+    "All normalisation statistics (feature and target mean/std) are fitted on training data only and "
+    "applied identically to validation and test splits. "
+    "For multi-site evaluation, each gauge uses its own per-gauge scaler fitted on that gauge's "
+    "training data exclusively — no cross-gauge normalisation. "
+    "Sliding windows never cross split boundaries. "
+    "These leakage-prevention practices are verified by dedicated tests in tests/test_src.py "
+    "(TestDataEdgeCases, TestTrainValTestSplit). NaN imputation uses a two-step strategy: "
     "linear interpolation for gaps ≤7 days, then training-set mean fill for remaining gaps."
 ))
 
@@ -901,7 +906,7 @@ story.append(bl_table)
 story.append(p(
     "Table 2: Baseline results on gauge 2473 test set (2017–2020). "
     "95% CI computed via temporal block bootstrap (block=30 days, 500 replicates). "
-    "LakeBeD-US reference from McAfee et al. (2025) on US lake data.", "caption"
+    "LakeBeD-US reference from McAfee et al. (2025) on US lake data. LSTM (best) is a 3-seed ensemble (seeds 0/42/123); per-seed RMSE range: 0.298–0.304 mg/L (std ≈0.003 mg/L).", "caption"
 ))
 
 story += fig("02_baseline_rmse_by_horizon.png",
@@ -1127,7 +1132,9 @@ story.append(p(
     "Three scientifically meaningful patterns emerge. First, <b>temperature dominates over DO "
     "itself</b>: temp_sensor[t−1] (mean |SHAP| = 0.644) outranks O2C_sensor[t−1] (0.527), "
     "consistent with the known physical relationship between water temperature and oxygen "
-    "solubility — colder water holds more DO, and the LSTM has learned this coupling. "
+    "solubility (Henry's Law). Note that SHAP attribution shows correlation, not causation "
+    "— the dominance of temperature may partly reflect autocorrelation structure in the "
+    "time series rather than explicit encoding of physical laws. "
     "Second, <b>attributions decay rapidly with lag</b>: the combined importance of all "
     "features beyond t−4 is negligible, indicating the LSTM operates with an effective memory "
     "of 3–4 days despite a 21-day lookback window. The model does not exploit the full "
@@ -1446,7 +1453,8 @@ story.append(p(
 story.append(anchor("s6_4"))
 story.append(h2("6.4  Limitations and Future Work"))
 story.append(p("• <b>Single focus gauge:</b> single-site results may not generalise to gauges with different land use or hydrology.", "bullet"))
-story.append(p("• <b>Limited DO coverage:</b> only 16 of 86 gauges have ≥10% DO data, constraining multi-site analysis.", "bullet"))
+story.append(p("\u2022 <b>Tail-event performance:</b> average RMSE may mask degraded performance during critical low-DO events (DO < 4\u00a0mg/L, heat waves, oxygen crashes). Separate evaluation of extreme events was not performed and remains a priority for operational deployment.", "bullet"))
+story.append(p("\u2022 <b>Limited DO coverage:</b> only 16 of 86 gauges have \u226510% DO data, constraining multi-site analysis.", "bullet"))
 story.append(p("• <b>No plastics data:</b> while AareML uses agricultural and chemical proxies from NAWA FRACHT, there is no dedicated microplastics time series in CAMELS-CH-Chem.", "bullet"))
 story.append(p("• <b>Limited Optuna budget:</b> Optuna ran for 75 trials on an NVIDIA RTX 4090 (UBELIX HPC, University of Bern). A larger search budget or multi-objective optimisation (jointly minimising RMSE and maximising KGE) may yield further improvements.", "bullet"))
 story.append(p("• <b>Missing NAWA features:</b> the 38 NAWA FRACHT chemistry variables (grab samples) are not yet used as model inputs; incorporating them as auxiliary features at the native 7\u201314 day resolution could capture nutrient\u2013oxygen dynamics beyond what daily sensors reveal.", "bullet"))
@@ -1482,8 +1490,10 @@ story.append(p(
     "regression — with block-bootstrap 95% confidence intervals provide a reproducible lower "
     "bound. A sequence-to-sequence LSTM optimised over 75 Optuna trials forms the primary model. "
     "The 3-seed ensemble LSTM achieves DO RMSE = 0.300 mg/L and KGE = 0.936 at the focus gauge "
-    "(gauge 2473, Aare at Bern), beating Ridge on both RMSE (0.300 vs 0.303) and KGE (0.936 vs 0.908), "
-    "while the default LSTM achieves RMSE = 0.309 mg/L (Table 3). "
+    "(gauge 2473, Aare at Bern). The RMSE margin over Ridge (0.300 vs 0.303 mg/L) is narrow "
+    "at a single gauge but statistically significant across 11 gauges (Wilcoxon p=0.024); "
+    "the KGE advantage (0.936 vs 0.908) reflects materially better preservation of DO distribution. "
+    "The default LSTM achieves RMSE = 0.309 mg/L (Table 3). "
     "Both values are substantially below the LakeBeD-US lake LSTM reference of 1.40 mg/L, "
     "confirming that Alpine river DO dynamics are inherently more predictable than lake dynamics "
     "under the same task formulation."
@@ -1498,7 +1508,7 @@ story.append(p(
     "that water temperature at lag t−1 is the dominant driver of DO prediction "
     "(mean |SHAP| = 0.644), consistent with the known physical coupling between temperature "
     "and oxygen solubility. The LSTM exhibits an effective memory of 3–4 days despite a "
-    "21-day lookback window, reflecting the short autocorrelation length of Alpine river DO."
+    "21-day lookback window, consistent with the short autocorrelation length of Alpine river DO. Note: SHAP attributions reflect learned correlations, not causal physical mechanisms; the temperature dominance may partly reflect autocorrelation in the input series."
 ))
 story.append(p(
     "Cross-ecosystem and cross-continental experiments quantify the limits of transferability. "
