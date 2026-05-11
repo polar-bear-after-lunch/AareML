@@ -238,16 +238,7 @@ The national and Swiss lakes extensions (notebooks 10, cross-cantonal data pooli
 
 ---
 
-## 9. Key Contacts
-
-| Name | Role | Contact |
-|---|---|---|
-| Programme Lead | Innovation Sandbox, Canton Zurich | [zh.ch Innovation Sandbox](https://www.zh.ch/en/wirtschaft-arbeit/wirtschaftsstandort/innovation-sandbox.html) |
-| Regulatory Expert | UZH ITSL | via sandbox team |
-| Scientific Partner | Eawag, CAMELS-CH-Chem lead | (positive contact established) |
-| AWEL | Cantonal water authority | via zh.ch/awel |
-
-**Application submission:** Online form via zh.ch Innovation Sandbox page (Phase III closes 24 May 2026)
+**Application submission:** Online form via [zh.ch Innovation Sandbox](https://www.zh.ch/en/wirtschaft-arbeit/wirtschaftsstandort/innovation-sandbox.html) (Phase III closes 24 May 2026)
 
 ---
 
