@@ -1,6 +1,8 @@
 # AareML × Canton Zurich Innovation Sandbox — Brainstorm
 
-**Prepared:** June 2026  
+**Application draft:** [AareML_InnovationSandbox_Application.docx](AareML_InnovationSandbox_Application.docx)
+
+**Prepared:** May 2026  
 **Project:** AareML — ML-based dissolved oxygen and water temperature prediction for Swiss rivers  
 **Programme:** Innovation Sandbox for Artificial Intelligence, Canton of Zurich (Phase III, open until 24 May 2026 → September 2026 implementation start)  
 **Sources:** [zh.ch Innovation Sandbox](https://www.zh.ch/en/wirtschaft-arbeit/wirtschaftsstandort/innovation-sandbox.html) · [About the Sandbox](https://www.zh.ch/en/wirtschaft-arbeit/wirtschaftsstandort/innovation-sandbox/ueber-die-innovation-sandbox-fuer-ki.html) · [Greater Zurich Area explainer](https://www.greaterzuricharea.com/en/news/zurich-ai-innovation-sandbox) · [AareML GitHub](https://github.com/polar-bear-after-lunch/AareML)
@@ -134,13 +136,13 @@ Regulatory questions relevant to AareML include:
 
 | Partner | Role | Why Relevant |
 |---|---|---|
-| **Eawag** (Swiss Federal Institute of Aquatic Science and Technology) | Scientific anchor + data broker | Lead institution for CAMELS-CH-Chem; positive contact already established (Thiago Nascimento). Runs fish movement and lake monitoring projects. Trusted by BAFU and cantons. |
+| **Eawag** (Swiss Federal Institute of Aquatic Science and Technology) | Scientific anchor + data broker | Lead institution for CAMELS-CH-Chem; positive contact already established. Runs fish movement and lake monitoring projects. Trusted by BAFU and cantons. |
 | **BAFU / FOEN** (Federal Office for the Environment) | Data provider + regulatory authority | Owns the NAWA/NAWA FRACHT monitoring network; issues water quality policy. Key to unlocking calibrated real-time DO data. |
 | **AWEL** (Amt für Abfall, Wasser, Energie und Luft, Canton Zurich) | Public sector deployment partner | Monitors 150+ watercourse sites; mandated for early detection and remediation. Would be the "public partner" role that every sandbox project requires. Has published the Gewässerbericht 2022 and 2018 showing unresolved DO challenges. |
 | **Fischereiinspektorat, Canton Zurich** (under Baudirektion) | End-user / operational deployment | Issues fishing restrictions; responds to fish kills. Natural end-user of a 14-day DO early warning. Provides ground-truth on fish stress events. |
 | **ETH AI Center** | Technical advisory + validation | Already a core sandbox partner. Can validate model architecture and provide ML governance guidance. |
-| **UZH ITSL** | Regulatory expert | Already embedded in sandbox team (Stephanie Volz). Would draft the legal framework for AI-based advisories in fisheries management. |
-| **Statistical Office, Canton Zurich** | Data infrastructure | Already a sandbox partner (Patrick Arnecke, Data Scientist); could help integrate AWEL gauge data into a standardised pipeline. |
+| **UZH ITSL** | Regulatory expert | Already embedded in sandbox team. Would draft the legal framework for AI-based advisories in fisheries management. |
+| **Statistical Office, Canton Zurich** | Data infrastructure | Already a sandbox partner; could help integrate AWEL gauge data into a standardised pipeline. |
 | **ZHAW digital / Lucerne UAS** | Technical partner | Both are sandbox ecosystem partners; ZHAW has environmental engineering and water-related research groups that could provide domain validation. |
 
 ---
@@ -240,10 +242,9 @@ The national and Swiss lakes extensions (notebooks 10, cross-cantonal data pooli
 
 | Name | Role | Contact |
 |---|---|---|
-| Lukas Willi | Project Lead AI, Sandbox | lukas.willi@vd.zh.ch · +41 43 258 44 59 |
-| Raphael von Thiessen | Programme Lead AI Hub | via standort@vd.zh.ch |
-| Stephanie Volz | Regulatory Expert (UZH ITSL) | via sandbox team |
-| Thiago Nascimento | Eawag, CAMELS-CH-Chem lead | (positive contact established) |
+| Programme Lead | Innovation Sandbox, Canton Zurich | [zh.ch Innovation Sandbox](https://www.zh.ch/en/wirtschaft-arbeit/wirtschaftsstandort/innovation-sandbox.html) |
+| Regulatory Expert | UZH ITSL | via sandbox team |
+| Scientific Partner | Eawag, CAMELS-CH-Chem lead | (positive contact established) |
 | AWEL | Cantonal water authority | via zh.ch/awel |
 
 **Application submission:** Online form via zh.ch Innovation Sandbox page (Phase III closes 24 May 2026)
