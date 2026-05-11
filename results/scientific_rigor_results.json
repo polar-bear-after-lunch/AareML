@@ -1,0 +1,171 @@
+{
+  "granger_causality": {
+    "temp": {
+      "lag_1": {
+        "F": 316.9514,
+        "p": 0.0,
+        "significant": true
+      },
+      "lag_3": {
+        "F": 488.8264,
+        "p": 0.0,
+        "significant": true
+      },
+      "lag_7": {
+        "F": 222.0746,
+        "p": 0.0,
+        "significant": true
+      },
+      "lag_14": {
+        "F": 115.6536,
+        "p": 0.0,
+        "significant": true
+      }
+    },
+    "EC": {
+      "lag_1": {
+        "F": 352.0116,
+        "p": 0.0,
+        "significant": true
+      },
+      "lag_3": {
+        "F": 107.0856,
+        "p": 0.0,
+        "significant": true
+      },
+      "lag_7": {
+        "F": 64.0708,
+        "p": 0.0,
+        "significant": true
+      },
+      "lag_14": {
+        "F": 37.8392,
+        "p": 0.0,
+        "significant": true
+      }
+    },
+    "pH": {
+      "lag_1": {
+        "F": 2.9993,
+        "p": 0.083326,
+        "significant": false
+      },
+      "lag_3": {
+        "F": 15.0169,
+        "p": 0.0,
+        "significant": true
+      },
+      "lag_7": {
+        "F": 14.2683,
+        "p": 0.0,
+        "significant": true
+      },
+      "lag_14": {
+        "F": 13.3529,
+        "p": 0.0,
+        "significant": true
+      }
+    },
+    "DO": {
+      "lag_1": {
+        "F": 0.0,
+        "p": 0.999998,
+        "significant": false
+      },
+      "lag_3": {
+        "F": 0.0,
+        "p": 1.0,
+        "significant": false
+      },
+      "lag_7": {
+        "F": 0.0,
+        "p": 1.0,
+        "significant": false
+      },
+      "lag_14": {
+        "F": -0.0,
+        "p": 1.0,
+        "significant": false
+      }
+    }
+  },
+  "worst_window_summary": {
+    "top_season": "MAM",
+    "pct_jja": 0.0,
+    "pct_low_do": 0.0,
+    "worst_window_date": "2018-03-01",
+    "worst_rmse": 1.027,
+    "season_breakdown": {
+      "DJF": 4,
+      "MAM": 16,
+      "JJA": 0,
+      "SON": 0
+    }
+  },
+  "do_threshold_recall": {
+    "8.0": {
+      "recall": NaN,
+      "precision": NaN,
+      "fnr": NaN,
+      "n_events": 0
+    },
+    "6.0": {
+      "recall": NaN,
+      "precision": NaN,
+      "fnr": NaN,
+      "n_events": 0
+    },
+    "4.0": {
+      "recall": NaN,
+      "precision": NaN,
+      "fnr": NaN,
+      "n_events": 0
+    }
+  },
+  "temporal_stability": {
+    "first_half_rmse": 0.3349,
+    "first_half_nse": 0.873,
+    "first_half_kge": 0.93,
+    "second_half_rmse": 0.2778,
+    "second_half_nse": 0.902,
+    "second_half_kge": 0.939,
+    "rmse_ratio_h2_h1": 0.8295,
+    "temporal_instability": false,
+    "year_by_year_rmse": {
+      "2017": 0.3239,
+      "2018": 0.3243,
+      "2019": 0.27,
+      "2020": 0.2763
+    }
+  },
+  "residual_autocorrelation": {
+    "durbin_watson_d1": 1.8416,
+    "durbin_watson_mean": 0.1699,
+    "ljung_box": {
+      "lag_1": {
+        "LB_stat": 7.2605,
+        "p": 0.007049,
+        "autocorrelated": true
+      },
+      "lag_3": {
+        "LB_stat": 25.3377,
+        "p": 1.3e-05,
+        "autocorrelated": true
+      },
+      "lag_7": {
+        "LB_stat": 83.7615,
+        "p": 0.0,
+        "autocorrelated": true
+      },
+      "lag_14": {
+        "LB_stat": 125.7335,
+        "p": 0.0,
+        "autocorrelated": true
+      }
+    },
+    "lb_lag1_p": 0.007049,
+    "lb_lag7_p": 0.0,
+    "autocorrelated": true,
+    "interpretation": "residuals approximately white noise \u2014 model captures temporal structure well"
+  }
+}
