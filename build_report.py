@@ -204,7 +204,7 @@ FISH_SECTION_DATA = {
         "latin": "Barbus barbus · Barbe",
         "do_chip": ">6 mg/L",
         "image": str(FISH_IMG_DIR / "fish_barbel_sm.png"),
-        "fact": "The barbel's eggs are toxic — containing ichthyotoxin poisonous to other fish and documented since Roman antiquity. Barbel spawn only in fast-flowing, well-oxygenated gravels above 6 mg/L DO.",
+        "fact": "The barbel's eggs are toxic — containing ichthyotoxin poisonous to other fish, documented in the medical literature since at least 1843 (Lancet). Barbel spawn only in fast-flowing, well-oxygenated gravels above 6 mg/L DO.",
         "ref": "Kottelat & Freyhof (2007) Handbook of European Freshwater Fishes",
     },
     "results": {
@@ -422,7 +422,7 @@ story.append(sp(4))
 from datetime import datetime as _dt
 _now = _dt.now().strftime("%d %b %Y, %H:%M")
 story.append(p("April 2026  ·  Deadline: 15 June 2026", "meta"))
-story.append(p(f"Report version: 1.20  ·  Last updated: {_now}", "meta"))
+story.append(p(f"Report version: 1.21  ·  Last updated: {_now}", "meta"))
 story.append(anchor("s_abstract"))
 story.append(sp(32))
 
@@ -602,8 +602,8 @@ story.append(p(
     "conductivity, and dissolved oxygen at 86 Swiss gauging stations from 1981 to 2020, "
     "complemented by 38-variable chemistry grab samples, land cover, and 115 catchment "
     "attribute files. To our knowledge, no published machine learning study has yet applied "
-    "predictive modelling to CAMELS-CH-Chem, making this a genuine first-of-its-kind "
-    "cross-ecosystem transfer study."
+    "predictive modelling to CAMELS-CH-Chem, making this, to our knowledge, the first LSTM transfer study from rivers to "
+    "standing lakes for dissolved oxygen prediction."
 ))
 story.append(p(
     "<b>AareML</b> makes four contributions: (1) adapts the LakeBeD-US seq2seq LSTM to "
@@ -623,12 +623,13 @@ story.append(h2("2.1  Machine Learning for Hydrology"))
 story.append(p(
     "LSTMs have become the dominant architecture for hydrological time-series forecasting. "
     "Kratzert et al. (2018, 2019) demonstrated that a single LSTM trained across 531 US basins "
-    "outperforms calibrated process-based models on 43% of catchments. "
+    "outperforms calibrated process-based models (VIC, mHM, HBV) across the vast majority of evaluated catchments. "
     "Their Entity-Aware LSTM (EA-LSTM) incorporates static catchment attributes "
     "directly into the gating mechanism, improving cross-basin transfer \u2014 "
     "a design which we implement and evaluate in Section 5.3 (Table 4). "
-    "For water quality specifically, Zhi et al. (2021) showed that LSTMs predict river DO "
-    "substantially better than process-based models at weekly timescales. "
+    "For water quality specifically, Zhi et al. (2021) demonstrated that an LSTM trained on daily hydrometeorology "
+    "can predict river DO across 236 US watersheds, including chemically ungauged basins "
+    "(NSE ≥0.4 at 74% of sites). "
     "Barzegar et al. (2020) and others have applied similar approaches in lakes, "
     "but primarily at single sites without multi-site generalisation evaluation."
 ))
@@ -652,7 +653,7 @@ story.append(p(
     "hydrometeorological benchmark with river chemistry data at 86 Swiss gauges. "
     "The daily sensor files contain temperature, pH, electrical conductivity, and "
     "dissolved oxygen from as early as 1981 through 2020, along with 38-variable "
-    "chemistry grab samples and 115 catchment attribute files. "
+    "chemistry grab samples, and 115 catchments with static attribute files. "
     "To our knowledge, no machine learning paper has yet applied predictive modelling "
     "to this dataset, making this a genuine first-of-its-kind cross-ecosystem study."
 ))
@@ -1239,7 +1240,7 @@ swiss_lake_tbl = Table(swiss_lake_data,
 swiss_lake_tbl.setStyle(TABLE_STYLE)
 story.append(swiss_lake_tbl)
 story.append(p(
-    "Table 9: Swiss lake LSTM results across 21 Swiss lakes (Bärenbold et al., 2026). "
+    "Table 9: Swiss lake LSTM results across 21 Swiss lakes (Bärenbold et al., 2026, preprint). "
     "Zero-shot river\u2192lake: Swiss-trained river LSTM applied directly to lake data without retraining. "
     "Lake-retrained: same LSTM architecture retrained on Swiss lake data. "
     "LakeBeD-US reference from McAfee et al. (2025).",
