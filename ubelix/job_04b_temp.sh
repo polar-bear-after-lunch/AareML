@@ -4,8 +4,12 @@
 #
 # IMPORTANT: Run AFTER job_04_multisite.sh completes.
 #
-# Estimated runtime: ~2h on RTX 4090 (80+ gauges × transfer)
-# GPU memory needed: ~6 GB
+# Estimated runtime: ~3h on RTX 4090 (80+ gauges × transfer + EA-LSTM training)
+# GPU memory needed: ~8 GB
+# NOTE (nb04b update): New section 4 adds EA-LSTM temperature training using
+# CAMELS-CH-Chem static attributes (matching nb04). Section 5 adds combined
+# zero-shot vs EA-LSTM comparison. Results saved to temp_ea_lstm_results.csv
+# and temp_multisite_combined.csv.
 #
 # Submit with: sbatch ubelix/job_04b_temp.sh
 # Or chain after job 04: sbatch --dependency=afterok:<JOB_04_ID> ubelix/job_04b_temp.sh

@@ -422,7 +422,7 @@ story.append(sp(4))
 from datetime import datetime as _dt
 _now = _dt.now().strftime("%d %b %Y, %H:%M")
 story.append(p("April 2026  ·  Deadline: 15 June 2026", "meta"))
-story.append(p(f"Report version: 1.22  ·  Last updated: {_now}", "meta"))
+story.append(p(f"Report version: 1.23  ·  Last updated: {_now}", "meta"))
 story.append(anchor("s_abstract"))
 story.append(sp(32))
 
@@ -436,10 +436,10 @@ abstract_table = Table(
         "statistical baselines, we train a single-site LSTM (Optuna-tuned "
         "over 75 trials; default config achieves DO RMSE = 0.309 mg/L, Optuna best = 0.300 mg/L) "
         "and evaluate its zero-shot transfer to 12 Swiss gauges (mean DO RMSE = 0.464 mg/L, 3.0\u00d7 lower RMSE than the LakeBeD-US LSTM reference; per-gauge retraining achieves 0.393 mg/L). "
-        "A Wilcoxon signed-rank test across 11 gauges confirms a <b>statistically significant improvement (p=0.024)</b> "
-        "for zero-shot transfer over Ridge regression. "
+        "A Wilcoxon signed-rank test across 11 gauges is consistent with a <b>statistically significant improvement (p=0.024)</b> "
+        "for zero-shot transfer over Ridge regression (note: n=11 limits statistical power). "
         "GradientSHAP attribution identifies temperature[t−1] as the strongest predictor (mean |SHAP|=0.644), "
-        "ahead of DO itself, with the LSTM exhibiting an effective memory of 3–4 days despite a 21-day lookback. "
+        "ahead of DO itself, with the LSTM at gauge 2473 showing dominant SHAP weights over lags 1–4 days despite a 21-day lookback. "
         "Baseline DO RMSE on gauge 2473 ranges from 0.30–0.34 mg/L, already well below the "
         "LakeBeD-US lake reference of 1.40 mg/L, suggesting rivers are more predictable than "
         "lakes under the same task formulation. "
@@ -1259,8 +1259,8 @@ story.append(p(
     "<b>Zero-shot river\u2192lake transfer fails entirely</b> (RMSE = 3.980 mg/L, "
     "NSE = \u22126.486, KGE = \u22120.375). An NSE below zero means the transferred model performs "
     "worse than simply predicting the lake DO mean — the river LSTM has no predictive "
-    "skill whatsoever when applied directly to lake dynamics. This definitively confirms "
-    "that river and lake DO dynamics are fundamentally different ecosystems: the physical "
+    "skill whatsoever when applied directly to lake dynamics. This is consistent with "
+    "the view that river and lake DO dynamics are fundamentally different ecosystems: the physical "
     "mechanisms driving DO in fast-flowing Alpine rivers (reaeration, temperature-driven "
     "solubility) do not transfer to stratified lakes dominated by algal blooms, thermal "
     "turnover, and hypolimnetic oxygen depletion."
@@ -1302,7 +1302,7 @@ story.append(p(
 # Ablation table
 abl_data = [
     [Paragraph(h, S["table_header"]) for h in
-     ["Ablation", "Condition", "DO RMSE", "DO KGE", "\u0394 RMSE"]],
+     ["Ablation", "Condition", "DO RMSE", "DO KGE", "delta RMSE"]],
     [p("A1: Architecture","table_cell"), p("LSTM (baseline)","table_cell"),
      p("<b>0.290</b>","table_cell_c"), p("0.920","table_cell_c"), p("\u2014","table_cell_c")],
     [p("","table_cell"), p("GRU","table_cell"),
@@ -1507,24 +1507,25 @@ story.append(p(
     "stratified by catchment elevation. GradientSHAP attribution (Captum 0.8.0) reveals "
     "that water temperature at lag t−1 is the dominant driver of DO prediction "
     "(mean |SHAP| = 0.644), consistent with the known physical coupling between temperature "
-    "and oxygen solubility. The LSTM exhibits an effective memory of 3–4 days despite a "
+    "and oxygen solubility. At gauge 2473, SHAP attributions show dominant weights over lags 1–4 days despite a "
     "21-day lookback window, consistent with the short autocorrelation length of Alpine river DO. Note: SHAP attributions reflect learned correlations, not causal physical mechanisms; the temperature dominance may partly reflect autocorrelation in the input series."
 ))
 story.append(p(
     "Cross-ecosystem and cross-continental experiments quantify the limits of transferability. "
     "The Swiss lake experiment (Section 5.7, 21 lakes, Bärenbold et al. 2026) delivers two "
     "complementary findings: zero-shot river\u2192lake transfer fails entirely "
-    "(RMSE = 3.980 mg/L, NSE = \u22126.486), confirming that river and lake DO dynamics are "
-    "fundamentally different ecosystems requiring separate models; and a lake-retrained LSTM "
+    "(RMSE = 3.980 mg/L, NSE = \u22126.486), consistent with river and lake DO dynamics "
+    "requiring separate models; and a lake-retrained LSTM "
     "achieves RMSE = 0.768 mg/L (NSE = 0.700, KGE = 0.796) on 21 Swiss lakes, "
     "<b>1.82\u00d7 better than the LakeBeD-US published benchmark</b> (1.40 mg/L). "
-    "The AareML architecture is therefore transferable across ecosystems, but "
-    "ecosystem-specific training data are required. In an "
+    "These results suggest the AareML architecture may be transferable across ecosystems, "
+    "but ecosystem-specific training data are required. In an "
     "exploratory zero-shot experiment on 4 US rivers (USGS NWIS, U.S. Geological Survey, 2024), "
     "the Swiss-trained LSTM achieves a mean RMSE of 1.376 mg/L, with the Willamette River "
     "(Oregon) achieving 0.996 mg/L — approaching the lake benchmark — consistent with its "
-    "alpine headwaters and temperate Pacific climate. These results support the hypothesis that "
-    "geographic transfer is bounded by hydrological similarity to the training distribution."
+    "alpine headwaters and temperate Pacific climate. These results are consistent with the hypothesis that "
+    "geographic transfer is bounded by hydrological similarity to the training distribution "
+    "(n=4 US gauges; inference is exploratory only)."
 ))
 story.append(p(
     "Future work should prioritise: (1) the catchment-attribute SHAP surrogate model "
@@ -1774,7 +1775,7 @@ changelog_data = [
        "added USGS scale-extrapolation limitation; "
        "added NSE+MSE loss formula to Methods; "
        "added bootstrap CI note for Table 8; "
-       "fixed erroneous Table 3 reference in Conclusion → Table 4; "
+       "fixed erroneous Table 3 reference in Conclusion (corrected to Table 4); "
        "updated gauge 2410 explanation.", "table_cell")],
     [p("1.10","table_cell_c"), p("April 2026","table_cell"),
      p("Cross-continental zero-shot transfer to 4 US rivers (notebook 08); "

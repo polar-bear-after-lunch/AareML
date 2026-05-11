@@ -4,8 +4,11 @@
 #
 # IMPORTANT: Run AFTER job_03_lstm.sh completes — needs the saved checkpoint.
 #
-# Estimated runtime: ~30 min on RTX 3090 (16 gauges × zero-shot + retrain)
-# GPU memory needed: ~6 GB
+# Estimated runtime: ~60 min on RTX 4090 (16 gauges × zero-shot + retrain + EA-LSTM)
+# GPU memory needed: ~8 GB
+# NOTE (nb04 update): EA-LSTM now uses CAMELS-CH-Chem derived static attributes
+# (log_area, gauge_lat, gauge_lon, Q, forest_frac, crop_frac, urban_frac, ice_frac)
+# built from gauges_metadata + per-gauge landcover CSVs (Nascimento et al. 2025).
 #
 # Submit with: sbatch ubelix/job_04_multisite.sh
 # Or chain after job 03: sbatch --dependency=afterok:<JOB_03_ID> ubelix/job_04_multisite.sh
