@@ -4,7 +4,10 @@
 #
 # IMPORTANT: Run AFTER job_04_multisite.sh completes.
 #
-# Estimated runtime: ~3h on RTX 4090 (80+ gauges × transfer + EA-LSTM training)
+# Estimated runtime: ~6h on RTX 4090 (86 gauges × transfer + EA-LSTM training)
+# NOTE (nb04b 86-gauge expansion): gauge discovery now scans all 86 CAMELS-CH-Chem
+# temperature gauges directly from raw CSVs (≥365 days threshold), replacing the
+# previous DO-filtered list of ~15 gauges. Runtime doubled to 6h accordingly.
 # GPU memory needed: ~8 GB
 # NOTE (nb04b update): New section 4 adds EA-LSTM temperature training using
 # CAMELS-CH-Chem static attributes (matching nb04). Section 5 adds combined
@@ -16,7 +19,7 @@
 # =============================================================================
 
 #SBATCH --job-name="aareml_04b_temp"
-#SBATCH --time=04:00:00
+#SBATCH --time=06:00:00
 #SBATCH --mem-per-cpu=16G
 #SBATCH --cpus-per-task=4
 #SBATCH --partition=gpu-invest
