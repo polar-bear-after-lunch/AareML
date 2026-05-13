@@ -422,7 +422,7 @@ story.append(sp(4))
 from datetime import datetime as _dt
 _now = _dt.now().strftime("%d %b %Y, %H:%M")
 story.append(p("April 2026  ·  Deadline: 15 June 2026", "meta"))
-story.append(p(f"Report version: 1.23  ·  Last updated: {_now}", "meta"))
+story.append(p(f"Report version: 1.24  ·  Last updated: {_now}", "meta"))
 story.append(anchor("s_abstract"))
 story.append(sp(32))
 
@@ -445,6 +445,7 @@ abstract_table = Table(
         "lakes under the same task formulation. "
         "Zero-shot temperature transfer across 15 gauges achieves mean RMSE of 2.59°C (NSE=0.727), "
         "with low-elevation gauges approaching single-site performance. "
+        "EA-LSTM temperature transfer reduces mean RMSE by 34% (2.597°C → 1.721°C, NSE = 0.862). "
         "Zero-shot application to 4 US rivers achieves mean RMSE of 1.376 mg/L, with the "
         "Willamette River (Oregon) well below the lake benchmark at 0.996 mg/L. "
         "A Swiss lake experiment (21 lakes, Bärenbold et al. 2026) confirms that "
@@ -1031,7 +1032,7 @@ ms_data = [
     [p("2473","table_cell"), p("0.300","table_cell_c"), p("0.299","table_cell_c"), p("0.297","table_cell_c"), p("0.891","table_cell_c")],
     [p("2613","table_cell"), p("0.514","table_cell_c"), p("0.433","table_cell_c"), p("0.492","table_cell_c"), p("0.904","table_cell_c")],
     [p("<b>Mean (excl. 2473)</b>","table_cell"), p("<b>0.464</b>","table_cell_c"), p("<b>0.393</b>","table_cell_c"),
-     p("<b>0.431</b>","table_cell_c"), p("<b>0.792</b>","table_cell_c")],
+     p("<b>0.420</b>","table_cell_c"), p("<b>0.792</b>","table_cell_c")],
 ]
 ms_tbl = Table(ms_data, colWidths=[2.2*cm, 3.2*cm, 3.2*cm, 3.2*cm, 3.2*cm])
 ms_tbl.setStyle(TABLE_STYLE)
@@ -1039,7 +1040,7 @@ story += highlight_new([ms_tbl])
 story.append(p(
     "Table 4: Multi-site DO RMSE (mg/L) across 12 Swiss gauges. Gauge 2473 is the training gauge "
     "(focus site). Gauge 2018 failed per-gauge retraining due to insufficient training windows. "
-    "EA-LSTM mean RMSE = 0.431 mg/L (11 gauges excluding 2473). "
+    "EA-LSTM mean RMSE = 0.420 mg/L (CAMELS-CH-Chem static attributes: log area, lat, lon, forest/crop/urban/ice fractions; 11 gauges excluding 2473). "
     "All strategies vastly outperform the LakeBeD-US LSTM reference (1.40 mg/L).",
     "caption"
 ))
@@ -1048,8 +1049,10 @@ story.append(p(
     "Table 4 reveals strong zero-shot transfer: the model trained solely on gauge 2473 achieves "
     "a mean DO RMSE of <b>0.464 mg/L</b> across 11 gauges (excl. training gauge 2473) \u2014 3.3\u00d7 better than the "
     "LakeBeD-US LSTM reference (1.40 mg/L). Per-gauge retraining improves this to "
-    "<b>0.393 mg/L</b> (3.6\u00d7 better). The EA-LSTM achieves <b>0.431 mg/L</b>, incorporating static catchment attributes (elevation, "
-    "area, land cover) into the gating mechanism \u2014 confirming that catchment descriptors "
+    "<b>0.393 mg/L</b> (3.6\u00d7 better). The EA-LSTM achieves <b>0.420 mg/L</b>, incorporating static catchment attributes "
+    "(CAMELS-CH-Chem derived: log catchment area, latitude, longitude, forest fraction, crop fraction, "
+    "urban fraction, ice fraction — 7 features, Nascimento et al. 2025) into the gating mechanism "
+    "\u2014 confirming that catchment descriptors "
     "carry predictive signal beyond the dynamic sensor inputs alone. "
     "One notable exception is gauge 2410 (NSE = 0.303 for transfer, NSE = 0.492 per-gauge): "
     "Gauge 2410 (Thur at Andelfingen) shows anomalously low transfer performance "
@@ -1064,7 +1067,9 @@ story += highlight_new([p(
     "complementary evidence of transfer learning effectiveness. "
     "Note: gauge 2473 (focus gauge, used for training) was excluded from the significance "
     "test. Gauge 2018, which lacks a Ridge baseline (per-gauge retrain also failed), is excluded from the Wilcoxon test, reducing to n=11 paired differences. The mean RMSE of 0.464 mg/L in Table 4 "
-    "includes all 12 gauges."
+    "includes all 12 gauges. "
+    "For context, Ridge regression zero-shot transfer achieves mean RMSE = 0.568 mg/L (NSE = 0.628) \u2014 the LSTM zero-shot outperforms Ridge by 18%, confirming that the LSTM\u2019s dynamic hidden state provides genuine transfer advantage beyond linear models. "
+    "A univariate AR(7) baseline achieves RMSE = 0.388 mg/L at gauge 2473, confirming that multi-variable LSTM inputs (temperature, EC, pH) account for the majority of the improvement over simple autoregressive models."
 )], label="NEW in v1.10")
 story.append(p(
     "The catchment attribute correlation analysis identified <b>gauge latitude (northing)</b> "
@@ -1090,6 +1095,10 @@ story.append(p(
     "Zero-shot temperature transfer across 15 Swiss gauges achieves mean RMSE = 2.59\u00b0C "
     "and NSE = 0.727. Low-elevation gauges (&lt;600 m a.s.l.) approach single-site performance, "
     "while high-alpine gauges show higher error due to snowmelt dynamics. "
+    "EA-LSTM temperature transfer further reduces mean RMSE to <b>1.721\u00b0C</b> (NSE = 0.862, 15 gauges) "
+    "\u2014 a 34% improvement over zero-shot, suggesting that static catchment attributes "
+    "(particularly elevation proxy via latitude and land cover) are more informative "
+    "for temperature than for DO prediction. "
     "Full results and figures are in Appendix B (notebook 04b)."
 ))
 
@@ -1683,6 +1692,16 @@ story.append(Spacer(1, 8))
 changelog_data = [
     [Paragraph(h, S["table_header"]) for h in
      ["Version", "Date", "Key Changes"]],
+    [p("1.24","table_cell_c"), p("May 2026","table_cell"),
+     p("Results updated from UBELIX reruns (jobs 3849463\u20133851712, 4006665\u20134007017): "
+       "EA-LSTM DO updated to 0.420 mg/L with CAMELS-CH-Chem static attributes "
+       "(log area, lat, lon, forest/crop/urban/ice fractions, Nascimento et al. 2025); "
+       "EA-LSTM temperature added: 1.721\u00b0C (NSE=0.862, 34% improvement over zero-shot); "
+       "Ridge zero-shot transfer: 0.568 mg/L (LSTM 18% better); "
+       "AR(7) baseline: 0.388 mg/L (LSTM 23% better); "
+       "Added nb14 (AR baseline), nb15 (scientific rigor), nb16 (cross-validation, pending); "
+       "Scientific restraint rewrites applied; \u0394 glyph fixed in ablation table.",
+       "table_cell")],
     [p("1.19","table_cell_c"), p("08 May 2026","table_cell"),
      p("Report shortened from 32 to ~20 main-body pages. "
        "S5.3b temperature condensed to 1 paragraph (full results Appendix B). "
