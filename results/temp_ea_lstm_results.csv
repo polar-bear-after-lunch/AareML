@@ -1,0 +1,16 @@
+gauge_id,rmse_temp,nse_temp,strategy
+2009,1.0968,0.743,ea_lstm_temp
+2016,1.7502,0.909,ea_lstm_temp
+2018,2.043,0.882,ea_lstm_temp
+2044,2.3115,0.852,ea_lstm_temp
+2068,1.5567,0.817,ea_lstm_temp
+2085,1.7433,0.892,ea_lstm_temp
+2130,1.7786,0.918,ea_lstm_temp
+2135,1.7254,0.882,ea_lstm_temp
+2143,1.8353,0.918,ea_lstm_temp
+2174,2.1065,0.85,ea_lstm_temp
+2243,1.871,0.918,ea_lstm_temp
+2410,1.2534,0.641,ea_lstm_temp
+2415,1.8805,0.888,ea_lstm_temp
+2462,1.0956,0.895,ea_lstm_temp
+2613,1.7608,0.918,ea_lstm_temp
