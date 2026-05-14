@@ -1,0 +1,127 @@
+[NbConvertApp] Converting notebook notebooks/16_cross_validation.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+DO_IDX = list(TARGETS).index('O2C_sensor')
+results = []
+
+for src_gid in tqdm(DO_GAUGES, desc='Source gauges'):
+    if src_gid not in gauge_data:
+        continue
+    
+    # Train model on source gauge
+    gd = gauge_data[src_gid]
+    ds_tr = RiverDataset(gd['train'], gd['means'], FEATURES, TARGETS)
+    ds_va = RiverDataset(gd['val'],   gd['means'], FEATURES, TARGETS)
+    dl_tr = torch.utils.data.DataLoader(ds_tr, batch_size=256, shuffle=True)
+    dl_va = torch.utils.data.DataLoader(ds_va, batch_size=256, shuffle=False)
+    
+    model = Seq2SeqLSTM(
+        n_feat=len(FEATURES), n_tgt=len(TARGETS),
+        hidden=HIDDEN, n_layers=N_LAYERS, dropout=DROPOUT,
+    ).to(DEVICE)
+    model, _ = train_model(model, dl_tr, dl_va, device=DEVICE,
+                            epochs=EPOCHS, lr=LR, patience=PATIENCE, verbose=False)
+    
+    # Zero-shot transfer to all other gauges
+    for tgt_gid in DO_GAUGES:
+        if tgt_gid == src_gid or tgt_gid not in gauge_data:
+            continue
+        tgt = gauge_data[tgt_gid]
+        if len(tgt['X_te']) < 10:
+            continue
+        try:
+            ds_te = RiverDataset(tgt['test'], tgt['means'], FEATURES, TARGETS)
+            dl_te = torch.utils.data.DataLoader(ds_te, batch_size=256, shuffle=False)
+            y_pred = predict(model, dl_te, DEVICE)
+            y_true = get_y_true(ds_te)
+            
+            rmse_val = mean_rmse(y_true, y_pred)[TARGETS[DO_IDX]]
+            nse_val  = nse(y_true, y_pred)[TARGETS[DO_IDX]]
+            
+            results.append({
+                'source_gauge': src_gid,
+                'target_gauge': tgt_gid,
+                'rmse_do': round(rmse_val, 4),
+                'nse_do':  round(nse_val, 3),
+            })
+        except Exception as e:
+            print(f'  {src_gid}\u2192{tgt_gid}: {e}')
+
+df_cv = pd.DataFrame(results)
+print(f'\nTotal pairs: {len(df_cv)}')
+print(f'Mean RMSE:   {df_cv["rmse_do"].mean():.4f} mg/L')
+print(f'Mean NSE:    {df_cv["nse_do"].mean():.3f}')
+
+# Comparison: fixed source 2473 vs all other sources
+src_2473 = df_cv[df_cv['source_gauge'] == 2473]
+src_other = df_cv[df_cv['source_gauge'] != 2473]
+print(f'\nSource=2473:  mean RMSE={src_2473["rmse_do"].mean():.4f}  NSE={src_2473["nse_do"].mean():.3f}')
+print(f'Other sources: mean RMSE={src_other["rmse_do"].mean():.4f}  NSE={src_other["nse_do"].mean():.3f}')
+
+df_cv.to_csv(RESULTS_DIR / 'cv_transfer_results.csv', index=False)
+print(f'Saved: {RESULTS_DIR}/cv_transfer_results.csv')
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mTypeError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[3][39m[32m, line 10[39m
+[32m      8[39m [38;5;66;03m# Train model on source gauge[39;00m
+[32m      9[39m gd = gauge_data[src_gid]
+[32m---> [39m[32m10[39m ds_tr = [43mRiverDataset[49m[43m([49m[43mgd[49m[43m[[49m[33;43m'[39;49m[33;43mtrain[39;49m[33;43m'[39;49m[43m][49m[43m,[49m[43m [49m[43mgd[49m[43m[[49m[33;43m'[39;49m[33;43mmeans[39;49m[33;43m'[39;49m[43m][49m[43m,[49m[43m [49m[43mFEATURES[49m[43m,[49m[43m [49m[43mTARGETS[49m[43m)[49m
+[32m     11[39m ds_va = RiverDataset(gd[[33m'[39m[33mval[39m[33m'[39m],   gd[[33m'[39m[33mmeans[39m[33m'[39m], FEATURES, TARGETS)
+[32m     12[39m dl_tr = torch.utils.data.DataLoader(ds_tr, batch_size=[32m256[39m, shuffle=[38;5;28;01mTrue[39;00m)
+
+[31mTypeError[39m: RiverDataset.__init__() takes 3 positional arguments but 5 were given
+

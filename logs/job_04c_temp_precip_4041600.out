@@ -1,0 +1,12 @@
+Job started: Thu May 14 03:17:19 PM CEST 2026
+Node: gnode30
+GPU: NVIDIA GeForce RTX 4090
+
+Running notebook 04c: Temperature Forecast with EC/Precip Input...
+
+Notebook 04c complete.
+Results written to:
+  results/temp_ec_results.csv
+  results/temp_forecast_comparison.csv
+  figures/nb04c_ec_temp_correlation.png
+Job finished: Thu May 14 03:36:23 PM CEST 2026
