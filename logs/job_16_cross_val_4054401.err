@@ -1,0 +1,281 @@
+[NbConvertApp] Converting notebook notebooks/16_cross_validation.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+DO_IDX = list(TARGETS).index('O2C_sensor')
+results = []
+
+for src_gid in tqdm(DO_GAUGES, desc='Source gauges'):
+    if src_gid not in gauge_data:
+        continue
+
+    gd = gauge_data[src_gid]
+    dl_tr = torch.utils.data.DataLoader(gd['ds_tr'], batch_size=256, shuffle=True)
+    dl_va = torch.utils.data.DataLoader(gd['ds_va'], batch_size=256, shuffle=False)
+
+    model = Seq2SeqLSTM(
+        n_feat=len(FEATURES), n_tgt=len(TARGETS),
+        hidden=HIDDEN, n_layers=N_LAYERS, dropout=DROPOUT,
+    ).to(DEVICE)
+    model, _ = train_model(model, dl_tr, dl_va, device=DEVICE,
+                           epochs=EPOCHS, lr=LR, patience=PATIENCE, verbose=False)
+
+    # Zero-shot transfer to all other gauges
+    for tgt_gid in DO_GAUGES:
+        if tgt_gid == src_gid or tgt_gid not in gauge_data:
+            continue
+        tgt = gauge_data[tgt_gid]
+        dl_te = torch.utils.data.DataLoader(tgt['ds_te'], batch_size=256, shuffle=False)
+
+        try:
+            # Predict (scaled) then inverse transform
+            y_pred_sc = predict(model, dl_te, DEVICE)           # shape (N, H, T)
+            y_pred = tgt['tgt_sc'].inverse_transform(
+                y_pred_sc.reshape(-1, len(TARGETS))
+            ).reshape(y_pred_sc.shape)
+
+            y_true = tgt['y_te_raw']   # already in original units
+
+            # DO only
+            y_pred_do = y_pred[:, :, DO_IDX]
+            y_true_do = y_true[:, :, DO_IDX]
+
+            rmse_val = float(np.sqrt(np.mean((y_pred_do - y_true_do)**2)))
+            ss_res   = np.sum((y_true_do - y_pred_do)**2)
+            ss_tot   = np.sum((y_true_do - y_true_do.mean())**2)
+            nse_val  = float(1 - ss_res/ss_tot) if ss_tot > 0 else float('nan')
+
+            results.append({
+                'source_gauge': src_gid,
+                'target_gauge': tgt_gid,
+                'rmse_do': round(rmse_val, 4),
+                'nse_do':  round(nse_val,  3),
+            })
+        except Exception as e:
+            print(f'  {src_gid}→{tgt_gid}: {e}')
+
+df_cv = pd.DataFrame(results)
+src_2473 = df_cv[df_cv['source_gauge'] == 2473]
+src_other = df_cv[df_cv['source_gauge'] != 2473]
+
+print(f'Total pairs:    {len(df_cv)}')
+print(f'Overall RMSE:   {df_cv["rmse_do"].mean():.4f} mg/L')
+print(f'Overall NSE:    {df_cv["nse_do"].mean():.3f}')
+print(f'Source=2473:    RMSE={src_2473["rmse_do"].mean():.4f}  NSE={src_2473["nse_do"].mean():.3f}')
+print(f'Other sources:  RMSE={src_other["rmse_do"].mean():.4f}  NSE={src_other["nse_do"].mean():.3f}')
+
+df_cv.to_csv(RESULTS_DIR / 'cv_transfer_results.csv', index=False)
+print(f'Saved: {RESULTS_DIR}/cv_transfer_results.csv')
+
+------------------
+
+----- stdout -----
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2473→2009: 'DataLoader' object is not subscriptable
+  2473→2613: 'DataLoader' object is not subscriptable
+  2473→2143: 'DataLoader' object is not subscriptable
+  2473→2016: 'DataLoader' object is not subscriptable
+  2473→2174: 'DataLoader' object is not subscriptable
+  2473→2415: 'DataLoader' object is not subscriptable
+  2473→2044: 'DataLoader' object is not subscriptable
+  2473→2410: 'DataLoader' object is not subscriptable
+  2473→2085: 'DataLoader' object is not subscriptable
+  2473→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2009→2473: 'DataLoader' object is not subscriptable
+  2009→2613: 'DataLoader' object is not subscriptable
+  2009→2143: 'DataLoader' object is not subscriptable
+  2009→2016: 'DataLoader' object is not subscriptable
+  2009→2174: 'DataLoader' object is not subscriptable
+  2009→2415: 'DataLoader' object is not subscriptable
+  2009→2044: 'DataLoader' object is not subscriptable
+  2009→2410: 'DataLoader' object is not subscriptable
+  2009→2085: 'DataLoader' object is not subscriptable
+  2009→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2613→2473: 'DataLoader' object is not subscriptable
+  2613→2009: 'DataLoader' object is not subscriptable
+  2613→2143: 'DataLoader' object is not subscriptable
+  2613→2016: 'DataLoader' object is not subscriptable
+  2613→2174: 'DataLoader' object is not subscriptable
+  2613→2415: 'DataLoader' object is not subscriptable
+  2613→2044: 'DataLoader' object is not subscriptable
+  2613→2410: 'DataLoader' object is not subscriptable
+  2613→2085: 'DataLoader' object is not subscriptable
+  2613→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2143→2473: 'DataLoader' object is not subscriptable
+  2143→2009: 'DataLoader' object is not subscriptable
+  2143→2613: 'DataLoader' object is not subscriptable
+  2143→2016: 'DataLoader' object is not subscriptable
+  2143→2174: 'DataLoader' object is not subscriptable
+  2143→2415: 'DataLoader' object is not subscriptable
+  2143→2044: 'DataLoader' object is not subscriptable
+  2143→2410: 'DataLoader' object is not subscriptable
+  2143→2085: 'DataLoader' object is not subscriptable
+  2143→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2016→2473: 'DataLoader' object is not subscriptable
+  2016→2009: 'DataLoader' object is not subscriptable
+  2016→2613: 'DataLoader' object is not subscriptable
+  2016→2143: 'DataLoader' object is not subscriptable
+  2016→2174: 'DataLoader' object is not subscriptable
+  2016→2415: 'DataLoader' object is not subscriptable
+  2016→2044: 'DataLoader' object is not subscriptable
+  2016→2410: 'DataLoader' object is not subscriptable
+  2016→2085: 'DataLoader' object is not subscriptable
+  2016→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2174→2473: 'DataLoader' object is not subscriptable
+  2174→2009: 'DataLoader' object is not subscriptable
+  2174→2613: 'DataLoader' object is not subscriptable
+  2174→2143: 'DataLoader' object is not subscriptable
+  2174→2016: 'DataLoader' object is not subscriptable
+  2174→2415: 'DataLoader' object is not subscriptable
+  2174→2044: 'DataLoader' object is not subscriptable
+  2174→2410: 'DataLoader' object is not subscriptable
+  2174→2085: 'DataLoader' object is not subscriptable
+  2174→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2415→2473: 'DataLoader' object is not subscriptable
+  2415→2009: 'DataLoader' object is not subscriptable
+  2415→2613: 'DataLoader' object is not subscriptable
+  2415→2143: 'DataLoader' object is not subscriptable
+  2415→2016: 'DataLoader' object is not subscriptable
+  2415→2174: 'DataLoader' object is not subscriptable
+  2415→2044: 'DataLoader' object is not subscriptable
+  2415→2410: 'DataLoader' object is not subscriptable
+  2415→2085: 'DataLoader' object is not subscriptable
+  2415→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2044→2473: 'DataLoader' object is not subscriptable
+  2044→2009: 'DataLoader' object is not subscriptable
+  2044→2613: 'DataLoader' object is not subscriptable
+  2044→2143: 'DataLoader' object is not subscriptable
+  2044→2016: 'DataLoader' object is not subscriptable
+  2044→2174: 'DataLoader' object is not subscriptable
+  2044→2415: 'DataLoader' object is not subscriptable
+  2044→2410: 'DataLoader' object is not subscriptable
+  2044→2085: 'DataLoader' object is not subscriptable
+  2044→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2410→2473: 'DataLoader' object is not subscriptable
+  2410→2009: 'DataLoader' object is not subscriptable
+  2410→2613: 'DataLoader' object is not subscriptable
+  2410→2143: 'DataLoader' object is not subscriptable
+  2410→2016: 'DataLoader' object is not subscriptable
+  2410→2174: 'DataLoader' object is not subscriptable
+  2410→2415: 'DataLoader' object is not subscriptable
+  2410→2044: 'DataLoader' object is not subscriptable
+  2410→2085: 'DataLoader' object is not subscriptable
+  2410→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2085→2473: 'DataLoader' object is not subscriptable
+  2085→2009: 'DataLoader' object is not subscriptable
+  2085→2613: 'DataLoader' object is not subscriptable
+  2085→2143: 'DataLoader' object is not subscriptable
+  2085→2016: 'DataLoader' object is not subscriptable
+  2085→2174: 'DataLoader' object is not subscriptable
+  2085→2415: 'DataLoader' object is not subscriptable
+  2085→2044: 'DataLoader' object is not subscriptable
+  2085→2410: 'DataLoader' object is not subscriptable
+  2085→2462: 'DataLoader' object is not subscriptable
+[model] train_model: 102,018 trainable params, device=cuda, epochs=30, patience=5, lr=0.001
+----- stdout -----
+  2462→2473: 'DataLoader' object is not subscriptable
+  2462→2009: 'DataLoader' object is not subscriptable
+  2462→2613: 'DataLoader' object is not subscriptable
+  2462→2143: 'DataLoader' object is not subscriptable
+  2462→2016: 'DataLoader' object is not subscriptable
+  2462→2174: 'DataLoader' object is not subscriptable
+  2462→2415: 'DataLoader' object is not subscriptable
+  2462→2044: 'DataLoader' object is not subscriptable
+  2462→2410: 'DataLoader' object is not subscriptable
+  2462→2085: 'DataLoader' object is not subscriptable
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mKeyError[39m                                  Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[3][39m[32m, line 54[39m
+[32m     51[39m             [38;5;28mprint[39m([33mf[39m[33m'[39m[33m  [39m[38;5;132;01m{[39;00msrc_gid[38;5;132;01m}[39;00m[33m→[39m[38;5;132;01m{[39;00mtgt_gid[38;5;132;01m}[39;00m[33m: [39m[38;5;132;01m{[39;00me[38;5;132;01m}[39;00m[33m'[39m)
+[32m     53[39m df_cv = pd.DataFrame(results)
+[32m---> [39m[32m54[39m src_2473 = df_cv[[43mdf_cv[49m[43m[[49m[33;43m'[39;49m[33;43msource_gauge[39;49m[33;43m'[39;49m[43m][49m == [32m2473[39m]
+[32m     55[39m src_other = df_cv[df_cv[[33m'[39m[33msource_gauge[39m[33m'[39m] != [32m2473[39m]
+[32m     57[39m [38;5;28mprint[39m([33mf[39m[33m'[39m[33mTotal pairs:    [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m(df_cv)[38;5;132;01m}[39;00m[33m'[39m)
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/pandas/core/frame.py:4102[39m, in [36mDataFrame.__getitem__[39m[34m(self, key)[39m
+[32m   4100[39m [38;5;28;01mif[39;00m [38;5;28mself[39m.columns.nlevels > [32m1[39m:
+[32m   4101[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._getitem_multilevel(key)
+[32m-> [39m[32m4102[39m indexer = [38;5;28;43mself[39;49m[43m.[49m[43mcolumns[49m[43m.[49m[43mget_loc[49m[43m([49m[43mkey[49m[43m)[49m
+[32m   4103[39m [38;5;28;01mif[39;00m is_integer(indexer):
+[32m   4104[39m     indexer = [indexer]
+
+[36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/pandas/core/indexes/range.py:417[39m, in [36mRangeIndex.get_loc[39m[34m(self, key)[39m
+[32m    415[39m         [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m(key) [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01merr[39;00m
+[32m    416[39m [38;5;28;01mif[39;00m [38;5;28misinstance[39m(key, Hashable):
+[32m--> [39m[32m417[39m     [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m(key)
+[32m    418[39m [38;5;28mself[39m._check_indexing_error(key)
+[32m    419[39m [38;5;28;01mraise[39;00m [38;5;167;01mKeyError[39;00m(key)
+
+[31mKeyError[39m: 'source_gauge'
+

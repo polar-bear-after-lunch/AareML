@@ -1,0 +1,159 @@
+[NbConvertApp] Converting notebook notebooks/04c_temp_precip_forecast.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from sklearn.preprocessing import StandardScaler
+
+def build_and_train(features, label):
+    """Train a Seq2SeqLSTM for temperature using the given feature set."""
+    raw  = load_gauge(FOCUS_GAUGE)
+    data = preprocess(raw)
+    train_df, val_df, test_df = train_val_test_split(data)
+    train_means = (pd.concat([train_df[features].mean(), train_df[TARGET_TEMP].mean()])
+                   .groupby(level=0).first())
+
+    X_tr, y_tr, _ = make_windows(train_df, train_means, features=features, targets=TARGET_TEMP)
+    X_va, y_va, _ = make_windows(val_df,   train_means, features=features, targets=TARGET_TEMP)
+    X_te, y_te, _ = make_windows(test_df,  train_means, features=features, targets=TARGET_TEMP)
+
+    N_tr, L, F = X_tr.shape
+    H, T = y_tr.shape[1], y_tr.shape[2]
+
+    feat_sc = StandardScaler().fit(X_tr.reshape(-1, F))
+    tgt_sc  = StandardScaler().fit(y_tr.reshape(-1, T))
+
+    def scale(X_raw, y_raw, N):
+        Xs = feat_sc.transform(X_raw.reshape(-1, F)).reshape(N, L, F).astype('float32')
+        ys = tgt_sc.transform(y_raw.reshape(-1, T)).reshape(N, H, T).astype('float32')
+        return Xs, ys
+
+    Xs_tr, ys_tr = scale(X_tr, y_tr, N_tr)
+    Xs_va, ys_va = scale(X_va, y_va, X_va.shape[0])
+    Xs_te, ys_te = scale(X_te, y_te, X_te.shape[0])
+
+    dl_tr = torch.utils.data.DataLoader(RiverDataset(Xs_tr, ys_tr), batch_size=256, shuffle=True)
+    dl_va = torch.utils.data.DataLoader(RiverDataset(Xs_va, ys_va), batch_size=256, shuffle=False)
+    dl_te = torch.utils.data.DataLoader(RiverDataset(Xs_te, ys_te), batch_size=256, shuffle=False)
+
+    model = Seq2SeqLSTM(
+        n_feat=F, n_tgt=T,
+        hidden=HIDDEN, n_layers=N_LAYERS, dropout=DROPOUT,
+    ).to(DEVICE)
+    model, history = train_model(model, dl_tr, dl_va, device=DEVICE,
+                                  epochs=EPOCHS, lr=LR, patience=PATIENCE, verbose=False)
+
+    # Evaluate on test set
+    y_pred_sc = predict(model, dl_te, DEVICE)
+    y_pred = tgt_sc.inverse_transform(
+        y_pred_sc.reshape(-1, T)
+    ).reshape(y_pred_sc.shape)
+
+    rmse = float(np.sqrt(np.mean((y_pred - y_te)**2)))
+    ss_res = np.sum((y_te - y_pred)**2)
+    ss_tot = np.sum((y_te - y_te.mean())**2)
+    nse_ = float(1 - ss_res/ss_tot) if ss_tot > 0 else float('nan')
+
+    print(f'  [{label}] test RMSE={rmse:.3f}°C  NSE={nse_:.3f}')
+    return model, feat_sc, tgt_sc, {'rmse': rmse, 'nse': nse_}
+
+print('Training temperature-only model...')
+model_base, feat_sc_base, tgt_sc_base, metrics_base = build_and_train(FEATURES_TEMP_ONLY, 'temp-only')
+
+print('Training temperature + EC model...')
+model_ec, feat_sc_ec, tgt_sc_ec, metrics_ec = build_and_train(FEATURES_TEMP_EC, 'temp+EC')
+
+print()
+print('=' * 50)
+print(f'Single-site comparison at gauge {FOCUS_GAUGE}:')
+print(f'  Temp-only:  RMSE={metrics_base["rmse"]:.3f}°C  NSE={metrics_base["nse"]:.3f}')
+print(f'  Temp + EC:  RMSE={metrics_ec["rmse"]:.3f}°C  NSE={metrics_ec["nse"]:.3f}')
+delta = metrics_base['rmse'] - metrics_ec['rmse']
+print(f'  EC improvement: {delta:+.3f}°C ({delta/metrics_base["rmse"]*100:+.1f}%)')
+
+------------------
+
+----- stdout -----
+Training temperature-only model...
+[data] load_gauge 2473: 14610 rows, 1981-01-01 → 2020-12-31, cols=['temp_sensor', 'pH_sensor', 'ec_sensor', 'O2C_sensor']
+[data] preprocess: 14610 days, NaN%={'temp_sensor': 0.0, 'pH_sensor': 0.01, 'ec_sensor': 0.007, 'O2C_sensor': 0.012}
+[data] split: train=12418, val=731, test=1461
+[data] make_windows: 12384 windows, X=(12384, 21, 1), y=(12384, 14, 1), date range 1981-01-22 → 2014-12-18
+[data] make_windows: 697 windows, X=(697, 21, 1), y=(697, 14, 1), date range 2015-01-22 → 2016-12-18
+[data] make_windows: 1427 windows, X=(1427, 21, 1), y=(1427, 14, 1), date range 2017-01-22 → 2020-12-18
+[model] RiverDataset: 12384 samples, X=(12384, 21, 1), y=(12384, 14, 1)
+[model] RiverDataset: 697 samples, X=(697, 21, 1), y=(697, 14, 1)
+[model] RiverDataset: 1427 samples, X=(1427, 21, 1), y=(1427, 14, 1)
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mNameError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[3][39m[32m, line 56[39m
+[32m     53[39m     [38;5;28;01mreturn[39;00m model, feat_sc, tgt_sc, {[33m'[39m[33mrmse[39m[33m'[39m: rmse, [33m'[39m[33mnse[39m[33m'[39m: nse_}
+[32m     55[39m [38;5;28mprint[39m([33m'[39m[33mTraining temperature-only model...[39m[33m'[39m)
+[32m---> [39m[32m56[39m model_base, feat_sc_base, tgt_sc_base, metrics_base = [43mbuild_and_train[49m[43m([49m[43mFEATURES_TEMP_ONLY[49m[43m,[49m[43m [49m[33;43m'[39;49m[33;43mtemp-only[39;49m[33;43m'[39;49m[43m)[49m
+[32m     58[39m [38;5;28mprint[39m([33m'[39m[33mTraining temperature + EC model...[39m[33m'[39m)
+[32m     59[39m model_ec, feat_sc_ec, tgt_sc_ec, metrics_ec = build_and_train(FEATURES_TEMP_EC, [33m'[39m[33mtemp+EC[39m[33m'[39m)
+
+[36mCell[39m[36m [39m[32mIn[3][39m[32m, line 36[39m, in [36mbuild_and_train[39m[34m(features, label)[39m
+[32m     31[39m dl_va = torch.utils.data.DataLoader(RiverDataset(Xs_va, ys_va), batch_size=[32m256[39m, shuffle=[38;5;28;01mFalse[39;00m)
+[32m     32[39m dl_te = torch.utils.data.DataLoader(RiverDataset(Xs_te, ys_te), batch_size=[32m256[39m, shuffle=[38;5;28;01mFalse[39;00m)
+[32m     34[39m model = Seq2SeqLSTM(
+[32m     35[39m     n_feat=F, n_tgt=T,
+[32m---> [39m[32m36[39m     hidden=[43mHIDDEN[49m, n_layers=N_LAYERS, dropout=DROPOUT,
+[32m     37[39m ).to(DEVICE)
+[32m     38[39m model, history = train_model(model, dl_tr, dl_va, device=DEVICE,
+[32m     39[39m                               epochs=EPOCHS, lr=LR, patience=PATIENCE, verbose=[38;5;28;01mFalse[39;00m)
+[32m     41[39m [38;5;66;03m# Evaluate on test set[39;00m
+
+[31mNameError[39m: name 'HIDDEN' is not defined
+
