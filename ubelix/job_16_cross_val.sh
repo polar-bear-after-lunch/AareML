@@ -14,7 +14,7 @@
 # =============================================================================
 
 #SBATCH --job-name="aareml_16_cross_val"
-#SBATCH --time=08:00:00              # 8 hours — 16 sources × ~30 min each
+#SBATCH --time=04:00:00              # 4h — reduced epochs for speed
 #SBATCH --mem-per-cpu=16G            # 16 GB RAM (more gauges loaded at once)
 #SBATCH --cpus-per-task=4            # 4 CPU cores for data loading
 #SBATCH --partition=gpu-invest
@@ -50,7 +50,7 @@ jupyter nbconvert \
     --to notebook \
     --execute \
     --inplace \
-    --ExecutePreprocessor.timeout=28800 \
+    --ExecutePreprocessor.timeout=14400 \
     --ExecutePreprocessor.kernel_name=aareml \
     notebooks/16_cross_validation.ipynb
 
