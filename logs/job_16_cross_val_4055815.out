@@ -1,0 +1,11 @@
+Job started: Thu May 14 11:11:43 PM CEST 2026
+Node: gnode39
+GPU: NVIDIA GeForce RTX 4090
+
+Running notebook 16: Cross-Validation (LOO zero-shot transfer)...
+
+Notebook 16 complete.
+Results saved to: results/cv_transfer_results.csv
+Figures saved to: figures/nb16_cv_heatmap.png
+             and: figures/nb16_source_comparison.png
+Job finished: Thu May 14 11:14:59 PM CEST 2026
