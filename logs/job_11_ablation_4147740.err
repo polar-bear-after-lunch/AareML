@@ -1,4 +1,16 @@
-[NbConvertApp] Converting notebook notebooks/04_multisite_analysis.ipynb to notebook
+[NbConvertApp] Converting notebook notebooks/11_ablation_study.ipynb to notebook
+[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count', 'outputs' were unexpected)
+
+Failed validating 'additionalProperties' in markdown_cell:
+
+On instance['cells'][24]:
+{'cell_type': 'markdown',
+ 'execution_count': None,
+ 'id': 'a5b6c7d8',
+ 'metadata': {},
+ 'outputs': ['...0 outputs...'],
+ 'source': "print('=== A4b: Short Lookback Ablation (SHAP-motivated: 4,5,6 "
+           'd...'}
 Traceback (most recent call last):
   File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
     sys.exit(main())
@@ -52,67 +64,36 @@ Traceback (most recent call last):
     raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
 nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
 ------------------
-meta = load_metadata()
-# Normalise: ensure gauge_id is a column
-if 'gauge_id' not in meta.columns:
-    meta = meta.reset_index()
-    meta.columns = [str(c) for c in meta.columns]
-    if meta.columns[0] != 'gauge_id':
-        meta = meta.rename(columns={meta.columns[0]: 'gauge_id'})
-id_col  = next((c for c in meta.columns if 'gauge' in c.lower() and 'id' in c.lower()), meta.columns[0])
-lat_col = next((c for c in meta.columns if 'lat' in c.lower()), None)
-lon_col = next((c for c in meta.columns if 'lon' in c.lower()), None)
+raw  = load_gauge(FOCUS_GAUGE)
+data = preprocess(raw)
+train, val, test = train_val_test_split(data)
 
-if lat_col and lon_col:
-    # Merge RMSE onto metadata
-    meta['gauge_id_str'] = meta[id_col].astype(str)
-    tr_map = transfer_df.copy(); tr_map['gauge_id'] = tr_map['gauge_id'].astype(str)
-    map_df = meta.merge(tr_map[['gauge_id','rmse_do','nse_do']],
-                        left_on='gauge_id_str', right_on='gauge_id', how='inner')
+# Training means used for NaN imputation — computed once, reused for all splits
+train_means = (
+    pd.concat([train[FEATURES].mean(), train[TARGETS].mean()])
+    .groupby(level=0).first()   # deduplicate temp_sensor / O2C_sensor
+)
 
-    fig, ax = plt.subplots(figsize=(9, 7))
-    # Plot all gauges as background
-    ax.scatter(meta[lon_col], meta[lat_col], c='lightgrey', s=20, zorder=1)
-    # Colour DO gauges by RMSE
-    sc = ax.scatter(map_df[lon_col], map_df[lat_col],
-                    c=map_df['rmse_do'], cmap='RdYlGn_r',
-                    s=80, edgecolors='white', linewidths=0.5,
-                    vmin=map_df['rmse_do'].quantile(0.05),
-                    vmax=map_df['rmse_do'].quantile(0.95),
-                    zorder=2)
-    plt.colorbar(sc, ax=ax, label='DO RMSE (mg/L)')
-
-    # Label the focus gauge
-    focus_row = map_df[map_df.index.astype(str) == str(FOCUS_GAUGE) if 'gauge_id' not in map_df.columns else map_df['gauge_id'].astype(str) == str(FOCUS_GAUGE)]
-    if not focus_row.empty:
-        ax.annotate(f'Gauge {FOCUS_GAUGE} (training)',
-                    (focus_row[lon_col].values[0], focus_row[lat_col].values[0]),
-                    textcoords='offset points', xytext=(8, 4), fontsize=8,
-                    color='#8B4FA8')
-
-    ax.set_xlabel('Longitude', fontsize=10); ax.set_ylabel('Latitude', fontsize=10)
-    ax.set_title('DO RMSE by Gauge Location (Transfer Model)', fontsize=12)
-    plt.tight_layout()
-    fig.savefig(FIGURES_DIR / '04_multisite_map.png', bbox_inches='tight')
-    plt.show()
-else:
-    print('Lat/lon columns not found in metadata — skipping map.')
-    print('Available columns:', meta.columns.tolist())
-
+print(f'Train: {train.index.min().date()} → {train.index.max().date()}  ({len(train):,} days)')
+print(f'Val  : {val.index.min().date()}   → {val.index.max().date()}  ({len(val):,} days)')
+print(f'Test : {test.index.min().date()}  → {test.index.max().date()}  ({len(test):,} days)')
 ------------------
 
 
 [31m---------------------------------------------------------------------------[39m
 [31mFileNotFoundError[39m                         Traceback (most recent call last)
-[36mCell[39m[36m [39m[32mIn[13][39m[32m, line 1[39m
-[32m----> [39m[32m1[39m meta = [43mload_metadata[49m[43m([49m[43m)[49m
-[32m      2[39m [38;5;66;03m# Normalise: ensure gauge_id is a column[39;00m
-[32m      3[39m [38;5;28;01mif[39;00m [33m'[39m[33mgauge_id[39m[33m'[39m [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m meta.columns:
+[36mCell[39m[36m [39m[32mIn[5][39m[32m, line 1[39m
+[32m----> [39m[32m1[39m raw  = [43mload_gauge[49m[43m([49m[43mFOCUS_GAUGE[49m[43m)[49m
+[32m      2[39m data = preprocess(raw)
+[32m      3[39m train, val, test = train_val_test_split(data)
 
-[36mFile [39m[32m~/AareML/notebooks/../src/data.py:38[39m, in [36mload_metadata[39m[34m()[39m
-[32m     36[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mload_metadata[39m() -> pd.DataFrame:
-[32m     37[39m [38;5;250m    [39m[33;03m"""Load gauge metadata table."""[39;00m
-[32m---> [39m[32m38[39m     [38;5;28;01mreturn[39;00m [43mpd[49m[43m.[49m[43mread_csv[49m[43m([49m[43mMETADATA_FILE[49m[43m)[49m
+[36mFile [39m[32m~/AareML/notebooks/../src/data.py:25[39m, in [36mload_gauge[39m[34m(gauge_id, daily_dir)[39m
+[32m     23[39m [38;5;250m[39m[33;03m"""Load a single gauge's daily sensor CSV and return a date-indexed DataFrame."""[39;00m
+[32m     24[39m path = daily_dir / [33mf[39m[33m"[39m[33mcamels_ch_chem_daily_[39m[38;5;132;01m{[39;00mgauge_id[38;5;132;01m}[39;00m[33m.csv[39m[33m"[39m
+[32m---> [39m[32m25[39m df = [43mpd[49m[43m.[49m[43mread_csv[49m[43m([49m[43mpath[49m[43m,[49m[43m [49m[43mparse_dates[49m[43m=[49m[43m[[49m[33;43m"[39;49m[33;43mdate[39;49m[33;43m"[39;49m[43m][49m[43m,[49m[43m [49m[43mindex_col[49m[43m=[49m[33;43m"[39;49m[33;43mdate[39;49m[33;43m"[39;49m[43m)[49m.sort_index()
+[32m     26[39m [38;5;28;01massert[39;00m [38;5;129;01mnot[39;00m df.empty, [33mf[39m[33m"[39m[33mload_gauge: file for gauge [39m[38;5;132;01m{[39;00mgauge_id[38;5;132;01m}[39;00m[33m is empty[39m[33m"[39m
+[32m     27[39m [38;5;28;01massert[39;00m [38;5;28misinstance[39m(df.index, pd.DatetimeIndex), \
+[32m     28[39m     [33mf[39m[33m"[39m[33mload_gauge: index is not DatetimeIndex for gauge [39m[38;5;132;01m{[39;00mgauge_id[38;5;132;01m}[39;00m[33m"[39m
 
 [36mFile [39m[32m~/.conda/envs/aareml/lib/python3.11/site-packages/pandas/io/parsers/readers.py:1026[39m, in [36mread_csv[39m[34m(filepath_or_buffer, sep, delimiter, header, names, index_col, usecols, dtype, engine, converters, true_values, false_values, skipinitialspace, skiprows, skipfooter, nrows, na_values, keep_default_na, na_filter, verbose, skip_blank_lines, parse_dates, infer_datetime_format, keep_date_col, date_parser, date_format, dayfirst, cache_dates, iterator, chunksize, compression, thousands, decimal, lineterminator, quotechar, quoting, doublequote, escapechar, comment, encoding, encoding_errors, dialect, on_bad_lines, delim_whitespace, low_memory, memory_map, float_precision, storage_options, dtype_backend)[39m
 [32m   1013[39m kwds_defaults = _refine_defaults_read(
@@ -157,16 +138,16 @@ else:
 [32m    870[39m     [38;5;66;03m# Binary mode does not support 'encoding' and 'newline'.[39;00m
 [32m    871[39m     [38;5;28;01mif[39;00m ioargs.encoding [38;5;129;01mand[39;00m [33m"[39m[33mb[39m[33m"[39m [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m ioargs.mode:
 [32m    872[39m         [38;5;66;03m# Encoding[39;00m
-[32m--> [39m[32m873[39m         handle = [38;5;28mopen[39m(
-[32m    874[39m             handle,
-[32m    875[39m             ioargs.mode,
-[32m    876[39m             encoding=ioargs.encoding,
-[32m    877[39m             errors=errors,
-[32m    878[39m             newline=[33m"[39m[33m"[39m,
-[32m    879[39m         )
+[32m--> [39m[32m873[39m         handle = [38;5;28;43mopen[39;49m[43m([49m
+[32m    874[39m [43m            [49m[43mhandle[49m[43m,[49m
+[32m    875[39m [43m            [49m[43mioargs[49m[43m.[49m[43mmode[49m[43m,[49m
+[32m    876[39m [43m            [49m[43mencoding[49m[43m=[49m[43mioargs[49m[43m.[49m[43mencoding[49m[43m,[49m
+[32m    877[39m [43m            [49m[43merrors[49m[43m=[49m[43merrors[49m[43m,[49m
+[32m    878[39m [43m            [49m[43mnewline[49m[43m=[49m[33;43m"[39;49m[33;43m"[39;49m[43m,[49m
+[32m    879[39m [43m        [49m[43m)[49m
 [32m    880[39m     [38;5;28;01melse[39;00m:
 [32m    881[39m         [38;5;66;03m# Binary mode[39;00m
 [32m    882[39m         handle = [38;5;28mopen[39m(handle, ioargs.mode)
 
-[31mFileNotFoundError[39m: [Errno 2] No such file or directory: '/storage/homefs/tn20y076/AareML/notebooks/../data/camels-ch-chem/gauges_metadata/camels_ch_chem_gauges_metadata.csv'
+[31mFileNotFoundError[39m: [Errno 2] No such file or directory: '/storage/homefs/tn20y076/AareML/notebooks/../data/camels-ch-chem/stream_water_chemistry/timeseries/daily/camels_ch_chem_daily_2473.csv'
 

@@ -1,1 +1,127 @@
 [NbConvertApp] Converting notebook notebooks/04b_multisite_temperature.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# ── Comparison: Zero-Shot vs EA-LSTM temperature results ──────────────────
+print('=' * 70)
+print('TEMPERATURE MULTI-SITE SUMMARY (Zero-Shot vs EA-LSTM)')
+print('=' * 70)
+
+print(f'\n{"Gauge":<12} {"ZS RMSE":>10} {"ZS NSE":>8} {"EA RMSE":>10} {"EA NSE":>8}')
+print('-' * 52)
+
+if not df_ea_temp.empty:
+    _merged_cmp = df_transfer[['gauge_id', 'rmse_temp', 'nse_temp']].rename(
+        columns={'rmse_temp': 'zs_rmse', 'nse_temp': 'zs_nse'}
+    ).merge(
+        df_ea_temp[['gauge_id', 'rmse_temp', 'nse_temp']].rename(
+            columns={'rmse_temp': 'ea_rmse', 'nse_temp': 'ea_nse'}
+        ), on='gauge_id', how='outer'
+    ).sort_values('zs_rmse')
+
+    for _, _r in _merged_cmp.iterrows():
+        print(f'{_r["gauge_id"]:<12} '
+              f'{_r["zs_rmse"]:>10.4f} {_r["zs_nse"]:>8.3f} '
+              f'{_r.get("ea_rmse", float("nan")):>10.4f} '
+              f'{_r.get("ea_nse", float("nan")):>8.3f}')
+
+    print('-' * 52)
+    print(f'{"MEAN":<12} '
+          f'{df_transfer["rmse_temp"].mean():>10.4f} '
+          f'{df_transfer["nse_temp"].mean():>8.3f} '
+          f'{df_ea_temp["rmse_temp"].mean():>10.4f} '
+          f'{df_ea_temp["nse_temp"].mean():>8.3f}')
+    print('=' * 70)
+
+    # Save combined results
+    _df_zs_tagged = df_transfer[['gauge_id', 'rmse_temp', 'nse_temp']].copy()
+    _df_zs_tagged['strategy'] = 'zero_shot_temp'
+    _df_ea_tagged = df_ea_temp[['gauge_id', 'rmse_temp', 'nse_temp', 'strategy']].copy()
+    _df_combined = pd.concat([_df_zs_tagged, _df_ea_tagged], ignore_index=True)
+    _df_combined.to_csv(RESULTS_DIR / 'temp_multisite_combined.csv', index=False)
+    print('\nSaved: results/temp_multisite_combined.csv')
+else:
+    print('Zero-shot transfer results only (EA-LSTM not available):')
+    print(df_transfer[['gauge_id', 'rmse_temp', 'nse_temp']].sort_values('rmse_temp').to_string(index=False))
+    print('-' * 52)
+    print(f'Mean RMSE : {df_transfer["rmse_temp"].mean():.4f} \u00b0C')
+    print(f'Mean NSE  : {df_transfer["nse_temp"].mean():.3f}')
+
+print('\nNext \u2192 notebook 05_shap_interpretation.ipynb')
+
+------------------
+
+----- stdout -----
+======================================================================
+TEMPERATURE MULTI-SITE SUMMARY (Zero-Shot vs EA-LSTM)
+======================================================================
+
+Gauge           ZS RMSE   ZS NSE    EA RMSE   EA NSE
+----------------------------------------------------
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mNameError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[14][39m[32m, line 9[39m
+[32m      6[39m [38;5;28mprint[39m([33mf[39m[33m'[39m[38;5;130;01m\n[39;00m[38;5;132;01m{[39;00m[33m"[39m[33mGauge[39m[33m"[39m[38;5;132;01m:[39;00m[33m<12[39m[38;5;132;01m}[39;00m[33m [39m[38;5;132;01m{[39;00m[33m"[39m[33mZS RMSE[39m[33m"[39m[38;5;132;01m:[39;00m[33m>10[39m[38;5;132;01m}[39;00m[33m [39m[38;5;132;01m{[39;00m[33m"[39m[33mZS NSE[39m[33m"[39m[38;5;132;01m:[39;00m[33m>8[39m[38;5;132;01m}[39;00m[33m [39m[38;5;132;01m{[39;00m[33m"[39m[33mEA RMSE[39m[33m"[39m[38;5;132;01m:[39;00m[33m>10[39m[38;5;132;01m}[39;00m[33m [39m[38;5;132;01m{[39;00m[33m"[39m[33mEA NSE[39m[33m"[39m[38;5;132;01m:[39;00m[33m>8[39m[38;5;132;01m}[39;00m[33m'[39m)
+[32m      7[39m [38;5;28mprint[39m([33m'[39m[33m-[39m[33m'[39m * [32m52[39m)
+[32m----> [39m[32m9[39m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [43mdf_ea_temp[49m.empty:
+[32m     10[39m     _merged_cmp = df_transfer[[[33m'[39m[33mgauge_id[39m[33m'[39m, [33m'[39m[33mrmse_temp[39m[33m'[39m, [33m'[39m[33mnse_temp[39m[33m'[39m]].rename(
+[32m     11[39m         columns={[33m'[39m[33mrmse_temp[39m[33m'[39m: [33m'[39m[33mzs_rmse[39m[33m'[39m, [33m'[39m[33mnse_temp[39m[33m'[39m: [33m'[39m[33mzs_nse[39m[33m'[39m}
+[32m     12[39m     ).merge(
+[32m   (...)[39m[32m     15[39m         ), on=[33m'[39m[33mgauge_id[39m[33m'[39m, how=[33m'[39m[33mouter[39m[33m'[39m
+[32m     16[39m     ).sort_values([33m'[39m[33mzs_rmse[39m[33m'[39m)
+[32m     18[39m     [38;5;28;01mfor[39;00m _, _r [38;5;129;01min[39;00m _merged_cmp.iterrows():
+
+[31mNameError[39m: name 'df_ea_temp' is not defined
+
