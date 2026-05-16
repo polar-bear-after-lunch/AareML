@@ -76,6 +76,16 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 - Effective LSTM memory: 3–4 days despite 21-day lookback
 - The AI rediscovered Henry's Law purely from data
 
+### Additional Results (v1.25)
+
+| Finding | Value | Notes |
+|---------|-------|-------|
+| Ridge zero-shot | 0.568 mg/L | LSTM 18% better |
+| AR(7) baseline | 0.388 mg/L | LSTM 23% better |
+| Short lookback: 6d vs 21d | 0.308 vs 0.304 mg/L | Δ=0.004 mg/L — confirms SHAP finding |
+| EA-LSTM temperature | 1.721°C (NSE=0.862) | 34% improvement over zero-shot |
+| nb16 LOO CV (110 pairs) | 0.463 mg/L mean | Leave-one-out transfer across 16 DO gauges |
+
 ---
 
 ## Setup
@@ -112,19 +122,19 @@ python download_data.py --swiss-lakes # Bärenbold 2026 Swiss lakes
 03_lstm_single_site.ipynb          — Seq2Seq LSTM + 75 Optuna trials + 3-seed ensemble
 04_multisite_analysis.ipynb        — Zero-shot + per-gauge + EA-LSTM (DO, 12 gauges)
 04b_multisite_temperature.ipynb    — Temperature multi-site (15 gauges)
-04c_ealstm_static_features.ipynb   — EA-LSTM static catchment features
+04c_ealstm_static_features.ipynb   — EA-LSTM static catchment features (CAMELS-CH base)
 05_shap_interpretation.ipynb       — GradientSHAP attribution
 06_cross_ecosystem_lake.ipynb      — River vs Lake Mendota (LakeBeD-US)
 07_lake_eda.ipynb                  — Lake Mendota EDA
 08_usgs_transfer.ipynb             — Cross-continental transfer (4 US rivers)
 09_canton_zurich_analysis.ipynb    — Canton Zurich DO analysis + stress map
 10_swiss_lakes_lstm.ipynb          — Swiss lakes EDA + LSTM (Bärenbold 2026)
-11_ensemble_analysis.ipynb         — Ensemble methods
-12_uncertainty_quantification.ipynb — Uncertainty quantification
-13_ablation_study.ipynb            — Ablation study
-14_ar_baseline.ipynb               — AR Baseline comparison
+11_ensemble_analysis.ipynb         — Ensemble methods (3-seed, 5-model)
+12_uncertainty_quantification.ipynb — Conformal prediction intervals, uncertainty estimates
+13_ablation_study.ipynb            — Lookback ablation (6d vs 21d), feature ablation
+14_ar_baseline.ipynb               — AR(7) autoregressive baseline comparison
 15_scientific_rigor.ipynb          — Granger causality, temporal stability, threshold recall
-16_cross_validation.ipynb          — Leave-one-out transfer across all 16 DO gauges
+16_cross_validation.ipynb          — Leave-one-out transfer across all 16 DO gauges (110 pairs)
 ```
 
 ### 5. UBELIX HPC
@@ -237,6 +247,27 @@ Used as EA-LSTM static input features.
 
 See [CHANGELOG.md](CHANGELOG.md) for full history.
 **Current version: v1.17** (May 2026)
+
+---
+
+## Novelty Claims
+
+- **First ML study on CAMELS-CH-Chem.** AareML is the first machine learning application to the CAMELS-CH-Chem dataset (Nascimento et al., 2025).
+- **First EA-LSTM application to water quality.** Entity-Aware LSTM (Kratzert et al., 2019) has not previously been applied to dissolved oxygen or water temperature prediction.
+
+---
+
+## Literature
+
+Key references informing this work:
+
+- **Zhi et al. (2023).** Swiss rivers deoxygenating at −0.038 mg/L/decade. *Nature Communications*, 14, 8498. https://doi.org/10.1038/s41467-023-44357-x
+- **Padrón et al. (2025).** Streamflow prediction with deep learning in Swiss catchments. *Hydrology and Earth System Sciences*. https://doi.org/10.5194/hess-2024-290
+- **Baste et al. (2025).** LSTM extrapolation ceiling: models underpredict extreme hydrological events. *Water Resources Research*. https://doi.org/10.1029/2024WR038012
+- Nascimento et al. (2025). CAMELS-CH-Chem. *Zenodo*. https://doi.org/10.5281/zenodo.14980027
+- McAfee et al. (2025). LakeBeD-US. *ESSD*, 17, 3141–3170. https://doi.org/10.5194/essd-17-3141-2025
+- Bärenbold et al. (2026). Swiss Lakes long-term dataset. *Eawag Open Data*. https://doi.org/10.25678/0009KJ
+- Höge et al. (2023). CAMELS-CH base. *Zenodo*. https://doi.org/10.5281/zenodo.7784632
 
 ---
 
