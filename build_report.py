@@ -1350,8 +1350,11 @@ story.append(abl_tbl)
 story.append(sp(4))
 story.append(p(
     "Table 6: Ablation study results on gauge 2473 test set. "
-    "\u0394 RMSE is relative to the baseline (LSTM, TF=0.5, NSE+MSE, lookback=21). "
-    "Baseline row shown in bold.",
+    "delta RMSE is relative to the baseline (LSTM, TF=0.5, NSE+MSE, lookback=21). "
+    "Baseline row shown in bold. "
+    "Notable finding: a 7-day lookback achieves RMSE = 0.300 mg/L vs. 0.290 mg/L for 21 days "
+    "(delta = 0.010 mg/L), consistent with SHAP analysis showing dominant signal at lags 1\u20134 days. "
+    "Short lookbacks (4\u20136 days) are evaluated in nb11 (results pending).",
     "caption"
 ))
 story.append(p(
