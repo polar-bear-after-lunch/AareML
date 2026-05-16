@@ -1352,9 +1352,11 @@ story.append(p(
     "Table 6: Ablation study results on gauge 2473 test set. "
     "delta RMSE is relative to the baseline (LSTM, TF=0.5, NSE+MSE, lookback=21). "
     "Baseline row shown in bold. "
-    "Notable finding: a 7-day lookback achieves RMSE = 0.300 mg/L vs. 0.290 mg/L for 21 days "
-    "(delta = 0.010 mg/L), consistent with SHAP analysis showing dominant signal at lags 1\u20134 days. "
-    "Short lookbacks (4\u20136 days) are evaluated in nb11 (results pending).",
+    "Notable finding: short lookbacks nearly match the 21-day baseline "
+    "(4d: 0.309, 5d: 0.314, 6d: 0.308, 7d: 0.318, 21d: 0.304 mg/L at 30 epochs, gauge 2473). "
+    "A 6-day lookback achieves RMSE within 0.004 mg/L of the 21-day baseline, "
+    "confirming SHAP analysis showing dominant signal at lags 1\u20134 days. "
+    "The 21-day window allows the model to discover this itself but is not strictly necessary.",
     "caption"
 ))
 story.append(p(
