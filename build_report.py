@@ -422,7 +422,7 @@ story.append(sp(4))
 from datetime import datetime as _dt
 _now = _dt.now().strftime("%d %b %Y, %H:%M")
 story.append(p("April 2026  ·  Deadline: 15 June 2026", "meta"))
-story.append(p(f"Report version: 1.24  ·  Last updated: {_now}", "meta"))
+story.append(p(f"Report version: 1.25  ·  Last updated: {_now}", "meta"))
 story.append(anchor("s_abstract"))
 story.append(sp(32))
 
@@ -604,7 +604,10 @@ story.append(p(
     "complemented by 38-variable chemistry grab samples, land cover, and 115 catchment "
     "attribute files. To our knowledge, no published machine learning study has yet applied "
     "predictive modelling to CAMELS-CH-Chem, making this, to our knowledge, the first LSTM transfer study from rivers to "
-    "standing lakes for dissolved oxygen prediction."
+    "standing lakes for dissolved oxygen prediction. "
+    "CAMELS-CH-Chem (Nascimento et al., 2025) was published in early 2025; to the best of our knowledge, "
+    "AareML is the first machine learning study to use this dataset. "
+    "It is also, to our knowledge, the first application of EA-LSTM to water quality prediction."
 ))
 story.append(p(
     "<b>AareML</b> makes four contributions: (1) adapts the LakeBeD-US seq2seq LSTM to "
@@ -628,11 +631,19 @@ story.append(p(
     "Their Entity-Aware LSTM (EA-LSTM) incorporates static catchment attributes "
     "directly into the gating mechanism, improving cross-basin transfer \u2014 "
     "a design which we implement and evaluate in Section 5.3 (Table 4). "
+    "Park et al. (2025) demonstrated EA-LSTM median NSE of 0.685 vs. standard LSTM 0.567 for transboundary streamflow, "
+    "confirming the generalisation advantage of static catchment conditioning. "
+    "To the best of our knowledge, AareML represents the first application of EA-LSTM to water quality prediction. "
     "For water quality specifically, Zhi et al. (2021) demonstrated that an LSTM trained on daily hydrometeorology "
     "can predict river DO across 236 US watersheds, including chemically ungauged basins "
-    "(NSE ≥0.4 at 74% of sites). "
+    "(NSE \u22650.4 at 74% of sites). "
+    "Zhi et al. (2023) extended this to 216 Central European rivers \u2014 including Swiss gauges from EAWAG/FOEN data \u2014 "
+    "and documented deoxygenation trends of \u22120.038 mg/L/decade, providing continental-scale context "
+    "for the warming dynamics observed in this study. "
     "Barzegar et al. (2020) and others have applied similar approaches in lakes, "
-    "but primarily at single sites without multi-site generalisation evaluation."
+    "but primarily at single sites without multi-site generalisation evaluation. "
+    "For Swiss water temperature, Padr\u00f3n et al. (2025) achieved a best CRPS of 0.70\u00b0C at 54 stations "
+    "using a Temporal Fusion Transformer \u2014 the closest Swiss analog to the temperature component of this study."
 ))
 
 story.append(anchor("s2_2"))
@@ -1484,6 +1495,18 @@ story.append(p(
     "is consistent with this scale mismatch; results should be interpreted as an exploratory "
     "lower bound on transferability rather than a generalisation claim.", "bullet"
 ))
+story.append(p(
+    "A fundamental limitation of LSTM-based forecasting is the inability to reliably "
+    "extrapolate beyond the training distribution. Baste et al. (2025) demonstrated this "
+    "explicitly for Swiss CAMELS-CH catchments: an LSTM trained on 196 Swiss basins could "
+    "not predict discharge values above 73 mm/day despite the training data reaching "
+    "183 mm/day, due to gating mechanisms preventing extreme signals from updating cell states. "
+    "An analogous ceiling likely applies to dissolved oxygen: if a severe hypoxic event "
+    "(DO < 4 mg/L) occurs outside the training distribution, the model may underpredict "
+    "its severity. This reinforces the design choice of an early warning threshold at "
+    "8 mg/L \u2014 well within the training distribution \u2014 rather than relying on the model "
+    "to predict crisis-level events directly."
+))
 
 # ══════════════════════════════════════════════════════════════════════════
 # 7. CONCLUSION
@@ -1692,6 +1715,12 @@ story.append(Spacer(1, 8))
 changelog_data = [
     [Paragraph(h, S["table_header"]) for h in
      ["Version", "Date", "Key Changes"]],
+    [p("1.25","table_cell_c"), p("May 2026","table_cell"),
+     p("Literature updates: added Zhi et al. 2023 (Central European deoxygenation), "
+       "Padr\u00f3n et al. 2025 (Swiss temperature TFT), Park et al. 2025 (EA-LSTM streamflow), "
+       "Baste et al. 2025 (LSTM extrapolation ceiling on Swiss CAMELS-CH); "
+       "added novelty statement (first EA-LSTM water quality, first CAMELS-CH-Chem ML study); "
+       "CAMELS-CH base attributes integrated into EA-LSTM static features.", "table_cell")],
     [p("1.24","table_cell_c"), p("May 2026","table_cell"),
      p("Results updated from UBELIX reruns (jobs 3849463\u20133851712, 4006665\u20134007017): "
        "EA-LSTM DO updated to 0.420 mg/L with CAMELS-CH-Chem static attributes "
