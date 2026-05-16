@@ -41,11 +41,14 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 |----------|-----------|-------------|
 | Zero-shot transfer | **0.464 mg/L** | p=0.024 vs Ridge (Wilcoxon, n=11) ✓ |
 | Per-gauge retrain | **0.393 mg/L** | — |
-| EA-LSTM | **0.431 mg/L** | — |
+| EA-LSTM | **0.420 mg/L** | — |
+
+> **EA-LSTM static features** (Höge et al. 2023 + Nascimento et al. 2025): log catchment area, mean elevation, aridity index, mean precipitation, snow fraction, forest fraction, crop fraction, urban fraction
 
 ### Temperature Multi-Site (15 Gauges)
 - Mean RMSE: **2.59°C** · Mean NSE: **0.730**
 - Best gauge: 1.12°C (low-elevation) · Worst: 3.68°C (high-alpine)
+- EA-LSTM: 1.721°C (NSE=0.862) — 34% improvement over zero-shot
 
 ### Cross-Continental Transfer (4 US Rivers — Zero Retraining)
 
@@ -109,12 +112,19 @@ python download_data.py --swiss-lakes # Bärenbold 2026 Swiss lakes
 03_lstm_single_site.ipynb          — Seq2Seq LSTM + 75 Optuna trials + 3-seed ensemble
 04_multisite_analysis.ipynb        — Zero-shot + per-gauge + EA-LSTM (DO, 12 gauges)
 04b_multisite_temperature.ipynb    — Temperature multi-site (15 gauges)
+04c_ealstm_static_features.ipynb   — EA-LSTM static catchment features
 05_shap_interpretation.ipynb       — GradientSHAP attribution
 06_cross_ecosystem_lake.ipynb      — River vs Lake Mendota (LakeBeD-US)
 07_lake_eda.ipynb                  — Lake Mendota EDA
 08_usgs_transfer.ipynb             — Cross-continental transfer (4 US rivers)
 09_canton_zurich_analysis.ipynb    — Canton Zurich DO analysis + stress map
 10_swiss_lakes_lstm.ipynb          — Swiss lakes EDA + LSTM (Bärenbold 2026)
+11_ensemble_analysis.ipynb         — Ensemble methods
+12_uncertainty_quantification.ipynb — Uncertainty quantification
+13_ablation_study.ipynb            — Ablation study
+14_ar_baseline.ipynb               — AR Baseline comparison
+15_scientific_rigor.ipynb          — Granger causality, temporal stability, threshold recall
+16_cross_validation.ipynb          — Leave-one-out transfer across all 16 DO gauges
 ```
 
 ### 5. UBELIX HPC
@@ -139,12 +149,19 @@ AareML/
 │   ├── 03_lstm_single_site.ipynb
 │   ├── 04_multisite_analysis.ipynb
 │   ├── 04b_multisite_temperature.ipynb
+│   ├── 04c_ealstm_static_features.ipynb
 │   ├── 05_shap_interpretation.ipynb
 │   ├── 06_cross_ecosystem_lake.ipynb
 │   ├── 07_lake_eda.ipynb
 │   ├── 08_usgs_transfer.ipynb
 │   ├── 09_canton_zurich_analysis.ipynb
-│   └── 10_swiss_lakes_lstm.ipynb
+│   ├── 10_swiss_lakes_lstm.ipynb
+│   ├── 11_ensemble_analysis.ipynb
+│   ├── 12_uncertainty_quantification.ipynb
+│   ├── 13_ablation_study.ipynb
+│   ├── 14_ar_baseline.ipynb
+│   ├── 15_scientific_rigor.ipynb
+│   └── 16_cross_validation.ipynb
 ├── src/
 │   ├── config.py      — Shared config (LOOKBACK=21, HORIZON=14)
 │   ├── data.py        — Data loading, preprocessing, windowing
@@ -204,7 +221,15 @@ Data is excluded due to size. Use `python download_data.py` to fetch all dataset
 | CAMELS-CH-Chem | ~165 MB | [Zenodo](https://zenodo.org/records/14980027) |
 | LakeBeD-US (Lake Mendota) | ~194 MB | [Hugging Face](https://huggingface.co/datasets/eco-kgml/LakeBeD-US-CSE) |
 | Swiss Lakes (Bärenbold 2026) | ~123 MB | [Eawag Open Data](https://opendata.eawag.ch/dataset/long-term-temperature-oxygen-and-water-clarity-trends-in-swiss-lakes) |
+| CAMELS-CH base | ~5 MB | [Zenodo](https://zenodo.org/records/7784632) |
 | USGS NWIS (NB08) | auto | Downloaded at runtime via `dataretrieval` |
+
+### CAMELS-CH base (Höge et al. 2023)
+Static catchment attributes for 331 Swiss catchments: topography (elevation, slope),
+climate (aridity, precipitation, snow fraction), hydrology, soil, geology, land use.
+Used as EA-LSTM static input features.
+- **Zenodo:** https://doi.org/10.5281/zenodo.7784632
+- **Download:** `python download_data.py --camels-base`
 
 ---
 

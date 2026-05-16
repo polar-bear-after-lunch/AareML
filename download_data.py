@@ -12,8 +12,9 @@ Usage:
 Datasets:
     1. CAMELS-CH-Chem  (~165 MB) — Swiss river sensor data (Zenodo)
     2. LakeBeD-US ME   (~194 MB) — Lake Mendota buoy data (Hugging Face)
+    3. CAMELS-CH base (~5 MB attributes only) — Swiss catchment static attributes (Zenodo)
 
-Total download: ~360 MB
+Total download: ~365 MB
 Estimated time: 5–10 min depending on connection speed.
 """
 
@@ -30,9 +31,11 @@ DATA_DIR    = ROOT / "data"
 CAMELS_DIR  = DATA_DIR / "camels-ch-chem"
 LAKE_DIR       = DATA_DIR / "lakebed-us"
 SWISS_LAKE_DIR = DATA_DIR / "swiss-lakes"
+CAMELS_BASE_DIR = DATA_DIR / "camels-ch-base"
 
 # ── URLs ───────────────────────────────────────────────────────────────────
 CAMELS_URL  = "https://zenodo.org/api/records/14980027/files/camels-ch-chem.zip/content"
+CAMELS_BASE_URL = "https://zenodo.org/api/records/7784632/files/camels_ch.zip/content"
 LAKE_HF_BASE = "https://huggingface.co/datasets/eco-kgml/LakeBeD-US-CSE/resolve/main/Data"
 MENDOTA_URL  = f"{LAKE_HF_BASE}/HighFrequency/ME/ME_Mendota_2D.parquet"
 NTL_URL      = f"{LAKE_HF_BASE}/HighFrequency/ME/ME_NTL_HF_2D.parquet"
@@ -198,6 +201,85 @@ def download_lake():
         sys.exit(1)
 
 
+# ── CAMELS-CH base (Höge et al. 2023) ────────────────────────────────────────────────
+
+def download_camels_base():
+    """
+    Download CAMELS-CH base static catchment attributes.
+    Only downloads the static_attributes/ folder (not the large time series).
+    
+    ~5 MB download, provides:
+    - elev_mean: mean catchment elevation (m)
+    - aridity: PET/P aridity index
+    - p_mean: mean annual precipitation (mm/day)
+    - frac_snow: fraction of precipitation as snow
+    - area: catchment area (km²)
+    - slope_mean, soil, geology, land use attributes
+    
+    Reference: Höge et al. (2023) https://essd.copernicus.org/articles/15/5755/2023/
+    Zenodo: https://doi.org/10.5281/zenodo.7784632
+    """
+    print("\n" + "="*60)
+    print("  2/4  CAMELS-CH base (static catchment attributes)")
+    print("       Source: Zenodo record 7784632")
+    print("       Reference: Höge et al. (2023)")
+    print("="*60)
+
+    CAMELS_BASE_DIR.mkdir(parents=True, exist_ok=True)
+    
+    # Check if already downloaded
+    merged_file = CAMELS_BASE_DIR / "camels_ch_attributes.csv"
+    if merged_file.exists():
+        import pandas as pd
+        n = len(pd.read_csv(merged_file, comment='#'))
+        print(f"  Already exists: camels_ch_attributes.csv ({n} catchments) — skipping")
+        return
+    
+    zip_path = DATA_DIR / "camels_ch_base.zip"
+    download(CAMELS_BASE_URL, zip_path, "CAMELS-CH base (~247 MB full, extracting attributes only)")
+    
+    print("  Extracting static attributes only...")
+    import zipfile
+    import pandas as pd
+    
+    attr_files = []
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        members = zf.namelist()
+        static_members = [m for m in members if 'static_attributes' in m and m.endswith('.csv')]
+        print(f"  Found {len(static_members)} attribute files")
+        for member in static_members:
+            fname = Path(member).name
+            dest = CAMELS_BASE_DIR / fname
+            with zf.open(member) as src, open(dest, 'wb') as dst:
+                dst.write(src.read())
+            attr_files.append(dest)
+            print(f"  Extracted: {fname}")
+    
+    zip_path.unlink()
+    print("  Removed zip file")
+    
+    # Merge all attribute files into one CSV
+    print("  Merging attribute files...")
+    dfs = []
+    for f in sorted(attr_files):
+        try:
+            df = pd.read_csv(f, comment='#', encoding='latin1')
+            if 'gauge_id' in df.columns:
+                dfs.append(df)
+        except Exception as e:
+            print(f"  Warning: could not read {f.name}: {e}")
+    
+    if dfs:
+        merged = dfs[0]
+        for df in dfs[1:]:
+            cols_to_add = [c for c in df.columns if c not in merged.columns or c == 'gauge_id']
+            merged = merged.merge(df[cols_to_add], on='gauge_id', how='outer')
+        merged.to_csv(merged_file, index=False)
+        print(f"  Merged {len(dfs)} files → camels_ch_attributes.csv ({len(merged)} catchments, {len(merged.columns)} columns)")
+    
+    print("  CAMELS-CH base attributes ready.")
+
+
 # ── Swiss Lakes (Bärenbold et al. 2026) ──────────────────────────────────────────────
 
 def download_swiss_lakes():
@@ -258,11 +340,14 @@ def main():
                         help="Download LakeBeD-US Lake Mendota only")
     parser.add_argument("--swiss-lakes",   action="store_true",
                         help="Download Bärenbold et al. 2026 Swiss Lakes dataset only")
+    parser.add_argument("--camels-base", action="store_true",
+                        help="Download CAMELS-CH base static attributes only")
     args = parser.parse_args()
 
-    do_camels      = args.camels or      (not args.camels and not args.lake and not args.swiss_lakes)
-    do_lake        = args.lake   or      (not args.camels and not args.lake and not args.swiss_lakes)
-    do_swiss_lakes = args.swiss_lakes or (not args.camels and not args.lake and not args.swiss_lakes)
+    do_camels      = args.camels      or (not any([args.camels, args.lake, args.swiss_lakes, args.camels_base]))
+    do_lake        = args.lake        or (not any([args.camels, args.lake, args.swiss_lakes, args.camels_base]))
+    do_swiss_lakes = args.swiss_lakes or (not any([args.camels, args.lake, args.swiss_lakes, args.camels_base]))
+    do_camels_base = args.camels_base or (not any([args.camels, args.lake, args.swiss_lakes, args.camels_base]))
 
     print("\nAareML — Data Download & Preparation")
     print(f"Data directory: {DATA_DIR.resolve()}")
@@ -273,6 +358,8 @@ def main():
 
     if do_camels:
         download_camels()
+    if do_camels_base:
+        download_camels_base()
     if do_lake:
         download_lake()
     if do_swiss_lakes:
@@ -281,7 +368,7 @@ def main():
     total = time.time() - t_start
     print("\n" + "="*60)
     print(f"  All done in {total/60:.1f} min")
-    print("  You can now run the notebooks in order: 01 → 02 → 03 → 04 → 04b → 05 → 06 → 07 → 08 → 09 → 10")
+    print("  You can now run the notebooks in order: 01 → 02 → 03 → 04 → 04b → 04c → 05 → 06 → 07 → 08 → 09 → 10 → 11 → 12 → 13 → 14 → 15 → 16")
     print("="*60 + "\n")
 
 
