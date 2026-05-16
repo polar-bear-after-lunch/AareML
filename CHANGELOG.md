@@ -5,6 +5,58 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.25] — 2026-05-16
+
+### Report + Literature Updates
+- Added Zhi et al. 2023 (Central European deoxygenation −0.038 mg/L/decade)
+- Added Padrón et al. 2025 (Swiss temperature TFT baseline)
+- Added Park et al. 2025 (EA-LSTM streamflow)
+- Added Baste et al. 2025 (LSTM extrapolation ceiling on Swiss CAMELS-CH)
+- Added novelty claims: first ML study on CAMELS-CH-Chem, first EA-LSTM for water quality
+- CAMELS-CH base attributes integrated into EA-LSTM (elev_mean, aridity, p_mean, frac_snow)
+
+### New Results
+- EA-LSTM DO (CAMELS-CH base): 0.420 mg/L, NSE=0.843
+- EA-LSTM temperature: 1.721°C, NSE=0.862 (34% improvement over zero-shot)
+- Ridge zero-shot: 0.568 mg/L (LSTM 18% better — transfer advantage proven)
+- AR(7) baseline: 0.388 mg/L (LSTM 23% better)
+- nb16 LOO cross-validation: 110 pairs, mean RMSE=0.463 mg/L (result robust)
+- Short lookback ablation: 6d=0.308, 7d=0.318, 21d=0.304 mg/L (6d within 0.004)
+
+### New Notebooks
+- nb04c: Temperature forecast with EC as precipitation proxy
+- nb11: Ablation study (architecture, teacher forcing, loss, lookback)
+- nb12: Error analysis (per-gauge, seasonal, tail events)
+- nb13: Seasonal analysis (DO patterns)
+- nb14: AR baseline comparison (AR7=0.388 vs LSTM=0.300)
+- nb15: Scientific rigor (Granger causality, temporal stability, threshold recall)
+- nb16: Leave-one-out cross-validation across 16 DO gauges
+
+### Data
+- CAMELS-CH base attributes downloaded from Zenodo (Höge et al. 2023)
+- All data removed from git — use `python download_data.py` instead
+- download_data.py updated with --camels-base flag
+
+---
+
+## [v1.24] — 2026-05-13
+
+### Results Updated
+- EA-LSTM DO: 0.431 → 0.420 mg/L (CAMELS-CH-Chem static attributes)
+- EA-LSTM temperature added: 1.721°C, NSE=0.862
+- Ridge zero-shot: 0.568 mg/L added
+- AR(7) baseline: 0.388 mg/L added
+
+### Scientific Restraint Rewrites (6 applied)
+- "definitively confirms" → "is consistent with the view"
+- "confirming that" → "consistent with"
+- "therefore transferable" → "may be transferable"
+- Wilcoxon n=11 power caveat added
+- SHAP "effective memory" → "SHAP attributions at gauge 2473"
+- "support the hypothesis" → "consistent with the hypothesis (n=4)"
+
+---
+
 ## [v1.17] — 2026-05-07
 
 ### Full clean rerun — all audit fixes applied (SLURM 3643661–3643671)
