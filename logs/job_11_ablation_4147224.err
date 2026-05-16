@@ -1,0 +1,154 @@
+[NbConvertApp] Converting notebook notebooks/11_ablation_study.ipynb to notebook
+[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count', 'outputs' were unexpected)
+
+Failed validating 'additionalProperties' in markdown_cell:
+
+On instance['cells'][24]:
+{'cell_type': 'markdown',
+ 'execution_count': None,
+ 'id': 'a5b6c7d8',
+ 'metadata': {},
+ 'outputs': ['...0 outputs...'],
+ 'source': "print('=== A4b: Short Lookback Ablation (SHAP-motivated: 4,5,6 "
+           'd...'}
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# ── Collect all results into a flat list ──────────────────────────────────
+all_results = [
+    # A1
+    res_a1_lstm,
+    res_a1_gru,
+    # A2
+    res_a2_tf00,
+    res_a2_tf05,
+    res_a2_tf10,
+    # A3
+    res_a3_mse,
+    res_a3_nse_mse,
+    # A4b — short lookbacks (SHAP-motivated)
+    res_a4b_lb4,
+    res_a4b_lb5,
+    res_a4b_lb6,
+    # A4
+    res_a4_lb7,
+    res_a4_lb14,
+    res_a4_lb21,
+]
+
+ablation_group = {
+    'A1_LSTM':                           'A1: Architecture',
+    'A1_GRU':                            'A1: Architecture',
+    'A2_TF=0.0  (no teacher forcing)':   'A2: Teacher Forcing',
+    'A2_TF=0.5  (Optuna best / baseline)': 'A2: Teacher Forcing',
+    'A2_TF=1.0  (full teacher forcing)':  'A2: Teacher Forcing',
+    'A3_Loss=MSE only':                  'A3: Loss Function',
+    'A3_Loss=NSE+MSE  (alpha=0.5, baseline)': 'A3: Loss Function',
+    'A4_Lookback= 7d':                   'A4: Lookback Window',
+    'A4_Lookback=14d':                   'A4: Lookback Window',
+    'A4_Lookback=21d  (baseline)':       'A4: Lookback Window',
+}
+
+rows = []
+for r in all_results:
+    group = ablation_group.get(r['name'], 'Other')
+    rows.append({
+        'Ablation':   group,
+        'Condition':  r['name'],
+        'RMSE_DO':    round(r['RMSE_DO'],    4),
+        'RMSE_temp':  round(r['RMSE_temp'],  4),
+        'NSE_DO':     round(r['NSE_DO'],     3),
+        'NSE_temp':   round(r['NSE_temp'],   3),
+        'KGE_DO':     round(r['KGE_DO'],     3),
+        'KGE_temp':   round(r['KGE_temp'],   3),
+        'Mean_RMSE':  round(r['mean_rmse'],  4),
+    })
+
+results_df = pd.DataFrame(rows)
+print(results_df.to_string(index=False))
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mNameError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[15][39m[32m, line 14[39m
+[32m      1[39m [38;5;66;03m# ── Collect all results into a flat list ──────────────────────────────────[39;00m
+[32m      2[39m all_results = [
+[32m      3[39m     [38;5;66;03m# A1[39;00m
+[32m      4[39m     res_a1_lstm,
+[32m      5[39m     res_a1_gru,
+[32m      6[39m     [38;5;66;03m# A2[39;00m
+[32m      7[39m     res_a2_tf00,
+[32m      8[39m     res_a2_tf05,
+[32m      9[39m     res_a2_tf10,
+[32m     10[39m     [38;5;66;03m# A3[39;00m
+[32m     11[39m     res_a3_mse,
+[32m     12[39m     res_a3_nse_mse,
+[32m     13[39m     [38;5;66;03m# A4b — short lookbacks (SHAP-motivated)[39;00m
+[32m---> [39m[32m14[39m     [43mres_a4b_lb4[49m,
+[32m     15[39m     res_a4b_lb5,
+[32m     16[39m     res_a4b_lb6,
+[32m     17[39m     [38;5;66;03m# A4[39;00m
+[32m     18[39m     res_a4_lb7,
+[32m     19[39m     res_a4_lb14,
+[32m     20[39m     res_a4_lb21,
+[32m     21[39m ]
+[32m     23[39m ablation_group = {
+[32m     24[39m     [33m'[39m[33mA1_LSTM[39m[33m'[39m:                           [33m'[39m[33mA1: Architecture[39m[33m'[39m,
+[32m     25[39m     [33m'[39m[33mA1_GRU[39m[33m'[39m:                            [33m'[39m[33mA1: Architecture[39m[33m'[39m,
+[32m   (...)[39m[32m     33[39m     [33m'[39m[33mA4_Lookback=21d  (baseline)[39m[33m'[39m:       [33m'[39m[33mA4: Lookback Window[39m[33m'[39m,
+[32m     34[39m }
+[32m     36[39m rows = []
+
+[31mNameError[39m: name 'res_a4b_lb4' is not defined
+

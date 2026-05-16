@@ -1,0 +1,127 @@
+[NbConvertApp] Converting notebook notebooks/04c_temp_precip_forecast.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import sys, warnings
+from pathlib import Path
+import numpy as np
+import pandas as pd
+import torch
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import seaborn as sns
+from tqdm.auto import tqdm
+from sklearn.preprocessing import StandardScaler
+
+warnings.filterwarnings('ignore')
+sys.path.insert(0, '..')
+
+from src.config import (
+    LOOKBACK, HORIZON, TRAIN_END, VAL_END, SEED,
+    FOCUS_GAUGE, RESULTS_DIR, FIGURES_DIR, DATA_ROOT,
+)
+from src.data import load_gauge, preprocess, train_val_test_split, make_windows
+from src.model import (
+    Seq2SeqLSTM, RiverDataset, train_model, predict, get_y_true,
+)
+from src.metrics import mean_rmse, nse, kge
+
+print(f'GPU: {torch.cuda.get_device_name(0)}')
+
+sns.set_style('whitegrid')
+plt.rcParams.update({'figure.dpi': 130})
+
+# Features: temp-only vs temp+EC
+
+DATA_DIR = DATA_ROOT / 'stream_water_chemistry/timeseries/daily'
+
+# LOCAL_TEST: True = fast CPU verification, False = full run
+if LOCAL_TEST:
+    print('LOCAL_TEST mode: reduced epochs for quick verification')
+
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f'Device: {DEVICE}')
+
+# Model hyperparameters
+HIDDEN, N_LAYERS, DROPOUT = 64, 2, 0.2
+LR, EPOCHS, PATIENCE = 1e-3, 50, 8
+EPOCHS_MULTI, PATIENCE_MULTI = 30, 5   # lighter for multi-gauge loop
+
+# Feature sets
+FEATURES_TEMP_ONLY = ['temp_sensor']
+FEATURES_TEMP_EC   = ['temp_sensor', 'ec_sensor']
+TARGET_TEMP        = ['temp_sensor']
+
+# Data directory
+REPO_ROOT = Path('/storage/homefs/tn20y076/AareML')
+
+------------------
+
+----- stdout -----
+GPU: NVIDIA GeForce RTX 4090
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mNameError[39m                                 Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[1][39m[32m, line 36[39m
+[32m     33[39m DATA_DIR = DATA_ROOT / [33m'[39m[33mstream_water_chemistry/timeseries/daily[39m[33m'[39m
+[32m     35[39m [38;5;66;03m# LOCAL_TEST: True = fast CPU verification, False = full run[39;00m
+[32m---> [39m[32m36[39m [38;5;28;01mif[39;00m [43mLOCAL_TEST[49m:
+[32m     37[39m     [38;5;28mprint[39m([33m'[39m[33mLOCAL_TEST mode: reduced epochs for quick verification[39m[33m'[39m)
+[32m     39[39m np.random.seed(SEED)
+
+[31mNameError[39m: name 'LOCAL_TEST' is not defined
+

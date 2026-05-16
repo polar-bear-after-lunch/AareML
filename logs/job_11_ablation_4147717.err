@@ -1,0 +1,13 @@
+[NbConvertApp] Converting notebook notebooks/11_ablation_study.ipynb to notebook
+[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count', 'outputs' were unexpected)
+
+Failed validating 'additionalProperties' in markdown_cell:
+
+On instance['cells'][24]:
+{'cell_type': 'markdown',
+ 'execution_count': None,
+ 'id': 'a5b6c7d8',
+ 'metadata': {},
+ 'outputs': ['...0 outputs...'],
+ 'source': "print('=== A4b: Short Lookback Ablation (SHAP-motivated: 4,5,6 "
+           'd...'}
