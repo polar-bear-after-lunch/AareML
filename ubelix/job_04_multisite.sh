@@ -6,9 +6,9 @@
 #
 # Estimated runtime: ~60 min on RTX 4090 (16 gauges × zero-shot + retrain + EA-LSTM)
 # GPU memory needed: ~8 GB
-# NOTE (nb04 update): EA-LSTM now uses CAMELS-CH-Chem derived static attributes
-# (log_area, gauge_lat, gauge_lon, Q, forest_frac, crop_frac, urban_frac, ice_frac)
-# built from gauges_metadata + per-gauge landcover CSVs (Nascimento et al. 2025).
+# NOTE (nb04 update): EA-LSTM now uses CAMELS-CH base attributes (Höge et al. 2023):
+# elev_mean, aridity, p_mean, frac_snow + landcover from CAMELS-CH-Chem
+# (forest_frac, crop_frac, urban_frac). Source: camels-ch-base/camels_ch_attributes.csv.
 #
 # Submit with: sbatch ubelix/job_04_multisite.sh
 # Or chain after job 03: sbatch --dependency=afterok:<JOB_03_ID> ubelix/job_04_multisite.sh

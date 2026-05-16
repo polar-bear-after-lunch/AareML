@@ -9,10 +9,10 @@
 # temperature gauges directly from raw CSVs (≥365 days threshold), replacing the
 # previous DO-filtered list of ~15 gauges. Runtime doubled to 6h accordingly.
 # GPU memory needed: ~8 GB
-# NOTE (nb04b update): New section 4 adds EA-LSTM temperature training using
-# CAMELS-CH-Chem static attributes (matching nb04). Section 5 adds combined
-# zero-shot vs EA-LSTM comparison. Results saved to temp_ea_lstm_results.csv
-# and temp_multisite_combined.csv.
+# NOTE (nb04b update): EA-LSTM now uses CAMELS-CH base attributes (Höge et al. 2023):
+# elev_mean, aridity, p_mean, frac_snow + landcover from CAMELS-CH-Chem
+# (forest_frac, crop_frac, urban_frac). Matching nb04 static feature set.
+# Results saved to temp_ea_lstm_results.csv and temp_multisite_combined.csv.
 #
 # Submit with: sbatch ubelix/job_04b_temp.sh
 # Or chain after job 04: sbatch --dependency=afterok:<JOB_04_ID> ubelix/job_04b_temp.sh
