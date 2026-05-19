@@ -1,6 +1,0 @@
-=============================================
-  AareML — Submitting UBELIX Jobs
-  Working directory: /var/spool/slurmd.spool
-=============================================
-mkdir: cannot create directory ‘results’: Permission denied
-mkdir: cannot create directory ‘logs’: Permission denied

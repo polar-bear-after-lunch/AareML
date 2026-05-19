@@ -59,3 +59,17 @@ AareML-report-ru.pdf
 
 # Old presentation version
 AareML-presentation-new.pptx
+
+# Model checkpoints — large binary files, regenerate by running notebooks
+results/*.pt
+results/*.db
+
+# Old versioned results
+results/*_v1.*.csv
+
+# Stale ubelix logs
+ubelix/slurm-*.out
+ubelix/logs/
+
+# Notebook creation scripts
+notebooks/create_*.py
