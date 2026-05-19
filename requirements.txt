@@ -41,3 +41,9 @@ dataretrieval>=1.0.0
 # conda install -c conda-forge llvmlite numba
 # numba==0.60.0
 # llvmlite==0.43.0
+
+# Progress bars (used in nb04b, nb04c, nb16)
+tqdm>=4.66.0
+
+# Download utilities (used in download_data.py)
+requests>=2.31.0

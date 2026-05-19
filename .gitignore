@@ -41,3 +41,21 @@ data/lakebed-us/
 data/swiss-lakes/
 # Keep the data directory itself (for .gitkeep)
 !data/.gitkeep
+
+# Build scripts — kept locally, not in repo
+build_effort_log.py
+build_report.py
+create_notebook_06.py
+factcheck_report.md
+fetch_from_ubelix.sh
+sync_to_ubelix.sh
+sandbox_brainstorm.md
+AareML_InnovationSandbox_Application.docx
+AareML-results-deepdive.pdf
+
+# Russian versions — available on request
+AareML-plain-language-ru.pdf
+AareML-report-ru.pdf
+
+# Old presentation version
+AareML-presentation-new.pptx
