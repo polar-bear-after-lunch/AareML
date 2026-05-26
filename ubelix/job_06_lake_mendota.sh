@@ -49,6 +49,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=2700 \
     --ExecutePreprocessor.kernel_name=aareml \
+    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/06_cross_ecosystem_lake.ipynb
 
 echo ""

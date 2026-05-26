@@ -31,6 +31,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=1800 \
     --ExecutePreprocessor.kernel_name=aareml \
+    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/12_error_analysis.ipynb
 
 echo "Notebook 12 complete. Job finished: $(date)"

@@ -55,6 +55,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=5400 \
     --ExecutePreprocessor.kernel_name=aareml \
+    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/05_shap_interpretation.ipynb
 
 echo ""

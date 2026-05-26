@@ -38,7 +38,7 @@ eval "$(conda shell.bash hook)"
 conda activate aareml
 
 # Move to project root
-cd $SLURM_SUBMIT_DIR
+cd /storage/homefs/tn20y076/AareML
 
 # ── Run notebook 03 ──────────────────────────────────────────────────────────
 echo ""
@@ -49,6 +49,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=7200 \
     --ExecutePreprocessor.kernel_name=aareml \
+    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/03_lstm_single_site.ipynb
 
 echo ""

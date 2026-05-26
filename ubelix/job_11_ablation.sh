@@ -40,6 +40,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=9000 \
     --ExecutePreprocessor.kernel_name=aareml \
+    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/11_ablation_study.ipynb
 
 echo ""

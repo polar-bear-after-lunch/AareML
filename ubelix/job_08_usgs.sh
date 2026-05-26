@@ -54,6 +54,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=3600 \
     --ExecutePreprocessor.kernel_name=aareml \
+    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/08_usgs_transfer.ipynb
 
 echo ""

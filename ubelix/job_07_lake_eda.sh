@@ -41,6 +41,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=1800 \
     --ExecutePreprocessor.kernel_name=aareml \
+    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/07_lake_eda.ipynb
 
 echo ""

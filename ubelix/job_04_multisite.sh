@@ -57,6 +57,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=7200 \
     --ExecutePreprocessor.kernel_name=aareml \
+    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/04_multisite_analysis.ipynb
 
 echo ""

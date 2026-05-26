@@ -52,6 +52,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=14400 \
     --ExecutePreprocessor.kernel_name=aareml \
+    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/16_cross_validation.ipynb
 
 echo ""
