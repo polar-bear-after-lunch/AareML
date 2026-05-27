@@ -74,15 +74,22 @@ FEATURES_WITH_NAWAF = FEATURES + NAWAF_FEATURES
 # To verify, run:
 # pd.read_csv('data/camels-ch-chem/gauges_metadata/camels_ch_chem_gauges_metadata.csv').columns.tolist()
 # Common CAMELS-CH column names (try both conventions):
-STATIC_COLS = [
-    "area",           "area_km2",          # catchment area
-    "ele_mt_smn",     "mean_elev",         # mean elevation
-    "slp_dg_sav",     "slope_mean",        # mean slope
-    "for_pc_sse",     "forest_frac",       # forest %
-    "crp_pc_sse",     "agriculture_frac",  # cropland %
+# CAMELS-CH base static attributes used in EA-LSTM (Höge et al. 2023)
+# Source: data/camels-ch-base/camels_ch_attributes.csv
+STATIC_FEATURES = [
+    "log_area",     # log1p(catchment area km²)
+    "elev_mean",    # mean catchment elevation (m)
+    "aridity",      # PET/P aridity index
+    "p_mean",       # mean annual precipitation (mm/day)
+    "frac_snow",    # fraction of precipitation as snow
+    "forest_frac",  # forest fraction (from CAMELS-CH-Chem landcover)
+    "crop_frac",    # cropland fraction
+    "urban_frac",   # urban fraction
 ]
-# Deduplicate while preserving order
-STATIC_COLS = list(dict.fromkeys(STATIC_COLS))
+N_STATIC = len(STATIC_FEATURES)
+
+# Legacy fallback column names (pre-CAMELS-CH-base integration) — kept for reference
+STATIC_COLS = STATIC_FEATURES  # alias for backward compatibility
 
 # ── Train / val / test split boundaries ───────────────────────────────────
 TRAIN_END  = "2014-12-31"

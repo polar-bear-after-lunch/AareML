@@ -153,25 +153,26 @@ bash fetch_from_ubelix.sh          # pull results back to Mac
 
 ```
 AareML/
-├── notebooks/
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_baselines.ipynb
-│   ├── 03_lstm_single_site.ipynb
-│   ├── 04_multisite_analysis.ipynb
-│   ├── 04b_multisite_temperature.ipynb
-│   ├── 04c_ealstm_static_features.ipynb
-│   ├── 05_shap_interpretation.ipynb
-│   ├── 06_cross_ecosystem_lake.ipynb
-│   ├── 07_lake_eda.ipynb
-│   ├── 08_usgs_transfer.ipynb
-│   ├── 09_canton_zurich_analysis.ipynb
-│   ├── 10_swiss_lakes_lstm.ipynb
-│   ├── 11_ensemble_analysis.ipynb
-│   ├── 12_uncertainty_quantification.ipynb
-│   ├── 13_ablation_study.ipynb
-│   ├── 14_ar_baseline.ipynb
-│   ├── 15_scientific_rigor.ipynb
-│   └── 16_cross_validation.ipynb
+├── notebooks/                           # GPU: RTX 4090 on UBELIX HPC
+│   ├── 01_data_exploration.ipynb        # ~51s
+│   ├── 02_baselines.ipynb               # ~21s
+│   ├── 03_lstm_single_site.ipynb        # ~18min (Optuna 75 trials)
+│   ├── 04_multisite_analysis.ipynb      # ~5min
+│   ├── 04b_multisite_temperature.ipynb  # ~1min (zero-shot) + ~6h (EA-LSTM 86 gauges)
+│   ├── 04c_temp_precip_forecast.ipynb   # ~19min
+│   ├── 05_shap_interpretation.ipynb     # ~33s
+│   ├── 06_cross_ecosystem_lake.ipynb    # ~19s
+│   ├── 07_lake_eda.ipynb                # ~16s
+│   ├── 08_usgs_transfer.ipynb           # ~28s
+│   ├── 09_canton_zurich_analysis.ipynb  # ~12s
+│   ├── 10_swiss_lakes_lstm.ipynb        # ~1min 20s
+│   ├── 11_ablation_study.ipynb          # ~33min
+│   ├── 12_error_analysis.ipynb          # ~2min
+│   ├── 13_seasonal_analysis.ipynb       # ~2min
+│   ├── 14_ar_baseline.ipynb             # ~8min (CPU local)
+│   ├── 15_scientific_rigor.ipynb        # ~3min
+│   ├── 16_cross_validation.ipynb        # ~3min (LOO CV, 110 pairs)
+│   └── 17_neuralhydrology.ipynb         # ~3-4h (NeuralHydrology EA-LSTM)
 ├── src/
 │   ├── config.py      — Shared config (LOOKBACK=21, HORIZON=14)
 │   ├── data.py        — Data loading, preprocessing, windowing
