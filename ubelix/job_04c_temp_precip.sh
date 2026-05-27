@@ -51,7 +51,6 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=10800 \
     --ExecutePreprocessor.kernel_name=aareml \
-    --ExecutePreprocessor.cwd=/storage/homefs/tn20y076/AareML \
     notebooks/04c_temp_precip_forecast.ipynb
 
 echo ""
