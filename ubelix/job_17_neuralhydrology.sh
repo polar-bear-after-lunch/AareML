@@ -17,7 +17,7 @@ echo "GPU: $(nvidia-smi --query-gpu=name --format=csv,noheader)"
 cd /storage/homefs/tn20y076/AareML
 
 # Install neuralhydrology if needed
-pip install neuralhydrology -q
+pip install neuralhydrology xarray -q
 
 mkdir -p logs
 
