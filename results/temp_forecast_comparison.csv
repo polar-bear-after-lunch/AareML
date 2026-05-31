@@ -1,4 +1,5 @@
-model,n_gauges,mean_rmse_C,mean_nse,notes
-Temp-only (this nb),19.0,57.26,-12.116,Single-feature autoregressive LSTM
-Temp + EC (this nb),19.0,57.267,-12.039,EC as precipitation proxy (dilution signal)
-Zero-shot transfer (nb04b),,2.597,,"Model trained on gauge 2473, applied to all others"
+model,mean_rmse,mean_nse,n_gauges
+Temp-only (this nb),1.4510357142857142,0.8805714285714284,14
+Temp + EC (this nb),1.4137000000000002,0.8879285714285714,14
+Zero-shot (nb04b),2.597,0.727,15
+EA-LSTM (nb04b),1.721,0.862,15
