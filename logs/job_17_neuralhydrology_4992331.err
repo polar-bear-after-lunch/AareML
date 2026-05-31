@@ -1,0 +1,114 @@
+[NbConvertApp] Converting notebook notebooks/17_neuralhydrology.ipynb to notebook
+Traceback (most recent call last):
+  File "/software.9/software/Anaconda3/2024.02-1/bin/jupyter-nbconvert", line 11, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/application.py", line 280, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/traitlets/config/application.py", line 992, in launch_instance
+    app.start()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 412, in start
+    self.convert_notebooks()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 590, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 556, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 479, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 203, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 222, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 156, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 354, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)  # type:ignore[operator]
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 102, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 123, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+import subprocess, sys
+# Install neuralhydrology if not present
+try:
+    import neuralhydrology
+    print("neuralhydrology already installed")
+except ImportError:
+    print("Installing neuralhydrology...")
+    subprocess.run([sys.executable, "-m", "pip", "install", "neuralhydrology", "-q"], check=True)
+    import neuralhydrology
+
+import os, sys, warnings, json
+from pathlib import Path
+import numpy as np
+import pandas as pd
+import xarray as xr
+import torch
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+warnings.filterwarnings('ignore')
+
+REPO_ROOT = Path('/storage/homefs/tn20y076/AareML')
+sys.path.insert(0, str(REPO_ROOT))
+
+from src.config import TRAIN_END, VAL_END, SEED, RESULTS_DIR, FIGURES_DIR
+
+NH_DATA_DIR   = REPO_ROOT / 'data' / 'nh_dataset'   # NeuralHydrology formatted data
+NH_RUN_DIR    = REPO_ROOT / 'results' / 'nh_run'      # NeuralHydrology output directory
+NH_CONFIG     = REPO_ROOT / 'neuralhydrology_config.yml'
+
+CHEM_DAILY = REPO_ROOT / 'data/camels-ch-chem/stream_water_chemistry/timeseries/daily'
+BASE_ATTRS  = REPO_ROOT / 'data/camels-ch-base/camels_ch_attributes.csv'
+LANDCOVER_DIR = REPO_ROOT / 'data/camels-ch-chem/catchment_aggregated_data/landcover_data'
+
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+print(f"Device: {DEVICE}")
+print(f"NeuralHydrology version: {neuralhydrology.__version__}")
+
+# DO gauges (16 gauges with sufficient DO coverage)
+DO_GAUGES = [2473, 2009, 2613, 2143, 2016, 2174, 2415,
+             2044, 2410, 2085, 2462, 2018, 2243, 2068, 2135, 2130]
+print(f"DO gauges: {len(DO_GAUGES)}")
+------------------
+
+----- stdout -----
+neuralhydrology already installed
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mModuleNotFoundError[39m                       Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[1][39m[32m, line 15[39m
+[32m     13[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mnumpy[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mnp[39;00m
+[32m     14[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mpandas[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mpd[39;00m
+[32m---> [39m[32m15[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mxarray[39;00m[38;5;250m [39m[38;5;28;01mas[39;00m[38;5;250m [39m[34;01mxr[39;00m
+[32m     16[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mtorch[39;00m
+[32m     17[39m [38;5;28;01mimport[39;00m[38;5;250m [39m[34;01mmatplotlib[39;00m
+
+[31mModuleNotFoundError[39m: No module named 'xarray'
+
