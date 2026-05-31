@@ -1,0 +1,113 @@
+[NbConvertApp] Converting notebook notebooks/18_cascaded_do_model.ipynb to notebook
+Traceback (most recent call last):
+  File "/software.9/software/Anaconda3/2024.02-1/bin/jupyter-nbconvert", line 11, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/application.py", line 280, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/traitlets/config/application.py", line 992, in launch_instance
+    app.start()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 412, in start
+    self.convert_notebooks()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 590, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 556, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 479, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 203, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 222, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 156, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 354, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)  # type:ignore[operator]
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 102, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 123, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# Training data: true DO vs true temperature windows
+temp_train_windows = X_tr[:, -1, TEMP_IDX]  # last observed temperature per window
+do_train_targets   = y_tr[:, :, DO_IDX]     # (N_tr, H) true DO
+
+# ── Setup A: per-gauge (here just gauge 2473) ─────────────────────────────
+# We'll use the LSTM T_f for test, but for the linear fit we use true T
+# Fit: DO_horizon_h ~ T_future_h for each horizon h separately
+A_coefs = np.zeros((HORIZON, 2))  # [a, b] per horizon
+for h in range(HORIZON):
+    X_lin = temp_train_windows.reshape(-1, 1)  # crude: use last T as proxy
+    y_lin = do_train_targets[:, h]
+    reg = LinearRegression().fit(X_lin, y_lin)
+    A_coefs[h] = [reg.coef_[0], reg.intercept_]
+
+# Apply to test: use T_f_A
+last_obs_temp_te = X_te[:, -1, TEMP_IDX]
+OC_f_0_A = np.column_stack([
+    A_coefs[h, 0] * T_f_A[:, h] + A_coefs[h, 1]
+    for h in range(HORIZON)
+])  # (N_te, H)
+rmse_lin_A = float(np.sqrt(np.mean((OC_f_0_A - y_do_true)**2)))
+print(f"Setup A linear baseline RMSE: {rmse_lin_A:.4f} mg/L")
+
+# ── Setup B: global fit across all hours/windows ─────────────────────────
+# Flatten: each (window, horizon) pair is one sample
+T_flat = temp_train_windows.repeat(HORIZON)    # crude global T proxy
+DO_flat = do_train_targets.ravel()
+reg_global = LinearRegression().fit(T_flat.reshape(-1,1), DO_flat)
+a_global, b_global = reg_global.coef_[0], reg_global.intercept_
+print(f"Global linear fit: DO = {a_global:.4f} × T + {b_global:.4f}")
+
+# Apply to test using T_f_B
+OC_f_0_B = a_global * T_f_B + b_global   # (N_te, H)
+rmse_lin_B = float(np.sqrt(np.mean((OC_f_0_B - y_do_true)**2)))
+print(f"Setup B linear baseline RMSE: {rmse_lin_B:.4f} mg/L")
+
+# Residuals
+resid_A = y_do_true - OC_f_0_A   # (N_te, H)
+resid_B = y_do_true - OC_f_0_B
+print(f"\nResidual stats (Setup A): mean={resid_A.mean():.4f}, std={resid_A.std():.4f}")
+print(f"Residual stats (Setup B): mean={resid_B.mean():.4f}, std={resid_B.std():.4f}")
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mValueError[39m                                Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[4][39m[32m, line 21[39m
+[32m     16[39m last_obs_temp_te = X_te[:, -[32m1[39m, TEMP_IDX]
+[32m     17[39m OC_f_0_A = np.column_stack([
+[32m     18[39m     A_coefs[h, [32m0[39m] * T_f_A[:, h] + A_coefs[h, [32m1[39m]
+[32m     19[39m     [38;5;28;01mfor[39;00m h [38;5;129;01min[39;00m [38;5;28mrange[39m(HORIZON)
+[32m     20[39m ])  [38;5;66;03m# (N_te, H)[39;00m
+[32m---> [39m[32m21[39m rmse_lin_A = [38;5;28mfloat[39m(np.sqrt(np.mean(([43mOC_f_0_A[49m[43m [49m[43m-[49m[43m [49m[43my_do_true[49m)**[32m2[39m)))
+[32m     22[39m [38;5;28mprint[39m([33mf[39m[33m"[39m[33mSetup A linear baseline RMSE: [39m[38;5;132;01m{[39;00mrmse_lin_A[38;5;132;01m:[39;00m[33m.4f[39m[38;5;132;01m}[39;00m[33m mg/L[39m[33m"[39m)
+[32m     24[39m [38;5;66;03m# ── Setup B: global fit across all hours/windows ─────────────────────────[39;00m
+[32m     25[39m [38;5;66;03m# Flatten: each (window, horizon) pair is one sample[39;00m
+
+[31mValueError[39m: operands could not be broadcast together with shapes (1427,14) (1348,14) 
+
