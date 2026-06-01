@@ -172,7 +172,8 @@ AareML/
 │   ├── 14_ar_baseline.ipynb             # ~8min (CPU local)
 │   ├── 15_scientific_rigor.ipynb        # ~3min
 │   ├── 16_cross_validation.ipynb        # ~3min (LOO CV, 110 pairs)
-│   └── 17_neuralhydrology.ipynb         # ~3-4h (NeuralHydrology EA-LSTM)
+│   ├── 17_neuralhydrology.ipynb         # ~3-4h (NeuralHydrology EA-LSTM)
+│   └── 18_cascaded_do_model.ipynb       # ~9min (cascaded Henry's Law + residual LSTM)
 ├── src/
 │   ├── config.py      — Shared config (LOOKBACK=21, HORIZON=14)
 │   ├── data.py        — Data loading, preprocessing, windowing
