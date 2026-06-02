@@ -35,7 +35,7 @@ CAMELS_BASE_DIR = DATA_DIR / "camels-ch-base"
 
 # ── URLs ───────────────────────────────────────────────────────────────────
 CAMELS_URL  = "https://zenodo.org/api/records/14980027/files/camels-ch-chem.zip/content"
-CAMELS_BASE_URL = "https://zenodo.org/api/records/7784632/files/camels_ch.zip/content"
+CAMELS_BASE_URL = "https://zenodo.org/api/records/15025258/files/camels_ch.zip/content"
 LAKE_HF_BASE = "https://huggingface.co/datasets/eco-kgml/LakeBeD-US-CSE/resolve/main/Data"
 MENDOTA_URL  = f"{LAKE_HF_BASE}/HighFrequency/ME/ME_Mendota_2D.parquet"
 NTL_URL      = f"{LAKE_HF_BASE}/HighFrequency/ME/ME_NTL_HF_2D.parquet"
