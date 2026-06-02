@@ -1,0 +1,67 @@
+
+# AareML — NeuralHydrology EA-LSTM configuration
+# Regional training on CAMELS-CH-Chem DO gauges
+# Reference: Kratzert et al. 2022, JOSS
+
+experiment_name: aareml_ealstm
+run_dir: /storage/homefs/tn20y076/AareML/results/nh_run
+train_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_train.txt
+validation_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_val.txt
+test_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_test.txt
+
+# Data
+dataset: generic
+data_dir: /storage/homefs/tn20y076/AareML/data/nh_dataset
+dynamic_inputs:
+  - water_temperature
+  - pH
+  - EC
+  - dissolved_oxygen
+target_variables:
+  - dissolved_oxygen
+static_attributes:
+  - log_area
+  - elev_mean
+  - aridity
+  - p_mean
+  - frac_snow
+  - runoff_ratio
+  - pet_mean
+  - forest_frac
+  - crop_frac
+  - urban_frac
+
+# Time periods (match AareML train/val/test split)
+train_start_date: "1981-01-01"
+train_end_date: "2014-12-31"
+validation_start_date: "2015-01-01"
+validation_end_date: "2016-12-31"
+test_start_date: "2017-01-01"
+test_end_date: "2020-12-31"
+
+# Sequence
+seq_length: 21
+predict_last_n: 14
+
+# Model
+model: ealstm
+hidden_size: 128
+initial_forget_bias: 3
+dropout: 0.4
+batch_size: 256
+epochs: 30
+learning_rate:
+  0: 0.001
+  10: 0.0005
+loss: NSE
+
+# Metrics
+metrics:
+  - NSE
+  - RMSE
+  - KGE
+
+# Other
+seed: 42
+device: cuda
+num_workers: 4

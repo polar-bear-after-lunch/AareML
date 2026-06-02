@@ -1,0 +1,113 @@
+[NbConvertApp] Converting notebook notebooks/17_neuralhydrology.ipynb to notebook
+Traceback (most recent call last):
+  File "/software.9/software/Anaconda3/2024.02-1/bin/jupyter-nbconvert", line 11, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/application.py", line 280, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/traitlets/config/application.py", line 992, in launch_instance
+    app.start()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 412, in start
+    self.convert_notebooks()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 590, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 556, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 479, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 203, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 222, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 156, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 354, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)  # type:ignore[operator]
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 102, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 123, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from neuralhydrology.nh_run import start_run
+from neuralhydrology.utils.config import Config
+
+NH_RUN_DIR.mkdir(parents=True, exist_ok=True)
+cfg = Config(NH_CONFIG)
+
+print("Starting NeuralHydrology EA-LSTM training...")
+print(f"  Gauges: {len(do_gauge_strs)}")
+print(f"  Target: dissolved_oxygen")
+print(f"  Static attributes: {len(attrs_df.columns)}")
+print(f"  Hidden size: 128, Epochs: 30")
+
+start_run(config_file=NH_CONFIG, gpu=0 if DEVICE=='cuda' else -1)
+print("Training complete.")
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mModuleNotFoundError[39m                       Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[4][39m[32m, line 1[39m
+[32m----> [39m[32m1[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mnh_run[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m start_run
+[32m      2[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mutils[39;00m[34;01m.[39;00m[34;01mconfig[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m Config
+[32m      4[39m NH_RUN_DIR.mkdir(parents=[38;5;28;01mTrue[39;00m, exist_ok=[38;5;28;01mTrue[39;00m)
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/nh_run.py:8[39m
+[32m      6[39m [38;5;66;03m# make sure code directory is in path, even if the package is not installed using the setup.py[39;00m
+[32m      7[39m sys.path.append([38;5;28mstr[39m(Path([34m__file__[39m).parent.parent))
+[32m----> [39m[32m8[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mevaluation[39;00m[34;01m.[39;00m[34;01mevaluate[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m start_evaluation
+[32m      9[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mtraining[39;00m[34;01m.[39;00m[34;01mtrain[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m start_training
+[32m     10[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mutils[39;00m[34;01m.[39;00m[34;01mconfig[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m Config
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/evaluation/__init__.py:3[39m
+[32m      1[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mpathlib[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m Path
+[32m----> [39m[32m3[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mevaluation[39;00m[34;01m.[39;00m[34;01mtester[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m BaseTester, RegressionTester, UncertaintyTester
+[32m      4[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mutils[39;00m[34;01m.[39;00m[34;01mconfig[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m Config
+[32m      7[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mget_tester[39m(cfg: Config, run_dir: Path, period: [38;5;28mstr[39m, init_model: [38;5;28mbool[39m) -> BaseTester:
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/evaluation/tester.py:17[39m
+[32m     14[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mtorch[39;00m[34;01m.[39;00m[34;01mutils[39;00m[34;01m.[39;00m[34;01mdata[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m DataLoader
+[32m     15[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mtqdm[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m tqdm
+[32m---> [39m[32m17[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mdatasetzoo[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m get_dataset
+[32m     18[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mdatasetzoo[39;00m[34;01m.[39;00m[34;01mbasedataset[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m BaseDataset
+[32m     19[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mdatautils[39;00m[34;01m.[39;00m[34;01mutils[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m get_frequency_factor, load_basin_file, load_scaler, sort_frequencies
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/datasetzoo/__init__.py:3[39m
+[32m      1[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mtyping[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m Type
+[32m----> [39m[32m3[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mdatasetzoo[39;00m[34;01m.[39;00m[34;01mbasedataset[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m BaseDataset
+[32m      4[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mdatasetzoo[39;00m[34;01m.[39;00m[34;01mcamelsaus[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m CamelsAUS
+[32m      5[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mneuralhydrology[39;00m[34;01m.[39;00m[34;01mdatasetzoo[39;00m[34;01m.[39;00m[34;01mcamelsbr[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m CamelsBR
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/datasetzoo/basedataset.py:16[39m
+[32m     14[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mnumba[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m NumbaPendingDeprecationWarning
+[32m     15[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mnumba[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m njit, prange
+[32m---> [39m[32m16[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mruamel[39;00m[34;01m.[39;00m[34;01myaml[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m YAML
+[32m     17[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mtorch[39;00m[34;01m.[39;00m[34;01mutils[39;00m[34;01m.[39;00m[34;01mdata[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m Dataset
+[32m     18[39m [38;5;28;01mfrom[39;00m[38;5;250m [39m[34;01mtqdm[39;00m[38;5;250m [39m[38;5;28;01mimport[39;00m tqdm
+
+[31mModuleNotFoundError[39m: No module named 'ruamel'
+
