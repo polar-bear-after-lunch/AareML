@@ -11,6 +11,7 @@ test_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_test.txt
 
 # Data
 dataset: generic
+time_format: '%Y-%m-%d'
 data_dir: /storage/homefs/tn20y076/AareML/data/nh_dataset
 dynamic_inputs:
   - water_temperature
