@@ -16,7 +16,6 @@ dynamic_inputs:
   - water_temperature
   - pH
   - EC
-  - dissolved_oxygen
 target_variables:
   - dissolved_oxygen
 static_attributes:
@@ -46,7 +45,6 @@ predict_last_n: 14
 # Model
 model: ealstm
 head: regression
-use_time_input: False
 hidden_size: 128
 initial_forget_bias: 3
 output_dropout: 0.4
