@@ -1,0 +1,64 @@
+attribute_means:
+  aridity: 0.44562500000000005
+  crop_frac: 0.1605125
+  elev_mean: 1332.44
+  forest_frac: 0.276425
+  frac_snow: 0.205625
+  log_area: 8.18283669690928
+  p_mean: 3.7858124999999996
+  pet_mean: 1.6671875
+  runoff_ratio: 0.78475
+  urban_frac: 0.079175
+attribute_stds:
+  aridity: 0.07813481938291021
+  crop_frac: 0.11688432387051167
+  elev_mean: 507.865119692227
+  forest_frac: 0.08516614742177003
+  frac_snow: 0.11795076656526372
+  log_area: 1.5585802121009544
+  p_mean: 0.46580013149418503
+  pet_mean: 0.23136874428784315
+  runoff_ratio: 0.14121402196665883
+  urban_frac: 0.06520431989779
+xarray_feature_scale:
+  coords: {}
+  attrs: {}
+  dims: {}
+  data_vars:
+    EC:
+      dims: []
+      attrs: {}
+      data: 105.06011199951172
+    dissolved_oxygen:
+      dims: []
+      attrs: {}
+      data: 1.31437087059021
+    pH:
+      dims: []
+      attrs: {}
+      data: 0.1914573609828949
+    water_temperature:
+      dims: []
+      attrs: {}
+      data: 5.374566555023193
+xarray_feature_center:
+  coords: {}
+  attrs: {}
+  dims: {}
+  data_vars:
+    EC:
+      dims: []
+      attrs: {}
+      data: 355.2048645019531
+    dissolved_oxygen:
+      dims: []
+      attrs: {}
+      data: 10.669825553894043
+    pH:
+      dims: []
+      attrs: {}
+      data: 8.045656204223633
+    water_temperature:
+      dims: []
+      attrs: {}
+      data: 10.488667488098145
