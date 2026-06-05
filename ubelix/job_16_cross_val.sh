@@ -60,3 +60,11 @@ echo "Results saved to: results/cv_transfer_results.csv"
 echo "Figures saved to: figures/nb16_cv_heatmap.png"
 echo "             and: figures/nb16_source_comparison.png"
 echo "Job finished: $(date)"
+
+# Auto-push results to GitHub
+cd /storage/homefs/tn20y076/AareML
+git config user.email "aareml@project.ch"
+git config user.name "AareML"
+git add -A
+git commit -m "ubelix run $(basename $0 .sh) $(date '+%Y-%m-%d %H:%M')" && git push origin main
+echo "Results pushed to GitHub."
