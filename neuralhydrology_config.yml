@@ -45,6 +45,7 @@ predict_last_n: 14
 
 # Model
 model: ealstm
+head: regression
 hidden_size: 128
 initial_forget_bias: 3
 output_dropout: 0.4
