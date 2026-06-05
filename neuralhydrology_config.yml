@@ -47,7 +47,7 @@ predict_last_n: 14
 model: ealstm
 hidden_size: 128
 initial_forget_bias: 3
-dropout: 0.4
+output_dropout: 0.4
 batch_size: 256
 epochs: 30
 learning_rate:

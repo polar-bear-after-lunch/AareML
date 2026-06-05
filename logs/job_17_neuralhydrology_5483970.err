@@ -1,0 +1,116 @@
+[NbConvertApp] Converting notebook notebooks/17_neuralhydrology.ipynb to notebook
+Traceback (most recent call last):
+  File "/software.9/software/Anaconda3/2024.02-1/bin/jupyter-nbconvert", line 11, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/application.py", line 280, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/traitlets/config/application.py", line 992, in launch_instance
+    app.start()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 412, in start
+    self.convert_notebooks()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 590, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 556, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 479, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 203, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 222, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 156, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 354, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)  # type:ignore[operator]
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 102, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 123, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from neuralhydrology.nh_run import start_run
+from neuralhydrology.utils.config import Config
+
+NH_RUN_DIR.mkdir(parents=True, exist_ok=True)
+cfg = Config(NH_CONFIG)
+
+print("Starting NeuralHydrology EA-LSTM training...")
+print(f"  Gauges: {len(do_gauge_strs)}")
+print(f"  Target: dissolved_oxygen")
+print(f"  Static attributes: {len(attrs_df.columns)}")
+print(f"  Hidden size: 128, Epochs: 30")
+
+start_run(config_file=NH_CONFIG, gpu=0 if DEVICE=='cuda' else -1)
+print("Training complete.")
+------------------
+
+----- stdout -----
+Starting NeuralHydrology EA-LSTM training...
+  Gauges: 16
+  Target: dissolved_oxygen
+  Static attributes: 10
+  Hidden size: 128, Epochs: 30
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mValueError[39m                                Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[4][39m[32m, line 13[39m
+[32m     10[39m [38;5;28mprint[39m([33mf[39m[33m"[39m[33m  Static attributes: [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m(attrs_df.columns)[38;5;132;01m}[39;00m[33m"[39m)
+[32m     11[39m [38;5;28mprint[39m([33mf[39m[33m"[39m[33m  Hidden size: 128, Epochs: 30[39m[33m"[39m)
+[32m---> [39m[32m13[39m [43mstart_run[49m[43m([49m[43mconfig_file[49m[43m=[49m[43mNH_CONFIG[49m[43m,[49m[43m [49m[43mgpu[49m[43m=[49m[32;43m0[39;49m[43m [49m[38;5;28;43;01mif[39;49;00m[43m [49m[43mDEVICE[49m[43m==[49m[33;43m'[39;49m[33;43mcuda[39;49m[33;43m'[39;49m[43m [49m[38;5;28;43;01melse[39;49;00m[43m [49m[43m-[49m[32;43m1[39;49m[43m)[49m
+[32m     14[39m [38;5;28mprint[39m([33m"[39m[33mTraining complete.[39m[33m"[39m)
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/nh_run.py:77[39m, in [36mstart_run[39m[34m(config_file, gpu)[39m
+[32m     74[39m [38;5;28;01mif[39;00m gpu [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m [38;5;129;01mand[39;00m gpu < [32m0[39m:
+[32m     75[39m     config.device = [33m"[39m[33mcpu[39m[33m"[39m
+[32m---> [39m[32m77[39m [43mstart_training[49m[43m([49m[43mconfig[49m[43m)[49m
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/training/train.py:15[39m, in [36mstart_training[39m[34m(cfg)[39m
+[32m      6[39m [38;5;250m[39m[33;03m"""Start model training.[39;00m
+[32m      7[39m [33;03m[39;00m
+[32m      8[39m [33;03mParameters[39;00m
+[32m   (...)[39m[32m     12[39m 
+[32m     13[39m [33;03m"""[39;00m
+[32m     14[39m [38;5;66;03m# MC-LSTM is a special case, where the head returns an empty string but the model is trained as regression model.[39;00m
+[32m---> [39m[32m15[39m [38;5;28;01mif[39;00m [43mcfg[49m[43m.[49m[43mhead[49m.lower() [38;5;129;01min[39;00m [[33m'[39m[33mregression[39m[33m'[39m, [33m'[39m[33mgmm[39m[33m'[39m, [33m'[39m[33mumal[39m[33m'[39m, [33m'[39m[33mcmal[39m[33m'[39m, [33m'[39m[33m'[39m]:
+[32m     16[39m     trainer = BaseTrainer(cfg=cfg)
+[32m     17[39m [38;5;28;01melse[39;00m:
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/utils/config.py:464[39m, in [36mConfig.head[39m[34m(self)[39m
+[32m    462[39m     [38;5;28;01mreturn[39;00m [33m'[39m[33m'[39m
+[32m    463[39m [38;5;28;01melse[39;00m:
+[32m--> [39m[32m464[39m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[43m.[49m[43m_get_value_verbose[49m[43m([49m[33;43m"[39;49m[33;43mhead[39;49m[33;43m"[39;49m[43m)[49m
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/utils/config.py:166[39m, in [36mConfig._get_value_verbose[39m[34m(self, key)[39m
+[32m    164[39m [38;5;250m[39m[33;03m"""Use this function internally to return attributes of the config that are mandatory"""[39;00m
+[32m    165[39m [38;5;28;01mif[39;00m key [38;5;129;01mnot[39;00m [38;5;129;01min[39;00m [38;5;28mself[39m._cfg.keys():
+[32m--> [39m[32m166[39m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m([33mf[39m[33m"[39m[38;5;132;01m{[39;00mkey[38;5;132;01m}[39;00m[33m is not specified in the config (.yml).[39m[33m"[39m)
+[32m    167[39m [38;5;28;01melif[39;00m [38;5;28mself[39m._cfg[key] [38;5;129;01mis[39;00m [38;5;28;01mNone[39;00m:
+[32m    168[39m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m([33mf[39m[33m"[39m[38;5;132;01m{[39;00mkey[38;5;132;01m}[39;00m[33m is mandatory but [39m[33m'[39m[33mNone[39m[33m'[39m[33m in the config.[39m[33m"[39m)
+
+[31mValueError[39m: head is not specified in the config (.yml).
+
