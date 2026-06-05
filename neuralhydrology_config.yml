@@ -65,6 +65,8 @@ metrics:
   - KGE
 
 # Other
+log_tensorboard: False
+save_git_diff: False
 seed: 42
 device: cuda
 num_workers: 4
