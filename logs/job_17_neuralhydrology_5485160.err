@@ -251,3 +251,5 @@ fatal: Not a valid object name HEAD
 
 [31mCalledProcessError[39m: Command '['git', '-C', '/storage/homefs/tn20y076/.local/lib/python3.11/site-packages/neuralhydrology/utils', 'describe', '--always']' returned non-zero exit status 128.
 
+To https://github.com/polar-bear-after-lunch/AareML.git
+   7bd2ebc..ea44356  main -> main

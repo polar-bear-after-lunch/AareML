@@ -1,0 +1,285 @@
+[NbConvertApp] Converting notebook notebooks/17_neuralhydrology.ipynb to notebook
+Traceback (most recent call last):
+  File "/software.9/software/Anaconda3/2024.02-1/bin/jupyter-nbconvert", line 11, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/application.py", line 280, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/traitlets/config/application.py", line 992, in launch_instance
+    app.start()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 412, in start
+    self.convert_notebooks()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 590, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 556, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 479, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 203, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 222, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 156, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 354, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)  # type:ignore[operator]
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 102, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 123, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from neuralhydrology.nh_run import start_run
+from neuralhydrology.utils.config import Config
+# Patch get_git_hash to avoid CalledProcessError on non-git install dirs
+import neuralhydrology.utils.logging_utils as _lu
+_lu.get_git_hash = lambda: None
+
+NH_RUN_DIR.mkdir(parents=True, exist_ok=True)
+cfg = Config(NH_CONFIG)
+
+print("Starting NeuralHydrology EA-LSTM training...")
+print(f"  Gauges: {len(do_gauge_strs)}")
+print(f"  Target: dissolved_oxygen")
+print(f"  Static attributes: {len(attrs_df.columns)}")
+print(f"  Hidden size: 128, Epochs: 30")
+
+start_run(config_file=NH_CONFIG, gpu=0 if DEVICE=='cuda' else -1)
+print("Training complete.")
+------------------
+
+----- stdout -----
+Starting NeuralHydrology EA-LSTM training...
+  Gauges: 16
+  Target: dissolved_oxygen
+  Static attributes: 10
+  Hidden size: 128, Epochs: 30
+2026-06-06 00:19:10,674: Logging to /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_001910/output.log initialized.
+----- stdout -----
+2026-06-06 00:19:10,675: ### Folder structure created at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_001910
+----- stdout -----
+2026-06-06 00:19:10,675: ### Run configurations for aareml_ealstm
+----- stdout -----
+2026-06-06 00:19:10,675: experiment_name: aareml_ealstm
+----- stdout -----
+2026-06-06 00:19:10,675: run_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_001910
+----- stdout -----
+2026-06-06 00:19:10,676: train_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_train.txt
+----- stdout -----
+2026-06-06 00:19:10,676: validation_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_val.txt
+----- stdout -----
+2026-06-06 00:19:10,676: test_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_test.txt
+----- stdout -----
+2026-06-06 00:19:10,676: dataset: generic
+----- stdout -----
+2026-06-06 00:19:10,676: data_dir: /storage/homefs/tn20y076/AareML/data/nh_dataset
+----- stdout -----
+2026-06-06 00:19:10,676: dynamic_inputs: ['water_temperature', 'pH', 'EC', 'dissolved_oxygen']
+----- stdout -----
+2026-06-06 00:19:10,677: target_variables: ['dissolved_oxygen']
+----- stdout -----
+2026-06-06 00:19:10,677: static_attributes: ['log_area', 'elev_mean', 'aridity', 'p_mean', 'frac_snow', 'runoff_ratio', 'pet_mean', 'forest_frac', 'crop_frac', 'urban_frac']
+----- stdout -----
+2026-06-06 00:19:10,677: train_start_date: 1981-01-01 00:00:00
+----- stdout -----
+2026-06-06 00:19:10,677: train_end_date: 2014-12-31 00:00:00
+----- stdout -----
+2026-06-06 00:19:10,677: validation_start_date: 2015-01-01 00:00:00
+----- stdout -----
+2026-06-06 00:19:10,677: validation_end_date: 2016-12-31 00:00:00
+----- stdout -----
+2026-06-06 00:19:10,677: test_start_date: 2017-01-01 00:00:00
+----- stdout -----
+2026-06-06 00:19:10,678: test_end_date: 2020-12-31 00:00:00
+----- stdout -----
+2026-06-06 00:19:10,678: seq_length: 21
+----- stdout -----
+2026-06-06 00:19:10,678: predict_last_n: 14
+----- stdout -----
+2026-06-06 00:19:10,678: model: ealstm
+----- stdout -----
+2026-06-06 00:19:10,678: head: regression
+----- stdout -----
+2026-06-06 00:19:10,678: hidden_size: 128
+----- stdout -----
+2026-06-06 00:19:10,678: initial_forget_bias: 3
+----- stdout -----
+2026-06-06 00:19:10,679: output_dropout: 0.4
+----- stdout -----
+2026-06-06 00:19:10,680: batch_size: 256
+----- stdout -----
+2026-06-06 00:19:10,680: epochs: 30
+----- stdout -----
+2026-06-06 00:19:10,680: learning_rate: {0: 0.001, 10: 0.0005}
+----- stdout -----
+2026-06-06 00:19:10,680: optimizer: Adam
+----- stdout -----
+2026-06-06 00:19:10,680: clip_gradient_norm: 1.0
+----- stdout -----
+2026-06-06 00:19:10,680: loss: NSE
+----- stdout -----
+2026-06-06 00:19:10,681: metrics: ['NSE', 'RMSE', 'KGE']
+----- stdout -----
+2026-06-06 00:19:10,681: log_tensorboard: False
+----- stdout -----
+2026-06-06 00:19:10,681: save_git_diff: False
+----- stdout -----
+2026-06-06 00:19:10,681: seed: 42
+----- stdout -----
+2026-06-06 00:19:10,681: device: cuda:0
+----- stdout -----
+2026-06-06 00:19:10,681: num_workers: 4
+----- stdout -----
+2026-06-06 00:19:10,681: number_of_basins: 16
+----- stdout -----
+2026-06-06 00:19:10,682: train_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_001910/train_data
+----- stdout -----
+2026-06-06 00:19:10,682: img_log_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_001910/img_log
+----- stdout -----
+2026-06-06 00:19:10,698: ### Device cuda:0 will be used for training
+----- stdout -----
+2026-06-06 00:19:10,704: Loading basin data into xarray data set.
+----- stdout -----
+  0%|          | 0/16 [00:00<?, ?it/s]
+----- stdout -----
+ 75%|███████▌  | 12/16 [00:00<00:00, 112.31it/s]
+----- stdout -----
+100%|██████████| 16/16 [00:00<00:00, 63.06it/s]
+----- stdout -----
+
+2026-06-06 00:19:10,965: Calculating target variable stds per basin
+----- stdout -----
+  0%|          | 0/16 [00:00<?, ?it/s]
+----- stdout -----
+100%|██████████| 16/16 [00:00<00:00, 1802.69it/s]
+----- stdout -----
+
+2026-06-06 00:19:10,980: Create lookup table and convert to pytorch tensor
+----- stdout -----
+  0%|          | 0/16 [00:00<?, ?it/s]
+----- stdout -----
+  6%|▋         | 1/16 [00:00<00:14,  1.01it/s]
+----- stdout -----
+ 12%|█▎        | 2/16 [00:01<00:06,  2.04it/s]
+----- stdout -----
+ 81%|████████▏ | 13/16 [00:01<00:00, 15.25it/s]
+----- stdout -----
+100%|██████████| 16/16 [00:01<00:00, 11.67it/s]
+----- stdout -----
+
+----- stdout -----
+  0%|          | 0/370 [00:00<?, ?it/s]
+----- stdout -----
+# Epoch 1:   0%|          | 0/370 [00:00<?, ?it/s]
+----- stdout -----
+# Epoch 1:   0%|          | 0/370 [00:03<?, ?it/s]
+----- stdout -----
+
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mRuntimeError[39m                              Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[4][39m[32m, line 16[39m
+[32m     13[39m [38;5;28mprint[39m([33mf[39m[33m"[39m[33m  Static attributes: [39m[38;5;132;01m{[39;00m[38;5;28mlen[39m(attrs_df.columns)[38;5;132;01m}[39;00m[33m"[39m)
+[32m     14[39m [38;5;28mprint[39m([33mf[39m[33m"[39m[33m  Hidden size: 128, Epochs: 30[39m[33m"[39m)
+[32m---> [39m[32m16[39m [43mstart_run[49m[43m([49m[43mconfig_file[49m[43m=[49m[43mNH_CONFIG[49m[43m,[49m[43m [49m[43mgpu[49m[43m=[49m[32;43m0[39;49m[43m [49m[38;5;28;43;01mif[39;49;00m[43m [49m[43mDEVICE[49m[43m==[49m[33;43m'[39;49m[33;43mcuda[39;49m[33;43m'[39;49m[43m [49m[38;5;28;43;01melse[39;49;00m[43m [49m[43m-[49m[32;43m1[39;49m[43m)[49m
+[32m     17[39m [38;5;28mprint[39m([33m"[39m[33mTraining complete.[39m[33m"[39m)
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/nh_run.py:77[39m, in [36mstart_run[39m[34m(config_file, gpu)[39m
+[32m     74[39m [38;5;28;01mif[39;00m gpu [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m [38;5;129;01mand[39;00m gpu < [32m0[39m:
+[32m     75[39m     config.device = [33m"[39m[33mcpu[39m[33m"[39m
+[32m---> [39m[32m77[39m [43mstart_training[49m[43m([49m[43mconfig[49m[43m)[49m
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/training/train.py:20[39m, in [36mstart_training[39m[34m(cfg)[39m
+[32m     18[39m     [38;5;28;01mraise[39;00m [38;5;167;01mValueError[39;00m([33mf[39m[33m"[39m[33mUnknown head [39m[38;5;132;01m{[39;00mcfg.head[38;5;132;01m}[39;00m[33m.[39m[33m"[39m)
+[32m     19[39m trainer.initialize_training()
+[32m---> [39m[32m20[39m [43mtrainer[49m[43m.[49m[43mtrain_and_validate[49m[43m([49m[43m)[49m
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/training/basetrainer.py:232[39m, in [36mBaseTrainer.train_and_validate[39m[34m(self)[39m
+[32m    229[39m         [38;5;28;01mfor[39;00m param_group [38;5;129;01min[39;00m [38;5;28mself[39m.optimizer.param_groups:
+[32m    230[39m             param_group[[33m"[39m[33mlr[39m[33m"[39m] = [38;5;28mself[39m.cfg.learning_rate[epoch]
+[32m--> [39m[32m232[39m [38;5;28;43mself[39;49m[43m.[49m[43m_train_epoch[49m[43m([49m[43mepoch[49m[43m=[49m[43mepoch[49m[43m)[49m
+[32m    233[39m avg_losses = [38;5;28mself[39m.experiment_logger.summarise()
+[32m    234[39m loss_str = [33m"[39m[33m, [39m[33m"[39m.join([33mf[39m[33m"[39m[38;5;132;01m{[39;00mk[38;5;132;01m}[39;00m[33m: [39m[38;5;132;01m{[39;00mv[38;5;132;01m:[39;00m[33m.5f[39m[38;5;132;01m}[39;00m[33m"[39m [38;5;28;01mfor[39;00m k, v [38;5;129;01min[39;00m avg_losses.items())
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/training/basetrainer.py:323[39m, in [36mBaseTrainer._train_epoch[39m[34m(self, epoch)[39m
+[32m    320[39m data = [38;5;28mself[39m.model.pre_model_hook(data, is_train=[38;5;28;01mTrue[39;00m)
+[32m    322[39m [38;5;66;03m# get predictions[39;00m
+[32m--> [39m[32m323[39m predictions = [38;5;28;43mself[39;49m[43m.[49m[43mmodel[49m[43m([49m[43mdata[49m[43m)[49m
+[32m    325[39m [38;5;28;01mif[39;00m [38;5;28mself[39m.noise_sampler_y [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m:
+[32m    326[39m     [38;5;28;01mfor[39;00m key [38;5;129;01min[39;00m [38;5;28mfilter[39m([38;5;28;01mlambda[39;00m k: [33m'[39m[33my[39m[33m'[39m [38;5;129;01min[39;00m k, data.keys()):
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/torch/nn/modules/module.py:1778[39m, in [36mModule._wrapped_call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1776[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._compiled_call_impl(*args, **kwargs)  [38;5;66;03m# type: ignore[misc][39;00m
+[32m   1777[39m [38;5;28;01melse[39;00m:
+[32m-> [39m[32m1778[39m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[43m.[49m[43m_call_impl[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/torch/nn/modules/module.py:1789[39m, in [36mModule._call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1784[39m [38;5;66;03m# If we don't have any hooks, we want to skip the rest of the logic in[39;00m
+[32m   1785[39m [38;5;66;03m# this function, and just call forward.[39;00m
+[32m   1786[39m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m ([38;5;28mself[39m._backward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._backward_pre_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_pre_hooks
+[32m   1787[39m         [38;5;129;01mor[39;00m _global_backward_pre_hooks [38;5;129;01mor[39;00m _global_backward_hooks
+[32m   1788[39m         [38;5;129;01mor[39;00m _global_forward_hooks [38;5;129;01mor[39;00m _global_forward_pre_hooks):
+[32m-> [39m[32m1789[39m     [38;5;28;01mreturn[39;00m [43mforward_call[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+[32m   1791[39m result = [38;5;28;01mNone[39;00m
+[32m   1792[39m called_always_called_hooks = [38;5;28mset[39m()
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/modelzoo/ealstm.py:102[39m, in [36mEALSTM.forward[39m[34m(self, data)[39m
+[32m     99[39m [38;5;66;03m# perform forward steps over input sequence[39;00m
+[32m    100[39m [38;5;28;01mfor[39;00m x_dt [38;5;129;01min[39;00m x_d:
+[32m--> [39m[32m102[39m     h_t, c_t = [38;5;28;43mself[39;49m[43m.[49m[43m_cell[49m[43m([49m[43mx_dt[49m[43m,[49m[43m [49m[43mi[49m[43m,[49m[43m [49m[43m([49m[43mh_t[49m[43m,[49m[43m [49m[43mc_t[49m[43m)[49m[43m)[49m
+[32m    104[39m     [38;5;66;03m# store intermediate hidden/cell state in list[39;00m
+[32m    105[39m     h_n.append(h_t)
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/modelzoo/ealstm.py:58[39m, in [36mEALSTM._cell[39m[34m(self, x, i, states)[39m
+[32m     55[39m h_0, c_0 = states
+[32m     57[39m [38;5;66;03m# calculate gates[39;00m
+[32m---> [39m[32m58[39m gates = [38;5;28;43mself[39;49m[43m.[49m[43mdynamic_gates[49m[43m([49m[43mh_0[49m[43m,[49m[43m [49m[43mx[49m[43m)[49m
+[32m     59[39m f, o, g = gates.chunk([32m3[39m, [32m1[39m)
+[32m     61[39m c_1 = torch.sigmoid(f) * c_0 + i * torch.tanh(g)
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/torch/nn/modules/module.py:1778[39m, in [36mModule._wrapped_call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1776[39m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m._compiled_call_impl(*args, **kwargs)  [38;5;66;03m# type: ignore[misc][39;00m
+[32m   1777[39m [38;5;28;01melse[39;00m:
+[32m-> [39m[32m1778[39m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[43m.[49m[43m_call_impl[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/torch/nn/modules/module.py:1789[39m, in [36mModule._call_impl[39m[34m(self, *args, **kwargs)[39m
+[32m   1784[39m [38;5;66;03m# If we don't have any hooks, we want to skip the rest of the logic in[39;00m
+[32m   1785[39m [38;5;66;03m# this function, and just call forward.[39;00m
+[32m   1786[39m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m ([38;5;28mself[39m._backward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._backward_pre_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m._forward_pre_hooks
+[32m   1787[39m         [38;5;129;01mor[39;00m _global_backward_pre_hooks [38;5;129;01mor[39;00m _global_backward_hooks
+[32m   1788[39m         [38;5;129;01mor[39;00m _global_forward_hooks [38;5;129;01mor[39;00m _global_forward_pre_hooks):
+[32m-> [39m[32m1789[39m     [38;5;28;01mreturn[39;00m [43mforward_call[49m[43m([49m[43m*[49m[43margs[49m[43m,[49m[43m [49m[43m*[49m[43m*[49m[43mkwargs[49m[43m)[49m
+[32m   1791[39m result = [38;5;28;01mNone[39;00m
+[32m   1792[39m called_always_called_hooks = [38;5;28mset[39m()
+
+[36mFile [39m[32m~/.local/lib/python3.11/site-packages/neuralhydrology/modelzoo/ealstm.py:144[39m, in [36m_DynamicGates.forward[39m[34m(self, h, x_d)[39m
+[32m    143[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mforward[39m([38;5;28mself[39m, h: torch.Tensor, x_d: torch.Tensor):
+[32m--> [39m[32m144[39m     gates = h @ [38;5;28mself[39m.weight_hh + [43mx_d[49m[43m [49m[43m@[49m[43m [49m[38;5;28;43mself[39;49m[43m.[49m[43mweight_ih[49m + [38;5;28mself[39m.bias
+[32m    145[39m     [38;5;28;01mreturn[39;00m gates
+
+[31mRuntimeError[39m: mat1 and mat2 shapes cannot be multiplied (256x5 and 4x384)
+
