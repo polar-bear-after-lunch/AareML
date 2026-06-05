@@ -32,3 +32,11 @@ jupyter nbconvert \
 echo ""
 echo "Notebook 17 complete."
 echo "Job finished: $(date)"
+
+# Auto-push results to GitHub
+cd /storage/homefs/tn20y076/AareML
+git config user.email "aareml@project.ch"
+git config user.name "AareML"
+git add -A
+git commit -m "ubelix run nb17 $(date '+%Y-%m-%d %H:%M')" && git push origin main
+echo "Results pushed to GitHub."
