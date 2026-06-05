@@ -1,0 +1,43 @@
+2026-06-06 00:05:10,350: Logging to /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_000510/output.log initialized.
+2026-06-06 00:05:10,350: ### Folder structure created at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_000510
+2026-06-06 00:05:10,350: ### Run configurations for aareml_ealstm
+2026-06-06 00:05:10,351: experiment_name: aareml_ealstm
+2026-06-06 00:05:10,351: run_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_000510
+2026-06-06 00:05:10,351: train_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_train.txt
+2026-06-06 00:05:10,351: validation_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_val.txt
+2026-06-06 00:05:10,351: test_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_test.txt
+2026-06-06 00:05:10,352: dataset: generic
+2026-06-06 00:05:10,352: data_dir: /storage/homefs/tn20y076/AareML/data/nh_dataset
+2026-06-06 00:05:10,352: dynamic_inputs: ['water_temperature', 'pH', 'EC', 'dissolved_oxygen']
+2026-06-06 00:05:10,352: target_variables: ['dissolved_oxygen']
+2026-06-06 00:05:10,352: static_attributes: ['log_area', 'elev_mean', 'aridity', 'p_mean', 'frac_snow', 'runoff_ratio', 'pet_mean', 'forest_frac', 'crop_frac', 'urban_frac']
+2026-06-06 00:05:10,353: train_start_date: 1981-01-01 00:00:00
+2026-06-06 00:05:10,353: train_end_date: 2014-12-31 00:00:00
+2026-06-06 00:05:10,353: validation_start_date: 2015-01-01 00:00:00
+2026-06-06 00:05:10,353: validation_end_date: 2016-12-31 00:00:00
+2026-06-06 00:05:10,353: test_start_date: 2017-01-01 00:00:00
+2026-06-06 00:05:10,354: test_end_date: 2020-12-31 00:00:00
+2026-06-06 00:05:10,354: seq_length: 21
+2026-06-06 00:05:10,354: predict_last_n: 14
+2026-06-06 00:05:10,354: model: ealstm
+2026-06-06 00:05:10,355: head: regression
+2026-06-06 00:05:10,355: hidden_size: 128
+2026-06-06 00:05:10,355: initial_forget_bias: 3
+2026-06-06 00:05:10,355: output_dropout: 0.4
+2026-06-06 00:05:10,355: batch_size: 256
+2026-06-06 00:05:10,356: epochs: 30
+2026-06-06 00:05:10,356: learning_rate: {0: 0.001, 10: 0.0005}
+2026-06-06 00:05:10,356: optimizer: Adam
+2026-06-06 00:05:10,356: clip_gradient_norm: 1.0
+2026-06-06 00:05:10,356: loss: NSE
+2026-06-06 00:05:10,356: metrics: ['NSE', 'RMSE', 'KGE']
+2026-06-06 00:05:10,357: seed: 42
+2026-06-06 00:05:10,357: device: cuda:0
+2026-06-06 00:05:10,357: num_workers: 4
+2026-06-06 00:05:10,357: number_of_basins: 16
+2026-06-06 00:05:10,357: train_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_000510/train_data
+2026-06-06 00:05:10,358: img_log_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_000510/img_log
+2026-06-06 00:05:10,373: ### Device cuda:0 will be used for training
+2026-06-06 00:05:10,379: Loading basin data into xarray data set.
+2026-06-06 00:05:10,525: Calculating target variable stds per basin
+2026-06-06 00:05:10,540: Create lookup table and convert to pytorch tensor
