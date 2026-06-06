@@ -62,3 +62,22 @@
 2026-06-06 13:15:49,919: Epoch 16 average loss: avg_loss: 0.06800, avg_total_loss: 0.06800
 2026-06-06 13:15:54,012: Epoch 17 average loss: avg_loss: 0.06771, avg_total_loss: 0.06771
 2026-06-06 13:15:58,178: Epoch 18 average loss: avg_loss: 0.06717, avg_total_loss: 0.06717
+2026-06-06 13:16:02,282: Epoch 19 average loss: avg_loss: 0.06681, avg_total_loss: 0.06681
+2026-06-06 13:16:06,390: Epoch 20 average loss: avg_loss: 0.06633, avg_total_loss: 0.06633
+2026-06-06 13:16:10,558: Epoch 21 average loss: avg_loss: 0.06601, avg_total_loss: 0.06601
+2026-06-06 13:16:14,916: Epoch 22 average loss: avg_loss: 0.06542, avg_total_loss: 0.06542
+2026-06-06 13:16:18,855: Epoch 23 average loss: avg_loss: 0.06528, avg_total_loss: 0.06528
+2026-06-06 13:16:23,122: Epoch 24 average loss: avg_loss: 0.06481, avg_total_loss: 0.06481
+2026-06-06 13:16:27,337: Epoch 25 average loss: avg_loss: 0.06435, avg_total_loss: 0.06435
+2026-06-06 13:16:31,437: Epoch 26 average loss: avg_loss: 0.06413, avg_total_loss: 0.06413
+2026-06-06 13:16:35,404: Epoch 27 average loss: avg_loss: 0.06414, avg_total_loss: 0.06414
+2026-06-06 13:16:39,380: Epoch 28 average loss: avg_loss: 0.06345, avg_total_loss: 0.06345
+2026-06-06 13:16:43,293: Epoch 29 average loss: avg_loss: 0.06302, avg_total_loss: 0.06302
+2026-06-06 13:16:47,275: Epoch 30 average loss: avg_loss: 0.06293, avg_total_loss: 0.06293
+2026-06-06 13:16:47,316: Using the model weights from /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406/model_epoch030.pt
+2026-06-06 13:16:48,790: The following basins had not enough valid target values to calculate a standard deviation: 2068. NSE loss values for this basin will be NaN.
+2026-06-06 13:16:48,990: The following basins had not enough valid target values to calculate a standard deviation: 2130. NSE loss values for this basin will be NaN.
+2026-06-06 13:16:49,188: The following basins had not enough valid target values to calculate a standard deviation: 2135. NSE loss values for this basin will be NaN.
+2026-06-06 13:16:49,468: The following basins had not enough valid target values to calculate a standard deviation: 2243. NSE loss values for this basin will be NaN.
+2026-06-06 13:16:49,923: Stored metrics at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406/test/model_epoch030/test_metrics.csv
+2026-06-06 13:16:49,927: Stored results at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406/test/model_epoch030/test_results.p

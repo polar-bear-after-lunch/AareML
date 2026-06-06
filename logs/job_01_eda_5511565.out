@@ -5,3 +5,43 @@ Running notebook 01: Data Exploration...
 
 Notebook 01 complete.
 Job finished: Sat Jun  6 01:15:48 PM CEST 2026
+[main 08e4370] ubelix run slurm_script 2026-06-06 13:16
+ 40 files changed, 401 insertions(+), 127 deletions(-)
+ create mode 100644 logs/job_01_eda_5511565.err
+ create mode 100644 logs/job_01_eda_5511565.out
+ create mode 100644 logs/job_17_neuralhydrology_5511553.err
+ create mode 100644 logs/job_17_neuralhydrology_5511553.out
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/config.yml
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch001.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch002.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch003.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch004.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch005.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch006.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch007.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch008.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch009.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch010.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch011.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch012.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch013.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch014.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/model_epoch015.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch001.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch002.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch003.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch004.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch005.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch006.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch007.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch008.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch009.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch010.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch011.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch012.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch013.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch014.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/optimizer_state_epoch015.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/output.log
+ create mode 100644 results/nh_run/aareml_ealstm_0606_131406/train_data/train_data_scaler.yml
+Results pushed to GitHub.
