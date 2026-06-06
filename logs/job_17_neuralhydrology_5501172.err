@@ -81,14 +81,15 @@ else:
                 nh_rmse.append({'gauge_id': gid, 'rmse_do': rmse, 'nse_do': nse, 'model': 'NH_EA-LSTM'})
         
         nh_df = pd.DataFrame(nh_rmse)
+        nh_df = nh_df.dropna(subset=['RMSE', 'NSE', 'KGE'])
         print(f"\n=== NeuralHydrology EA-LSTM Results ===")
         print(f"Gauges evaluated: {len(nh_df)}")
-        print(f"Mean RMSE: {nh_df.rmse_do.mean():.4f} mg/L")
-        print(f"Mean NSE:  {nh_df.nse_do.mean():.3f}")
+        print(f"Mean RMSE: {nh_df.RMSE.mean():.4f} mg/L")
+        print(f"Mean NSE:  {nh_df.NSE.mean():.3f}")
         
         print(f"\n=== Comparison ===")
         print(f"Manual EA-LSTM (nb04): 0.420 mg/L RMSE, NSE=0.843")
-        print(f"NH EA-LSTM (nb17):     {nh_df.rmse_do.mean():.3f} mg/L RMSE, NSE={nh_df.nse_do.mean():.3f}")
+        print(f"NH EA-LSTM (nb17):     {nh_df.RMSE.mean():.3f} mg/L RMSE, NSE={nh_df.NSE.mean():.3f}")
         
         # Save
         nh_df.to_csv(RESULTS_DIR / 'nh_ealstm_results.csv', index=False)
@@ -96,9 +97,9 @@ else:
 ------------------
 
 ----- stdout -----
-Evaluating run: aareml_ealstm_0606_003205
+Evaluating run: aareml_ealstm_0606_073519
 ----- stdout -----
-2026-06-06 00:34:04,580: Using the model weights from /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_003205/model_epoch030.pt
+2026-06-06 07:37:21,461: Using the model weights from /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_073519/model_epoch030.pt
 ----- stdout -----
   0%|          | 0/16 [00:00<?, ?it/s]
 ----- stdout -----
@@ -111,64 +112,61 @@ Evaluating run: aareml_ealstm_0606_003205
 Metrics for 1D are calculated over last 1 elements only. Ignoring 13 predictions per sequence.
 # Evaluation:   0%|          | 0/16 [00:00<?, ?it/s]
 ----- stdout -----
-# Evaluation:   6%|▋         | 1/16 [00:01<00:16,  1.11s/it]
+# Evaluation:   6%|▋         | 1/16 [00:01<00:16,  1.10s/it]
 ----- stdout -----
-# Evaluation:  19%|█▉        | 3/16 [00:01<00:04,  2.61it/s]
+# Evaluation:  19%|█▉        | 3/16 [00:01<00:04,  2.66it/s]
 ----- stdout -----
-2026-06-06 00:34:06,396: The following basins had not enough valid target values to calculate a standard deviation: 2068. NSE loss values for this basin will be NaN.
+2026-06-06 07:37:23,426: The following basins had not enough valid target values to calculate a standard deviation: 2068. NSE loss values for this basin will be NaN.
 ----- stdout -----
-# Evaluation:  31%|███▏      | 5/16 [00:01<00:02,  4.10it/s]
+# Evaluation:  31%|███▏      | 5/16 [00:01<00:02,  4.17it/s]
 ----- stdout -----
-2026-06-06 00:34:06,668: The following basins had not enough valid target values to calculate a standard deviation: 2130. NSE loss values for this basin will be NaN.
+2026-06-06 07:37:23,662: The following basins had not enough valid target values to calculate a standard deviation: 2130. NSE loss values for this basin will be NaN.
 ----- stdout -----
-# Evaluation:  44%|████▍     | 7/16 [00:01<00:01,  5.05it/s]
+# Evaluation:  44%|████▍     | 7/16 [00:01<00:01,  5.32it/s]
 ----- stdout -----
-2026-06-06 00:34:06,823: The following basins had not enough valid target values to calculate a standard deviation: 2135. NSE loss values for this basin will be NaN.
+2026-06-06 07:37:23,808: The following basins had not enough valid target values to calculate a standard deviation: 2135. NSE loss values for this basin will be NaN.
 ----- stdout -----
-# Evaluation:  50%|█████     | 8/16 [00:02<00:01,  5.32it/s]
+# Evaluation:  50%|█████     | 8/16 [00:01<00:01,  5.61it/s]
 ----- stdout -----
-# Evaluation:  62%|██████▎   | 10/16 [00:02<00:00,  7.05it/s]
+# Evaluation:  62%|██████▎   | 10/16 [00:02<00:00,  7.27it/s]
 ----- stdout -----
-2026-06-06 00:34:07,122: The following basins had not enough valid target values to calculate a standard deviation: 2243. NSE loss values for this basin will be NaN.
+2026-06-06 07:37:24,102: The following basins had not enough valid target values to calculate a standard deviation: 2243. NSE loss values for this basin will be NaN.
 ----- stdout -----
-# Evaluation:  69%|██████▉   | 11/16 [00:02<00:00,  6.92it/s]
+# Evaluation:  69%|██████▉   | 11/16 [00:02<00:00,  7.24it/s]
 ----- stdout -----
-# Evaluation:  81%|████████▏ | 13/16 [00:02<00:00,  8.69it/s]
+# Evaluation:  81%|████████▏ | 13/16 [00:02<00:00,  9.04it/s]
 ----- stdout -----
-# Evaluation:  94%|█████████▍| 15/16 [00:02<00:00, 10.12it/s]
+# Evaluation:  94%|█████████▍| 15/16 [00:02<00:00, 10.52it/s]
 ----- stdout -----
-# Evaluation: 100%|██████████| 16/16 [00:02<00:00,  5.97it/s]
------ stdout -----
-
-2026-06-06 00:34:07,616: Stored metrics at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_003205/test/model_epoch030/test_metrics.csv
------ stdout -----
-2026-06-06 00:34:07,619: Stored results at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_003205/test/model_epoch030/test_results.p
+# Evaluation: 100%|██████████| 16/16 [00:02<00:00,  6.24it/s]
 ----- stdout -----
 
-=== NeuralHydrology EA-LSTM Results ===
-Gauges evaluated: 0
+2026-06-06 07:37:24,553: Stored metrics at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_073519/test/model_epoch030/test_metrics.csv
+----- stdout -----
+2026-06-06 07:37:24,556: Stored results at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_073519/test/model_epoch030/test_results.p
 ------------------
 
 [31m---------------------------------------------------------------------------[39m
-[31mAttributeError[39m                            Traceback (most recent call last)
-[32m/scratch/local/5486589/ipykernel_1731760/848771792.py[39m in [36m?[39m[34m()[39m
+[31mKeyError[39m                                  Traceback (most recent call last)
+[32m/scratch/local/5501172/ipykernel_783257/1665015778.py[39m in [36m?[39m[34m()[39m
+[32m     26[39m                 nse  = res[[33m'dissolved_oxygen'[39m][[33m'NSE'[39m]
+[32m     27[39m                 nh_rmse.append({[33m'gauge_id'[39m: gid, [33m'rmse_do'[39m: rmse, [33m'nse_do'[39m: nse, [33m'model'[39m: [33m'NH_EA-LSTM'[39m})
 [32m     28[39m 
 [32m     29[39m         nh_df = pd.DataFrame(nh_rmse)
-[32m     30[39m         print([33mf"\n=== NeuralHydrology EA-LSTM Results ==="[39m)
-[32m     31[39m         print([33mf"Gauges evaluated: {len(nh_df)}"[39m)
-[32m---> [39m[32m32[39m         print([33mf"Mean RMSE: {nh_df.rmse_do.mean():.4f} mg/L"[39m)
-[32m     33[39m         print([33mf"Mean NSE:  {nh_df.nse_do.mean():.3f}"[39m)
-[32m     34[39m 
-[32m     35[39m         print([33mf"\n=== Comparison ==="[39m)
+[32m---> [39m[32m30[39m         nh_df = nh_df.dropna(subset=[[33m'RMSE'[39m, [33m'NSE'[39m, [33m'KGE'[39m])
+[32m     31[39m         print([33mf"\n=== NeuralHydrology EA-LSTM Results ==="[39m)
+[32m     32[39m         print([33mf"Gauges evaluated: {len(nh_df)}"[39m)
+[32m     33[39m         print([33mf"Mean RMSE: {nh_df.RMSE.mean():.4f} mg/L"[39m)
 
-[32m~/.conda/envs/aareml/lib/python3.11/site-packages/pandas/core/generic.py[39m in [36m?[39m[34m(self, name)[39m
-[32m   6295[39m             [38;5;28;01mand[39;00m name [38;5;28;01mnot[39;00m [38;5;28;01min[39;00m self._accessors
-[32m   6296[39m             [38;5;28;01mand[39;00m self._info_axis._can_hold_identifiers_and_holds_name(name)
-[32m   6297[39m         ):
-[32m   6298[39m             [38;5;28;01mreturn[39;00m self[name]
-[32m-> [39m[32m6299[39m         [38;5;28;01mreturn[39;00m object.__getattribute__(self, name)
+[32m~/.conda/envs/aareml/lib/python3.11/site-packages/pandas/core/frame.py[39m in [36m?[39m[34m(self, axis, how, thresh, subset, inplace, ignore_index)[39m
+[32m   6666[39m             ax = self._get_axis(agg_axis)
+[32m   6667[39m             indices = ax.get_indexer_for(subset)
+[32m   6668[39m             check = indices == -[32m1[39m
+[32m   6669[39m             [38;5;28;01mif[39;00m check.any():
+[32m-> [39m[32m6670[39m                 [38;5;28;01mraise[39;00m KeyError(np.array(subset)[check].tolist())
+[32m   6671[39m             agg_obj = self.take(indices, axis=agg_axis)
+[32m   6672[39m 
+[32m   6673[39m         [38;5;28;01mif[39;00m thresh [38;5;28;01mis[39;00m [38;5;28;01mnot[39;00m lib.no_default:
 
-[31mAttributeError[39m: 'DataFrame' object has no attribute 'rmse_do'
+[31mKeyError[39m: ['RMSE', 'NSE', 'KGE']
 
-To https://github.com/polar-bear-after-lunch/AareML.git
-   e86d2a7..1342914  main -> main
