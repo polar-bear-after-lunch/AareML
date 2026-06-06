@@ -8,6 +8,14 @@
 set -euo pipefail
 cd /storage/homefs/tn20y076/AareML
 
+# Guard: refuse to run if AareML jobs already queued
+if squeue --me --noheader 2>/dev/null | grep -q "aareml"; then
+    echo "ERROR: AareML jobs already in queue."
+    echo "Run: scancel --me  then resubmit."
+    squeue --me
+    exit 1
+fi
+
 echo "============================================================"
 echo "  AareML — Full notebook rerun"
 echo "  Started: $(date '+%Y-%m-%d %H:%M:%S')"
