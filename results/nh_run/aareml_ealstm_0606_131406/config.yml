@@ -1,0 +1,64 @@
+batch_size: 256
+clip_gradient_norm: 1.0
+commit_hash:
+data_dir: /storage/homefs/tn20y076/AareML/data/nh_dataset
+dataset: generic
+device: cuda:0
+dynamic_inputs:
+- water_temperature
+- pH
+- EC
+epochs: 30
+experiment_name: aareml_ealstm
+head: regression
+hidden_size: 128
+img_log_dir: 
+  /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406/img_log
+initial_forget_bias: 3
+learning_rate:
+  0: 0.001
+  10: 0.0005
+log_tensorboard: false
+loss: NSE
+metrics:
+- NSE
+- RMSE
+- KGE
+model: ealstm
+num_workers: 4
+number_of_basins: 16
+optimizer: Adam
+output_dropout: 0.4
+package_version: 1.13.0
+predict_last_n: 14
+run_dir: 
+  /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406
+save_git_diff: false
+seed: 42
+seq_length: 21
+static_attributes:
+- log_area
+- elev_mean
+- aridity
+- p_mean
+- frac_snow
+- runoff_ratio
+- pet_mean
+- forest_frac
+- crop_frac
+- urban_frac
+target_variables:
+- dissolved_oxygen
+test_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_test.txt
+test_end_date: 31/12/2020
+test_start_date: 01/01/2017
+train_basin_file: 
+  /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_train.txt
+train_dir: 
+  /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406/train_data
+train_end_date: 31/12/2014
+train_start_date: 01/01/1981
+validation_basin_file: 
+  /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_val.txt
+validation_end_date: 31/12/2016
+validation_start_date: 01/01/2015

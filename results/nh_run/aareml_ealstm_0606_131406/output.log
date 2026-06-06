@@ -1,0 +1,64 @@
+2026-06-06 13:14:06,930: Logging to /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406/output.log initialized.
+2026-06-06 13:14:06,930: ### Folder structure created at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406
+2026-06-06 13:14:06,931: ### Run configurations for aareml_ealstm
+2026-06-06 13:14:06,931: experiment_name: aareml_ealstm
+2026-06-06 13:14:06,931: run_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406
+2026-06-06 13:14:06,931: train_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_train.txt
+2026-06-06 13:14:06,931: validation_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_val.txt
+2026-06-06 13:14:06,932: test_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_test.txt
+2026-06-06 13:14:06,932: dataset: generic
+2026-06-06 13:14:06,932: data_dir: /storage/homefs/tn20y076/AareML/data/nh_dataset
+2026-06-06 13:14:06,932: dynamic_inputs: ['water_temperature', 'pH', 'EC']
+2026-06-06 13:14:06,933: target_variables: ['dissolved_oxygen']
+2026-06-06 13:14:06,933: static_attributes: ['log_area', 'elev_mean', 'aridity', 'p_mean', 'frac_snow', 'runoff_ratio', 'pet_mean', 'forest_frac', 'crop_frac', 'urban_frac']
+2026-06-06 13:14:06,933: train_start_date: 1981-01-01 00:00:00
+2026-06-06 13:14:06,933: train_end_date: 2014-12-31 00:00:00
+2026-06-06 13:14:06,934: validation_start_date: 2015-01-01 00:00:00
+2026-06-06 13:14:06,934: validation_end_date: 2016-12-31 00:00:00
+2026-06-06 13:14:06,934: test_start_date: 2017-01-01 00:00:00
+2026-06-06 13:14:06,934: test_end_date: 2020-12-31 00:00:00
+2026-06-06 13:14:06,934: seq_length: 21
+2026-06-06 13:14:06,934: predict_last_n: 14
+2026-06-06 13:14:06,935: model: ealstm
+2026-06-06 13:14:06,935: head: regression
+2026-06-06 13:14:06,935: hidden_size: 128
+2026-06-06 13:14:06,935: initial_forget_bias: 3
+2026-06-06 13:14:06,935: output_dropout: 0.4
+2026-06-06 13:14:06,936: batch_size: 256
+2026-06-06 13:14:06,936: epochs: 30
+2026-06-06 13:14:06,936: learning_rate: {0: 0.001, 10: 0.0005}
+2026-06-06 13:14:06,936: optimizer: Adam
+2026-06-06 13:14:06,936: clip_gradient_norm: 1.0
+2026-06-06 13:14:06,936: loss: NSE
+2026-06-06 13:14:06,937: metrics: ['NSE', 'RMSE', 'KGE']
+2026-06-06 13:14:06,937: log_tensorboard: False
+2026-06-06 13:14:06,937: save_git_diff: False
+2026-06-06 13:14:06,937: seed: 42
+2026-06-06 13:14:06,938: device: cuda:0
+2026-06-06 13:14:06,938: num_workers: 4
+2026-06-06 13:14:06,938: number_of_basins: 16
+2026-06-06 13:14:06,938: train_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406/train_data
+2026-06-06 13:14:06,938: img_log_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0606_131406/img_log
+2026-06-06 13:14:07,062: ### Device cuda:0 will be used for training
+2026-06-06 13:14:07,355: Loading basin data into xarray data set.
+2026-06-06 13:14:07,997: Calculating target variable stds per basin
+2026-06-06 13:14:08,429: Create lookup table and convert to pytorch tensor
+2026-06-06 13:14:50,098: Epoch 1 average loss: avg_loss: 0.14765, avg_total_loss: 0.14765
+2026-06-06 13:14:54,026: Epoch 2 average loss: avg_loss: 0.10523, avg_total_loss: 0.10523
+2026-06-06 13:14:57,965: Epoch 3 average loss: avg_loss: 0.09274, avg_total_loss: 0.09274
+2026-06-06 13:15:01,791: Epoch 4 average loss: avg_loss: 0.08579, avg_total_loss: 0.08579
+2026-06-06 13:15:05,489: Epoch 5 average loss: avg_loss: 0.08128, avg_total_loss: 0.08128
+2026-06-06 13:15:09,300: Epoch 6 average loss: avg_loss: 0.07915, avg_total_loss: 0.07915
+2026-06-06 13:15:13,197: Epoch 7 average loss: avg_loss: 0.07729, avg_total_loss: 0.07729
+2026-06-06 13:15:17,208: Epoch 8 average loss: avg_loss: 0.07553, avg_total_loss: 0.07553
+2026-06-06 13:15:21,247: Epoch 9 average loss: avg_loss: 0.07418, avg_total_loss: 0.07418
+2026-06-06 13:15:21,252: Setting learning rate to 0.0005
+2026-06-06 13:15:25,132: Epoch 10 average loss: avg_loss: 0.07180, avg_total_loss: 0.07180
+2026-06-06 13:15:28,943: Epoch 11 average loss: avg_loss: 0.07069, avg_total_loss: 0.07069
+2026-06-06 13:15:33,024: Epoch 12 average loss: avg_loss: 0.07031, avg_total_loss: 0.07031
+2026-06-06 13:15:37,478: Epoch 13 average loss: avg_loss: 0.06972, avg_total_loss: 0.06972
+2026-06-06 13:15:41,600: Epoch 14 average loss: avg_loss: 0.06900, avg_total_loss: 0.06900
+2026-06-06 13:15:45,857: Epoch 15 average loss: avg_loss: 0.06861, avg_total_loss: 0.06861
+2026-06-06 13:15:49,919: Epoch 16 average loss: avg_loss: 0.06800, avg_total_loss: 0.06800
+2026-06-06 13:15:54,012: Epoch 17 average loss: avg_loss: 0.06771, avg_total_loss: 0.06771
+2026-06-06 13:15:58,178: Epoch 18 average loss: avg_loss: 0.06717, avg_total_loss: 0.06717
