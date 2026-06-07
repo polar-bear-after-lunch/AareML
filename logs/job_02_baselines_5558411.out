@@ -1,0 +1,9 @@
+Job started: Sun Jun  7 01:10:44 PM CEST 2026
+Node: gnode35
+
+Running notebook 02: Baselines...
+
+Notebook 02 complete.
+Results saved to: results/baseline_results.csv
+Results saved to: results/baseline_per_gauge.csv
+Job finished: Sun Jun  7 01:11:37 PM CEST 2026
