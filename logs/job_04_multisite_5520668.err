@@ -1,0 +1,162 @@
+[NbConvertApp] Converting notebook notebooks/04_multisite_analysis.ipynb to notebook
+Traceback (most recent call last):
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/traitlets/config/application.py", line 1075, in launch_instance
+    app.start()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+# ── Statistical significance test: LSTM vs Ridge across gauges ────────────
+from scipy import stats
+import json as _json
+
+# Build per-gauge RMSE dicts from the actual computed result DataFrames
+# transfer_df and loo_df are computed in earlier cells of this notebook
+
+# LSTM zero-shot transfer per-gauge RMSEs (from transfer_df computed above)
+lstm_per_gauge = (
+    transfer_df[transfer_df['strategy'] == 'transfer_normed']
+    .set_index('gauge_id')['rmse_do']
+    .to_dict()
+)
+
+# LSTM per-gauge retrain RMSEs (from loo_df computed above)
+lstm_retrain = (
+    loo_df.set_index('gauge_id')['rmse_do']
+    .to_dict()
+)
+
+# Ridge per-gauge RMSEs — computed from notebook 02 results
+# baseline_results.csv is a model-level summary (no per-gauge breakdown)
+# Use per-gauge values derived from the transfer_df Ridge column if available,
+# otherwise fall back to hardcoded values from the last real run
+_ridge_gauge_path = RESULTS_DIR / 'baseline_per_gauge.csv'
+if _ridge_gauge_path.exists():
+    _ridge_df = pd.read_csv(_ridge_gauge_path)
+    _ridge_df['gauge_id'] = _ridge_df['gauge_id'].astype(str)
+    ridge_per_gauge = _ridge_df.set_index('gauge_id')['rmse_do'].to_dict()
+    print(f'Loaded Ridge per-gauge RMSEs from baseline_per_gauge.csv ({len(ridge_per_gauge)} gauges)')
+else:
+    # Hardcoded from last real run (v1.18, notebook 02)
+    ridge_per_gauge = {
+        '2009': 0.2348, '2016': 0.5084, '2044': 0.5162,
+        '2085': 0.3661, '2143': 0.4333, '2174': 0.3780,
+        '2410': 0.4179, '2415': 0.3850, '2462': 0.2642,
+        '2473': 0.3028, '2613': 0.4443,
+    }
+    print('Note: using hardcoded Ridge per-gauge RMSEs (baseline_per_gauge.csv not found)')
+
+# Use only gauges present in all three dicts
+# Predefined evaluation cohort: exclude focus gauge (2473) used for training
+EVAL_COHORT = sorted(
+    (set(ridge_per_gauge) & set(lstm_per_gauge)) - {str(FOCUS_GAUGE), FOCUS_GAUGE}
+)
+common = EVAL_COHORT  # consistent cohort for means AND significance tests
+ridge_vals   = [ridge_per_gauge[g]  for g in common]
+lstm_vals    = [lstm_per_gauge[g]   for g in common]
+retrain_vals = [lstm_retrain[g]     for g in common]
+
+# Wilcoxon signed-rank test: zero-shot LSTM vs Ridge
+stat_zs, p_zs = stats.wilcoxon(lstm_vals, ridge_vals, alternative='two-sided')
+# Wilcoxon: per-gauge retrain vs Ridge
+stat_rt, p_rt = stats.wilcoxon(retrain_vals, ridge_vals, alternative='two-sided')
+
+print('=' * 65)
+print('STATISTICAL SIGNIFICANCE — Wilcoxon Signed-Rank Test')
+print('=' * 65)
+print(f'Gauges compared: {len(common)}')
+print()
+print(f'LSTM (zero-shot) vs Ridge:')
+print(f'  Mean RMSE diff : {(sum(lstm_vals)-sum(ridge_vals))/len(common):+.4f} mg/L')
+print(f'  Wilcoxon stat  : {stat_zs:.3f}')
+print(f'  p-value        : {p_zs:.4f}  {"** significant (p<0.05)" if p_zs<0.05 else "(not significant)"}')
+print()
+print(f'LSTM (per-gauge retrain) vs Ridge:')
+print(f'  Mean RMSE diff : {(sum(retrain_vals)-sum(ridge_vals))/len(common):+.4f} mg/L')
+print(f'  Wilcoxon stat  : {stat_rt:.3f}')
+print(f'  p-value        : {p_rt:.4f}  {"** significant (p<0.05)" if p_rt<0.05 else "(not significant)"}')
+print()
+print('Note: Wilcoxon signed-rank test on 11 paired gauge-level RMSEs.')
+print('Null hypothesis: no difference between LSTM and Ridge RMSE distributions.')
+
+# Save results
+sig_results = {
+    'n_gauges': len(common),
+    'lstm_zeroshot_vs_ridge': {'stat': float(stat_zs), 'p': float(p_zs), 'significant': bool(p_zs < 0.05)},
+    'lstm_retrain_vs_ridge':  {'stat': float(stat_rt), 'p': float(p_rt), 'significant': bool(p_rt < 0.05)},
+}
+import json as _json2
+with open(str(RESULTS_DIR / 'significance_tests.json'), 'w') as _f:
+    _json2.dump(sig_results, _f, indent=2)
+print(f'\nSaved: results/significance_tests.json')
+
+------------------
+
+----- stdout -----
+Loaded Ridge per-gauge RMSEs from baseline_per_gauge.csv (12 gauges)
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mKeyError[39m                                  Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[17][39m[32m, line 49[39m
+[32m     47[39m ridge_vals   = [ridge_per_gauge[g]  [38;5;28;01mfor[39;00m g [38;5;129;01min[39;00m common]
+[32m     48[39m lstm_vals    = [lstm_per_gauge[g]   [38;5;28;01mfor[39;00m g [38;5;129;01min[39;00m common]
+[32m---> [39m[32m49[39m retrain_vals = [43m[[49m[43mlstm_retrain[49m[43m[[49m[43mg[49m[43m][49m[43m     [49m[38;5;28;43;01mfor[39;49;00m[43m [49m[43mg[49m[43m [49m[38;5;129;43;01min[39;49;00m[43m [49m[43mcommon[49m[43m][49m
+[32m     51[39m [38;5;66;03m# Wilcoxon signed-rank test: zero-shot LSTM vs Ridge[39;00m
+[32m     52[39m stat_zs, p_zs = stats.wilcoxon(lstm_vals, ridge_vals, alternative=[33m'[39m[33mtwo-sided[39m[33m'[39m)
+
+[36mCell[39m[36m [39m[32mIn[17][39m[32m, line 49[39m, in [36m<listcomp>[39m[34m(.0)[39m
+[32m     47[39m ridge_vals   = [ridge_per_gauge[g]  [38;5;28;01mfor[39;00m g [38;5;129;01min[39;00m common]
+[32m     48[39m lstm_vals    = [lstm_per_gauge[g]   [38;5;28;01mfor[39;00m g [38;5;129;01min[39;00m common]
+[32m---> [39m[32m49[39m retrain_vals = [[43mlstm_retrain[49m[43m[[49m[43mg[49m[43m][49m     [38;5;28;01mfor[39;00m g [38;5;129;01min[39;00m common]
+[32m     51[39m [38;5;66;03m# Wilcoxon signed-rank test: zero-shot LSTM vs Ridge[39;00m
+[32m     52[39m stat_zs, p_zs = stats.wilcoxon(lstm_vals, ridge_vals, alternative=[33m'[39m[33mtwo-sided[39m[33m'[39m)
+
+[31mKeyError[39m: '2018'
+
