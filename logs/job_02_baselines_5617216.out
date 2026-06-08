@@ -11,3 +11,6 @@ Job finished: Mon Jun  8 09:32:22 PM CEST 2026
  5 files changed, 334 insertions(+), 351 deletions(-)
  create mode 100644 logs/job_02_baselines_5617216.err
  create mode 100644 logs/job_02_baselines_5617216.out
+[main 0020d4d] ubelix run slurm_script 2026-06-08 21:32 NB_EXIT=
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...
