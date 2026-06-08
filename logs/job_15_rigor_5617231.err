@@ -1,2 +1,6 @@
 [NbConvertApp] Converting notebook notebooks/15_scientific_rigor.ipynb to notebook
 [NbConvertApp] Writing 472917 bytes to notebooks/15_scientific_rigor.ipynb
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
