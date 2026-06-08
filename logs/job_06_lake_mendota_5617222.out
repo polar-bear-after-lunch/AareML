@@ -21,3 +21,7 @@ fi
 
 Notebook 06 complete.
 Job finished: Mon Jun  8 11:25:38 PM CEST 2026
+[main 805483c] ubelix run slurm_script 2026-06-08 23:25
+ 4 files changed, 170 insertions(+)
+ create mode 100644 logs/job_06_lake_mendota_5617222.err
+ create mode 100644 logs/job_06_lake_mendota_5617222.out
