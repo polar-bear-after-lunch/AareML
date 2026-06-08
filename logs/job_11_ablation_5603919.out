@@ -7,3 +7,7 @@ Running notebook 11: Ablation Study...
 Notebook 11 complete.
 Results: results/ablation_results.csv
 Job finished: Mon Jun  8 05:25:45 PM CEST 2026
+[main bdc2a2a] ubelix run slurm_script 2026-06-08 17:25
+ 4 files changed, 5748 insertions(+), 107 deletions(-)
+ create mode 100644 logs/job_11_ablation_5603919.err
+ create mode 100644 logs/job_11_ablation_5603919.out
