@@ -1,2 +1,6 @@
 Job started: Mon Jun  8 05:25:48 PM CEST 2026
 Notebook 12 complete. Job finished: Mon Jun  8 05:27:43 PM CEST 2026
+[main aa22e7f] ubelix run slurm_script 2026-06-08 17:27
+ 9 files changed, 133 insertions(+), 125 deletions(-)
+ create mode 100644 logs/job_12_error_5603920.err
+ create mode 100644 logs/job_12_error_5603920.out
