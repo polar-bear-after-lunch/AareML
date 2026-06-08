@@ -46,13 +46,14 @@ cd /storage/homefs/tn20y076/AareML
 # ── Run notebook 16 ──────────────────────────────────────────────────────────
 echo ""
 echo "Running notebook 16: Cross-Validation (LOO zero-shot transfer)..."
+NB_EXIT=0
 jupyter nbconvert \
     --to notebook \
     --execute \
     --inplace \
     --ExecutePreprocessor.timeout=14400 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/16_cross_validation.ipynb
+    notebooks/16_cross_validation.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 16 complete."

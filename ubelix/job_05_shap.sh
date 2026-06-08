@@ -55,7 +55,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=5400 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/05_shap_interpretation.ipynb
+    notebooks/05_shap_interpretation.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 05 complete."

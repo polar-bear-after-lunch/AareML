@@ -54,7 +54,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=3600 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/08_usgs_transfer.ipynb
+    notebooks/08_usgs_transfer.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 08 complete."

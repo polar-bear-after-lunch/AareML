@@ -49,7 +49,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=2700 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/06_cross_ecosystem_lake.ipynb
+    notebooks/06_cross_ecosystem_lake.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 06 complete."
