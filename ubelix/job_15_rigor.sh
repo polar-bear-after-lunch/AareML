@@ -5,7 +5,7 @@
 # =============================================================================
 
 #SBATCH --job-name="aareml_15_rigor"
-#SBATCH --time=00:30:00
+#SBATCH --time=01:30:00
 #SBATCH --mem-per-cpu=8G
 #SBATCH --cpus-per-task=4
 #SBATCH --partition=gpu-invest
@@ -42,11 +42,10 @@ git config user.name "AareML"
 git add -A
 git commit -m "ubelix run $(basename $0 .sh) $(date '+%Y-%m-%d %H:%M')" || true
 for attempt in 1 2 3 4 5; do
-    git stash || true
     git add -A
-    git commit -m "ubelix run $(basename $0 .sh) $(date '+%Y-%m-%d %H:%M') NB_EXIT=$NB_EXIT" || true
-    git stash pop || true
-    git pull --rebase origin main && git push origin main && echo "Results pushed (attempt $attempt)." && break
+    git commit -m "ubelix run $(SCRIPT=$(basename $0); echo ${SCRIPT%.sh}) $(date '+%Y-%m-%d %H:%M') NB_EXIT=$NB_EXIT" || true
+    git reset --hard HEAD
+    git pull origin main && git push origin main && echo "Results pushed (attempt $attempt)." && break
     echo "Push attempt $attempt failed, retrying in 15s..."
     sleep 15
 done
