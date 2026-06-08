@@ -6,3 +6,8 @@ Running notebook 10: Swiss Lakes EDA + LSTM...
 
 Notebook 10 complete.
 Job finished: Mon Jun  8 04:15:31 PM CEST 2026
+[main f88c081] ubelix run slurm_script 2026-06-08 16:15
+ 5 files changed, 268 insertions(+)
+ create mode 100644 logs/job_10_lakes_5603918.err
+ create mode 100644 logs/job_10_lakes_5603918.out
+ create mode 100644 results/swiss_lake_all_results.csv
