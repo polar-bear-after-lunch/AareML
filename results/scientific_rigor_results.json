@@ -94,7 +94,7 @@
     "pct_jja": 0.0,
     "pct_low_do": 0.0,
     "worst_window_date": "2018-03-01",
-    "worst_rmse": 1.3047,
+    "worst_rmse": 1.2767,
     "season_breakdown": {
       "DJF": 9,
       "MAM": 11,
@@ -123,47 +123,47 @@
     }
   },
   "temporal_stability": {
-    "first_half_rmse": 0.4124,
-    "first_half_nse": 0.8,
-    "first_half_kge": 0.828,
-    "second_half_rmse": 0.3287,
-    "second_half_nse": 0.86,
-    "second_half_kge": 0.843,
-    "rmse_ratio_h2_h1": 0.7971,
+    "first_half_rmse": 0.3772,
+    "first_half_nse": 0.835,
+    "first_half_kge": 0.908,
+    "second_half_rmse": 0.2985,
+    "second_half_nse": 0.886,
+    "second_half_kge": 0.934,
+    "rmse_ratio_h2_h1": 0.7913,
     "temporal_instability": false,
     "year_by_year_rmse": {
-      "2017": 0.4063,
-      "2018": 0.3637,
-      "2019": 0.3418,
-      "2020": 0.3333
+      "2017": 0.3695,
+      "2018": 0.3442,
+      "2019": 0.3052,
+      "2020": 0.2956
     }
   },
   "residual_autocorrelation": {
-    "durbin_watson_d1": 1.7612,
-    "durbin_watson_mean": 0.137,
+    "durbin_watson_d1": 1.7724,
+    "durbin_watson_mean": 0.1531,
     "ljung_box": {
       "lag_1": {
-        "LB_stat": 14.5888,
-        "p": 0.000134,
+        "LB_stat": 7.3799,
+        "p": 0.006596,
         "autocorrelated": true
       },
       "lag_3": {
-        "LB_stat": 27.887,
-        "p": 4e-06,
+        "LB_stat": 16.7115,
+        "p": 0.00081,
         "autocorrelated": true
       },
       "lag_7": {
-        "LB_stat": 89.565,
+        "LB_stat": 49.8124,
         "p": 0.0,
         "autocorrelated": true
       },
       "lag_14": {
-        "LB_stat": 142.7814,
+        "LB_stat": 71.6142,
         "p": 0.0,
         "autocorrelated": true
       }
     },
-    "lb_lag1_p": 0.000134,
+    "lb_lag1_p": 0.006596,
     "lb_lag7_p": 0.0,
     "autocorrelated": true,
     "interpretation": "residuals approximately white noise \u2014 model captures temporal structure well"
