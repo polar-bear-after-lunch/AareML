@@ -1,2 +1,6 @@
 [NbConvertApp] Converting notebook notebooks/11_ablation_study.ipynb to notebook
 [NbConvertApp] Writing 217995 bytes to notebooks/11_ablation_study.ipynb
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
