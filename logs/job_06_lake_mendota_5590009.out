@@ -1,0 +1,13 @@
+Job started: Mon Jun  8 09:48:50 AM CEST 2026
+Node: gnode39
+
+Running notebook 06: Cross-Ecosystem Lake Mendota...
+
+# Download LakeBeD-US data if not already present
+if [ ! -f data/lakebed-us/ME_daily_surface.csv ]; then
+    echo Downloading LakeBeD-US Lake Mendota data...
+    python3 download_data.py --lake-mendota
+fi
+
+Notebook 06 complete.
+Job finished: Mon Jun  8 09:49:12 AM CEST 2026
