@@ -1,2 +1,6 @@
 [NbConvertApp] Converting notebook notebooks/13_seasonal_analysis.ipynb to notebook
 [NbConvertApp] Writing 37030 bytes to notebooks/13_seasonal_analysis.ipynb
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.

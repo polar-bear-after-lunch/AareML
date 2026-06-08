@@ -4,3 +4,6 @@ Notebook 13 complete. Job finished: Tue Jun  9 12:53:00 AM CEST 2026
  10 files changed, 124 insertions(+), 101 deletions(-)
  create mode 100644 logs/job_13_seasonal_5617229.err
  create mode 100644 logs/job_13_seasonal_5617229.out
+[main 544bbc8] ubelix run slurm_script 2026-06-09 00:53 NB_EXIT=
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...
