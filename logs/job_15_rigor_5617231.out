@@ -7,3 +7,6 @@ Notebook 15 complete. Job finished: Tue Jun  9 01:04:14 AM CEST 2026
 [main dea52fb] ubelix run slurm_script 2026-06-09 01:04 NB_EXIT=
  1 file changed, 4 insertions(+)
 Push attempt 1 failed, retrying in 15s...
+[main 4a97d82] ubelix run slurm_script 2026-06-09 01:04 NB_EXIT=
+ 2 files changed, 7 insertions(+)
+Push attempt 2 failed, retrying in 15s...
