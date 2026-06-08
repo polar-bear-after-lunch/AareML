@@ -30,17 +30,17 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 | Climatology | 0.334 mg/L | 1.444°C | 0.853 | Baseline |
 | Ridge Regression | 0.303 mg/L | 1.261°C | 0.908 | Best RMSE |
 | LSTM (default) | 0.309 mg/L | 1.270°C | 0.850 | — |
-| **LSTM (best Optuna, 3-seed ensemble)** | **0.300 mg/L** | **1.256°C** | **0.936** | Beats Ridge on RMSE and KGE |
+| **LSTM (best Optuna, 3-seed ensemble)** | **0.296 mg/L** | **1.256°C** | **0.926** | Beats Ridge on RMSE and KGE |
 | LakeBeD-US LSTM (ref.) | 1.40 mg/L | — | — | Published lake benchmark |
 
-> LSTM beats Ridge on both RMSE (0.300 vs 0.303 mg/L) and KGE (0.936 vs 0.908) simultaneously — no trade-off.
+> LSTM beats Ridge on both RMSE (0.296 vs 0.303 mg/L) and KGE (0.926 vs 0.908) simultaneously — no trade-off.
 
 ### Multi-Site DO Transfer (12 Swiss Gauges)
 
 | Strategy | Mean RMSE | Significance |
 |----------|-----------|-------------|
-| Zero-shot transfer | **0.464 mg/L** | p=0.024 vs Ridge (Wilcoxon, n=11) ✓ |
-| Per-gauge retrain | **0.393 mg/L** | — |
+| Zero-shot transfer | **0.451 mg/L** | p=0.024 vs Ridge (Wilcoxon, n=11) ✓ |
+| Per-gauge retrain | **0.390 mg/L** | — |
 | EA-LSTM | **0.420 mg/L** | — |
 
 > **EA-LSTM static features** (Höge et al. 2023 + Nascimento et al. 2025): log catchment area, mean elevation, aridity index, mean precipitation, snow fraction, forest fraction, crop fraction, urban fraction
@@ -135,6 +135,8 @@ python download_data.py --swiss-lakes # Bärenbold 2026 Swiss lakes
 14_ar_baseline.ipynb               — AR(7) autoregressive baseline comparison
 15_scientific_rigor.ipynb          — Granger causality, temporal stability, threshold recall
 16_cross_validation.ipynb          — Leave-one-out transfer across all 16 DO gauges (110 pairs)
+17_neuralhydrology.ipynb           — NeuralHydrology EA-LSTM benchmark (12 gauges, Mean RMSE=0.512 mg/L, NSE=0.756)
+18_cascaded_do_model.ipynb         — Cascaded physics-informed (Henry's Law + residual LSTM)
 ```
 
 ### 5. UBELIX HPC
@@ -172,8 +174,8 @@ AareML/
 │   ├── 14_ar_baseline.ipynb             # ~8min (CPU local)
 │   ├── 15_scientific_rigor.ipynb        # ~3min
 │   ├── 16_cross_validation.ipynb        # ~3min (LOO CV, 110 pairs)
-│   ├── 17_neuralhydrology.ipynb         # ~3-4h (NeuralHydrology EA-LSTM)
-│   └── 18_cascaded_do_model.ipynb       # ~9min (cascaded Henry's Law + residual LSTM)
+│   ├── 17_neuralhydrology.ipynb         # ~3-4h (NeuralHydrology EA-LSTM) ✓
+│   └── 18_cascaded_do_model.ipynb       # ~9min (cascaded Henry's Law + residual LSTM) ✓
 ├── src/
 │   ├── config.py      — Shared config (LOOKBACK=21, HORIZON=14)
 │   ├── data.py        — Data loading, preprocessing, windowing
@@ -214,6 +216,18 @@ AareML/
 
 ---
 
+## Pipeline Status
+
+All 18 notebooks are complete and verified on the full pipeline (June 2026 rerun).
+
+| Notebook | Status | Notes |
+|----------|--------|-------|
+| nb01–nb16 | ✅ Complete | All passing |
+| nb17 (NeuralHydrology) | ✅ Complete | EA-LSTM, 12 gauges, Mean RMSE=0.512 mg/L |
+| nb18 (Cascaded DO) | ✅ Complete | Physics-informed residual LSTM |
+
+---
+
 ## Testing
 
 ```bash
@@ -248,14 +262,14 @@ Used as EA-LSTM static input features.
 ## Version History
 
 See [CHANGELOG.md](CHANGELOG.md) for full history.
-**Current version: v1.17** (May 2026)
+**Current version: v1.31** (June 2026)
 
 ---
 
 ## Novelty Claims
 
-- **First ML study on CAMELS-CH-Chem.** AareML is the first machine learning application to the CAMELS-CH-Chem dataset (Nascimento et al., 2025).
-- **First EA-LSTM application to water quality.** Entity-Aware LSTM (Kratzert et al., 2019) has not previously been applied to dissolved oxygen or water temperature prediction.
+- **First ML study on CAMELS-CH-Chem.** To the best of our knowledge, as of June 2026, AareML is the first machine learning application to the CAMELS-CH-Chem dataset (Nascimento et al., 2025).
+- **First EA-LSTM application to water quality.** To the best of our knowledge, as of June 2026, Entity-Aware LSTM (Kratzert et al., 2019) has not previously been applied to dissolved oxygen or water temperature prediction.
 
 ---
 
