@@ -94,3 +94,13 @@ Or run notebook 06 first which generates this file.
 
 [31mFileNotFoundError[39m: ../data/lakebed-us/ME_daily_surface.csv
 
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
