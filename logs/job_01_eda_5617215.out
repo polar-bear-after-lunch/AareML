@@ -9,3 +9,6 @@ Job finished: Mon Jun  8 09:30:26 PM CEST 2026
  4 files changed, 141 insertions(+), 121 deletions(-)
  create mode 100644 logs/job_01_eda_5617215.err
  create mode 100644 logs/job_01_eda_5617215.out
+[main b24ff3d] ubelix run slurm_script 2026-06-08 21:30 NB_EXIT=
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...
