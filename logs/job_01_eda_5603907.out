@@ -5,3 +5,7 @@ Running notebook 01: Data Exploration...
 
 Notebook 01 complete.
 Job finished: Mon Jun  8 02:20:52 PM CEST 2026
+[main cdfa6cd] ubelix run slurm_script 2026-06-08 14:21
+ 3 files changed, 130 insertions(+), 127 deletions(-)
+ create mode 100644 logs/job_01_eda_5603907.err
+ create mode 100644 logs/job_01_eda_5603907.out
