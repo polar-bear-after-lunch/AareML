@@ -9,3 +9,7 @@ Results saved to: results/cv_transfer_results.csv
 Figures saved to: figures/nb16_cv_heatmap.png
              and: figures/nb16_source_comparison.png
 Job finished: Tue Jun  9 01:08:54 AM CEST 2026
+[main 91e52ae] ubelix run slurm_script 2026-06-09 01:08
+ 5 files changed, 325 insertions(+), 300 deletions(-)
+ create mode 100644 logs/job_16_cross_val_5617232.err
+ create mode 100644 logs/job_16_cross_val_5617232.out
