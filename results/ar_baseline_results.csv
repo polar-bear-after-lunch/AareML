@@ -1,8 +1,8 @@
 Model,DO RMSE,NSE,KGE,Notes
 VAR(7),0.2992,0.891,0.911,computed NB14
+"LSTM (best, ensemble)",0.3026,0.889,0.945,from v1.17 (NB03)
 Ridge Regression,0.3028,0.888,0.908,from v1.17 (NB02)
 LSTM (default),0.3052,0.887,0.901,from v1.17 (NB03)
-"LSTM (best, ensemble)",0.307,0.885,0.939,from v1.17 (NB03)
 AR(21),0.3202,0.875,0.9,computed NB14
 Climatology,0.3316,0.872,0.851,computed NB14
 Persistence,0.3389,0.86,0.93,computed NB14
