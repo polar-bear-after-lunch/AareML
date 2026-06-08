@@ -10,3 +10,6 @@ Job finished: Mon Jun  8 11:11:28 PM CEST 2026
  5 files changed, 767 insertions(+), 714 deletions(-)
  create mode 100644 logs/job_04b_temp_5617219.err
  create mode 100644 logs/job_04b_temp_5617219.out
+[main 38f0ef3] ubelix run slurm_script 2026-06-08 23:11 NB_EXIT=0
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...

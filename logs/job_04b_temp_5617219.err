@@ -1,2 +1,7 @@
 [NbConvertApp] Converting notebook notebooks/04b_multisite_temperature.ipynb to notebook
 [NbConvertApp] Writing 169884 bytes to notebooks/04b_multisite_temperature.ipynb
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+   e358174..45cf4ae  main       -> origin/main
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
