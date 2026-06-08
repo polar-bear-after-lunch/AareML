@@ -3,3 +3,7 @@ Node: gnode39
 GPU: NVIDIA GeForce RTX 4090
 
 Running notebook 11: Ablation Study...
+
+Notebook 11 complete.
+Results: results/ablation_results.csv
+Job finished: Mon Jun  8 11:06:33 AM CEST 2026
