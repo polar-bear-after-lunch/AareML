@@ -94,3 +94,7 @@ Or run notebook 06 first which generates this file.
 
 [31mFileNotFoundError[39m: ../data/lakebed-us/ME_daily_surface.csv
 
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+To https://github.com/polar-bear-after-lunch/AareML.git
+   5242df5..1480feb  main -> main
