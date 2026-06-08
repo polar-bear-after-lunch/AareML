@@ -1,2 +1,7 @@
 [NbConvertApp] Converting notebook notebooks/03_lstm_single_site.ipynb to notebook
 [NbConvertApp] Writing 88100 bytes to notebooks/03_lstm_single_site.ipynb
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+   8485f49..62ead3e  main       -> origin/main
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
