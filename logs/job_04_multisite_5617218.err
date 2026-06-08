@@ -1,2 +1,7 @@
 [NbConvertApp] Converting notebook notebooks/04_multisite_analysis.ipynb to notebook
 [NbConvertApp] Writing 163946 bytes to notebooks/04_multisite_analysis.ipynb
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+   62ead3e..e358174  main       -> origin/main
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
