@@ -123,3 +123,13 @@ Saved → /storage/homefs/tn20y076/AareML/notebooks/../results/ablation_results.
 
 [31mPermissionError[39m: [Errno 13] Permission denied: '/home/user'
 
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
