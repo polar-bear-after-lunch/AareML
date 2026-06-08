@@ -16,3 +16,6 @@ Job finished: Tue Jun  9 01:08:54 AM CEST 2026
 [main 3b3abba] ubelix run slurm_script 2026-06-09 01:08 NB_EXIT=0
  1 file changed, 4 insertions(+)
 Push attempt 1 failed, retrying in 15s...
+[main 8095c2b] ubelix run slurm_script 2026-06-09 01:09 NB_EXIT=0
+ 2 files changed, 7 insertions(+)
+Push attempt 2 failed, retrying in 15s...
