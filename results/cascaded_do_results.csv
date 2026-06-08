@@ -1,7 +1,7 @@
 Setup,RMSE
 Linear baseline only (A),0.8616
 Linear baseline only (B),0.9184
-Setup A: LSTM T_f + Optuna residual,0.861
-Setup B: AR T_f + minimal residual,0.9077
+Setup A: LSTM T_f + Optuna residual,0.8606
+Setup B: AR T_f + minimal residual,0.9003
 Standard LSTM (nb03 best),0.3006
 Ridge regression (nb02),0.303
