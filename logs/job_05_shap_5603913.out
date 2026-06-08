@@ -6,3 +6,7 @@ Running notebook 05: SHAP Attribution...
 
 Notebook 05 complete.
 Job finished: Mon Jun  8 04:06:23 PM CEST 2026
+[main e62f226] ubelix run slurm_script 2026-06-08 16:06
+ 8 files changed, 94 insertions(+), 80 deletions(-)
+ create mode 100644 logs/job_05_shap_5603913.err
+ create mode 100644 logs/job_05_shap_5603913.out
