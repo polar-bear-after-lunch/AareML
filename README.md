@@ -273,6 +273,24 @@ See [CHANGELOG.md](CHANGELOG.md) for full history.
 
 ---
 
+
+## Tests
+
+The test suite provides a lightweight regression check for the full AareML workflow: data, models, and statistical evaluation.
+
+- `tests/test_core_modules.py` — source/module sanity checks for config, data, model, metrics, and impute.
+- `tests/test_notebook_pipeline.py` — notebook-dependent checks in three groups:
+  - **TestNotebooksBasics** — nb01–nb18 key outputs exist (CSVs, figures)
+  - **TestModelsAndMetrics** — LSTM, EA-LSTM, AR baselines, NSE/KGE/RMSE ranges
+  - **TestSignificanceAndBaselines** — Wilcoxon tests, `significance_tests.json`, p-values
+
+```bash
+pytest               # run all tests
+pytest -q            # quiet mode
+pytest tests/test_notebook_pipeline.py          # notebook-only
+pytest -k "significance"                        # filter by keyword
+```
+
 ## Literature
 
 Key references informing this work:
