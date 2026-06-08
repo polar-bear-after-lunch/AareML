@@ -94,10 +94,10 @@
     "pct_jja": 0.0,
     "pct_low_do": 0.0,
     "worst_window_date": "2018-03-01",
-    "worst_rmse": 1.027,
+    "worst_rmse": 1.3047,
     "season_breakdown": {
-      "DJF": 4,
-      "MAM": 16,
+      "DJF": 9,
+      "MAM": 11,
       "JJA": 0,
       "SON": 0
     }
@@ -123,47 +123,47 @@
     }
   },
   "temporal_stability": {
-    "first_half_rmse": 0.3349,
-    "first_half_nse": 0.873,
-    "first_half_kge": 0.93,
-    "second_half_rmse": 0.2778,
-    "second_half_nse": 0.902,
-    "second_half_kge": 0.939,
-    "rmse_ratio_h2_h1": 0.8295,
+    "first_half_rmse": 0.4124,
+    "first_half_nse": 0.8,
+    "first_half_kge": 0.828,
+    "second_half_rmse": 0.3287,
+    "second_half_nse": 0.86,
+    "second_half_kge": 0.843,
+    "rmse_ratio_h2_h1": 0.7971,
     "temporal_instability": false,
     "year_by_year_rmse": {
-      "2017": 0.3239,
-      "2018": 0.3243,
-      "2019": 0.27,
-      "2020": 0.2763
+      "2017": 0.4063,
+      "2018": 0.3637,
+      "2019": 0.3418,
+      "2020": 0.3333
     }
   },
   "residual_autocorrelation": {
-    "durbin_watson_d1": 1.8416,
-    "durbin_watson_mean": 0.1699,
+    "durbin_watson_d1": 1.7612,
+    "durbin_watson_mean": 0.137,
     "ljung_box": {
       "lag_1": {
-        "LB_stat": 7.2605,
-        "p": 0.007049,
+        "LB_stat": 14.5888,
+        "p": 0.000134,
         "autocorrelated": true
       },
       "lag_3": {
-        "LB_stat": 25.3377,
-        "p": 1.3e-05,
+        "LB_stat": 27.887,
+        "p": 4e-06,
         "autocorrelated": true
       },
       "lag_7": {
-        "LB_stat": 83.7615,
+        "LB_stat": 89.565,
         "p": 0.0,
         "autocorrelated": true
       },
       "lag_14": {
-        "LB_stat": 125.7335,
+        "LB_stat": 142.7814,
         "p": 0.0,
         "autocorrelated": true
       }
     },
-    "lb_lag1_p": 0.007049,
+    "lb_lag1_p": 0.000134,
     "lb_lag7_p": 0.0,
     "autocorrelated": true,
     "interpretation": "residuals approximately white noise \u2014 model captures temporal structure well"
