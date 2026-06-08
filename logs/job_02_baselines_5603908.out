@@ -7,3 +7,7 @@ Notebook 02 complete.
 Results saved to: results/baseline_results.csv
 Results saved to: results/baseline_per_gauge.csv
 Job finished: Mon Jun  8 02:22:45 PM CEST 2026
+[main d77da15] ubelix run slurm_script 2026-06-08 14:22
+ 4 files changed, 372 insertions(+), 345 deletions(-)
+ create mode 100644 logs/job_02_baselines_5603908.err
+ create mode 100644 logs/job_02_baselines_5603908.out
