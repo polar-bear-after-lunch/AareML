@@ -2,3 +2,8 @@ Job started: Mon Jun  8 08:58:53 PM CEST 2026
 Running on: gnode24
 CPUs: 4
 Notebook 14 complete. Job finished: Mon Jun  8 09:04:58 PM CEST 2026
+[main 13c0727] ubelix run slurm_script 2026-06-08 21:04
+ 6 files changed, 706 insertions(+), 113 deletions(-)
+ create mode 100644 logs/job_14_ar_baseline_5616610.err
+ create mode 100644 logs/job_14_ar_baseline_5616610.out
+ create mode 100644 results/ar_baseline_per_horizon.csv
