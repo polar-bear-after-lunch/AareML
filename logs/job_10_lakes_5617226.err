@@ -252,3 +252,7 @@ Evaluated 0 lakes
 
 [31mKeyError[39m: 'zero_shot_rmse'
 
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.

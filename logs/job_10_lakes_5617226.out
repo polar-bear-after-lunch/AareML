@@ -10,3 +10,6 @@ Job finished: Mon Jun  8 11:35:39 PM CEST 2026
  5 files changed, 269 insertions(+)
  create mode 100644 logs/job_10_lakes_5617226.err
  create mode 100644 logs/job_10_lakes_5617226.out
+[main ce79900] ubelix run slurm_script 2026-06-08 23:35 NB_EXIT=1
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...
