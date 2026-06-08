@@ -1,2 +1,6 @@
 [NbConvertApp] Converting notebook notebooks/18_cascaded_do_model.ipynb to notebook
 [NbConvertApp] Writing 41846 bytes to notebooks/18_cascaded_do_model.ipynb
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
