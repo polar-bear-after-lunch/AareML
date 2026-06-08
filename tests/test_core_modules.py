@@ -1,6 +1,5 @@
 """
-AareML comprehensive test suite.
-Covers: config, data, model, metrics, impute modules.
+AareML core module tests — config, data, model, metrics, impute.
 """
 from __future__ import annotations
 
