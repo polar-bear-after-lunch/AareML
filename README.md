@@ -29,11 +29,11 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 | Persistence | 0.339 mg/L | 1.365°C | 0.930 | Baseline |
 | Climatology | 0.334 mg/L | 1.444°C | 0.853 | Baseline |
 | Ridge Regression | 0.303 mg/L | 1.261°C | 0.908 | Best RMSE |
-| LSTM (default) | 0.309 mg/L | 1.270°C | 0.850 | — |
+| LSTM (default) | 0.305 mg/L | 1.270°C | 0.901 | — |
 | **LSTM (best Optuna, 3-seed ensemble)** | **0.296 mg/L** | **1.256°C** | **0.926** | Beats Ridge on RMSE and KGE |
 | LakeBeD-US LSTM (ref.) | 1.40 mg/L | — | — | Published lake benchmark |
 
-> LSTM beats Ridge on both RMSE (0.296 vs 0.303 mg/L) and KGE (0.926 vs 0.908) simultaneously — no trade-off.
+> LSTM best model achieves comparable RMSE to Ridge (0.296 vs 0.303 mg/L, overlapping CIs) with meaningfully better KGE (0.926 vs 0.908), indicating superior representation of DO dynamics.
 
 ### Multi-Site DO Transfer (12 Swiss Gauges)
 
@@ -64,7 +64,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 
 | Model | RMSE | NSE |
 |-------|------|-----|
-| River LSTM zero-shot → lake | 3.980 mg/L | -6.486 |
+| Lake Mendota river zero-shot | 2.962 mg/L | -2.145 |
 | **Lake-retrained LSTM** | **0.768 mg/L** | **0.700** |
 | LakeBeD-US benchmark | 1.40 mg/L | — |
 
@@ -74,7 +74,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 - `temp_sensor[t-1]`: dominant driver (mean |SHAP| = 0.644)
 - `O2C_sensor[t-1]`: second (|SHAP| = 0.527)
 - Effective LSTM memory: 3–4 days despite 21-day lookback
-- The AI rediscovered Henry's Law purely from data
+- Temperature dominance is consistent with Henry's Law (correlation, not established causation)
 
 ### Additional Results (v1.25)
 
@@ -85,6 +85,26 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 | Short lookback: 6d vs 21d | 0.308 vs 0.304 mg/L | Δ=0.004 mg/L — confirms SHAP finding |
 | EA-LSTM temperature | 1.721°C (NSE=0.862) | 34% improvement over zero-shot |
 | nb16 LOO CV (110 pairs) | 0.463 mg/L mean | Leave-one-out transfer across 16 DO gauges |
+
+### NeuralHydrology EA-LSTM (nb17 — Independent Framework Benchmark)
+
+| Gauge | RMSE | NSE | KGE |
+|-------|------|-----|-----|
+| Mean (12 valid gauges) | **0.512 mg/L** | **0.756** | **0.868** |
+| Focus gauge 2473 | **0.407 mg/L** | **0.816** | **0.943** |
+
+> NeuralHydrology framework (Kratzert et al. 2022), 30-epoch EA-LSTM on CAMELS-CH base attributes. 4 gauges returned NaN (missing static attributes). Focus gauge KGE of 0.943 exceeds the standard LSTM (0.926), suggesting the NeuralHydrology framework's data pipeline and training loop offer marginal additional gains.
+
+### Cascaded DO Model — Physics-Informed Residual LSTM (nb18)
+
+| Model | RMSE | vs Standard LSTM |
+|-------|------|-----------------|
+| Linear baseline (T→DO) | 0.862 mg/L | 2.9× worse |
+| Setup A: LSTM T-forecast + Optuna residual | 0.861 mg/L | 2.9× worse |
+| Setup B: AR(7) T-forecast + minimal residual | 0.908 mg/L | 3.1× worse |
+| **Standard LSTM (nb03)** | **0.296 mg/L** | — |
+
+> The cascaded approach (DO = linear(T\_future) + residual\_LSTM) does not improve on direct LSTM prediction. Temperature alone explains ~12% of DO variance; the remaining signal (pH, EC, DO autocorrelation) is captured natively by the direct LSTM. Setup A marginally beats its own linear baseline (0.861 vs 0.862 mg/L) after correcting 5 implementation bugs — a valid negative result.
 
 ---
 
