@@ -1,0 +1,16 @@
+[NbConvertApp] Converting notebook notebooks/14_autoregressive_baseline.ipynb to notebook
+/storage/homefs/tn20y076/.conda/envs/aareml/lib/python3.11/site-packages/nbformat/__init__.py:96: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  validate(nb)
+[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count', 'outputs' were unexpected)
+
+Failed validating 'additionalProperties' in markdown_cell:
+
+On instance['cells'][18]:
+{'cell_type': 'markdown',
+ 'execution_count': None,
+ 'id': '400fece5',
+ 'metadata': {},
+ 'outputs': ['...0 outputs...'],
+ 'source': '# SARIMA(1,0,1)(1,0,1,365) — SKIPPED\n'
+           '# SARIMAX with annual seaso...'}
+[NbConvertApp] Writing 146629 bytes to notebooks/14_autoregressive_baseline.ipynb
