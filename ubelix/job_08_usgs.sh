@@ -67,7 +67,7 @@ git config user.name "AareML"
 git add -A
 git commit -m "ubelix run $(basename $0 .sh) $(date '+%Y-%m-%d %H:%M')" || true
 for attempt in 1 2 3 4 5; do
-    git pull --rebase origin main && git push origin main && echo "Results pushed (attempt $attempt)." && break
+    git add -A && git pull --rebase origin main && git push origin main && echo "Results pushed (attempt $attempt)." && break
     echo "Push attempt $attempt failed, retrying in 15s..."
     sleep 15
 done
