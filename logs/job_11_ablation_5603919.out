@@ -1,0 +1,9 @@
+Job started: Mon Jun  8 04:16:15 PM CEST 2026
+Node: gnode31
+GPU: NVIDIA GeForce RTX 4090
+
+Running notebook 11: Ablation Study...
+
+Notebook 11 complete.
+Results: results/ablation_results.csv
+Job finished: Mon Jun  8 05:25:45 PM CEST 2026
