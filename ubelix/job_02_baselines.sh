@@ -57,10 +57,12 @@ git config user.name "AareML"
 git add -A
 git commit -m "ubelix run $(basename $0 .sh) $(date '+%Y-%m-%d %H:%M')" || true
 for attempt in 1 2 3 4 5; do
+    SCRIPT_NAME=$(basename $0 .sh)
     git add -A
-    git commit -m "ubelix run $(SCRIPT=$(basename $0); echo ${SCRIPT%.sh}) $(date '+%Y-%m-%d %H:%M') NB_EXIT=$NB_EXIT" || true
-    git reset --hard HEAD
-    git pull origin main && git push origin main && echo "Results pushed (attempt $attempt)." && break
+    git commit -m "ubelix run $SCRIPT_NAME $(date '+%Y-%m-%d %H:%M') NB_EXIT=$NB_EXIT" || true
+    git fetch origin main
+    git rebase origin/main && git push origin main && echo "Results pushed (attempt $attempt)." && break
+    git rebase --abort 2>/dev/null || true
     echo "Push attempt $attempt failed, retrying in 15s..."
     sleep 15
 done
