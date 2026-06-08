@@ -8,3 +8,7 @@ Notebook 03 complete.
 Results saved to: results/
 Figures saved to: figures/
 Job finished: Mon Jun  8 03:16:41 PM CEST 2026
+[main c8b7ece] ubelix run slurm_script 2026-06-08 15:16
+ 11 files changed, 362 insertions(+), 310 deletions(-)
+ create mode 100644 logs/job_03_lstm_5603909.err
+ create mode 100644 logs/job_03_lstm_5603909.out
