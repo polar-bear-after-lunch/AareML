@@ -51,7 +51,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=10800 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/04c_temp_precip_forecast.ipynb
+    notebooks/04c_temp_precip_forecast.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 04c complete."

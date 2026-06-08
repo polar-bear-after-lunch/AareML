@@ -46,13 +46,14 @@ cd /storage/homefs/tn20y076/AareML
 
 echo ""
 echo "Running notebook 04b: Temperature Multi-Site Analysis..."
+NB_EXIT=0
 jupyter nbconvert \
     --to notebook \
     --execute \
     --inplace \
     --ExecutePreprocessor.timeout=14400 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/04b_multisite_temperature.ipynb
+    notebooks/04b_multisite_temperature.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 04b complete."

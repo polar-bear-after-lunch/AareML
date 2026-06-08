@@ -55,7 +55,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=7200 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/10_swiss_lakes_lstm.ipynb
+    notebooks/10_swiss_lakes_lstm.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 10 complete."

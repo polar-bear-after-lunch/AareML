@@ -40,7 +40,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=9000 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/11_ablation_study.ipynb
+    notebooks/11_ablation_study.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 11 complete."

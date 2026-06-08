@@ -41,7 +41,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=1800 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/07_lake_eda.ipynb
+    notebooks/07_lake_eda.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 07 complete."

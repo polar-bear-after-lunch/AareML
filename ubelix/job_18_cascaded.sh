@@ -24,7 +24,7 @@ jupyter nbconvert \
     --inplace \
     --ExecutePreprocessor.timeout=10800 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/18_cascaded_do_model.ipynb
+    notebooks/18_cascaded_do_model.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 18 complete."

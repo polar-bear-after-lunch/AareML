@@ -29,13 +29,14 @@ fi
 
 mkdir -p logs
 
+NB_EXIT=0
 jupyter nbconvert \
     --to notebook \
     --execute \
     --inplace \
     --ExecutePreprocessor.timeout=14400 \
     --ExecutePreprocessor.kernel_name=aareml \
-    notebooks/17_neuralhydrology.ipynb
+    notebooks/17_neuralhydrology.ipynb || NB_EXIT=$?
 
 echo ""
 echo "Notebook 17 complete."
