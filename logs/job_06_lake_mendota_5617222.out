@@ -25,3 +25,6 @@ Job finished: Mon Jun  8 11:25:38 PM CEST 2026
  4 files changed, 170 insertions(+)
  create mode 100644 logs/job_06_lake_mendota_5617222.err
  create mode 100644 logs/job_06_lake_mendota_5617222.out
+[main 5f3074a] ubelix run slurm_script 2026-06-08 23:25 NB_EXIT=1
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...

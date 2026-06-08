@@ -138,3 +138,7 @@ for col in lake.columns:
 
 [31mFileNotFoundError[39m: [Errno 2] No such file or directory: '../data/lakebed-us/ME_daily_surface.csv'
 
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
