@@ -6,3 +6,6 @@ Notebook 14 complete. Job finished: Tue Jun  9 01:01:08 AM CEST 2026
  7 files changed, 128 insertions(+), 103 deletions(-)
  create mode 100644 logs/job_14_ar_baseline_5617230.err
  create mode 100644 logs/job_14_ar_baseline_5617230.out
+[main fcfe33c] ubelix run slurm_script 2026-06-09 01:01 NB_EXIT=
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...

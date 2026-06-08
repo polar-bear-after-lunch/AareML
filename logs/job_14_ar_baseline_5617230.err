@@ -12,3 +12,7 @@ On instance['cells'][18]:
  'source': '# SARIMA(1,0,1)(1,0,1,365) — SKIPPED\n'
            '# SARIMAX with annual seaso...'}
 [NbConvertApp] Writing 145929 bytes to notebooks/14_autoregressive_baseline.ipynb
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
