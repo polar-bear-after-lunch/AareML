@@ -9,3 +9,6 @@ Job finished: Mon Jun  8 11:32:36 PM CEST 2026
  5 files changed, 60 insertions(+), 44 deletions(-)
  create mode 100644 logs/job_09_canton_5617225.err
  create mode 100644 logs/job_09_canton_5617225.out
+[main 9469f2d] ubelix run slurm_script 2026-06-08 23:32 NB_EXIT=
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...
