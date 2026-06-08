@@ -216,3 +216,13 @@ Evaluating 21 lakes...
 
 [31mNameError[39m: name 'tqdm' is not defined
 
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
+error: cannot pull with rebase: Your index contains uncommitted changes.
+error: Please commit or stash them.
