@@ -1,13 +1,13 @@
 gauge_id,gauge_name,rmse,nse,tier,failure_mode,rmse_pergauge,nse_pergauge
-2009,Porte du Scex,0.3416,0.622,Medium,Moderate DO variability or partial regime mismatch,0.2403,0.818
-2016,Brugg,0.6712,0.802,Good,"Strong seasonal signal, low DO variance — model fits well",0.5195,0.885
-2018,Mellingen,0.412,0.895,Good,"Strong seasonal signal, low DO variance — model fits well",,
-2044,Andelfingen,0.5403,0.856,Good,"Strong seasonal signal, low DO variance — model fits well",0.5018,0.877
-2085,Hagneck,0.4074,0.898,Good,"Strong seasonal signal, low DO variance — model fits well",0.3627,0.919
-2143,Rekingen,0.565,0.877,Good,"Strong seasonal signal, low DO variance — model fits well",0.4399,0.928
-2174,"Chancy, Aux Ripes",0.4431,0.838,Good,"Strong seasonal signal, low DO variance — model fits well",0.3952,0.872
-2410,Ruggell,0.5262,0.168,Poor,"Regime differences, agricultural drainage, or data quality",0.4131,0.493
-2415,Rheinsfelden,0.4307,0.894,Good,"Strong seasonal signal, low DO variance — model fits well",0.3926,0.913
-2462,S-chanf,0.3809,0.779,Medium,Moderate DO variability or partial regime mismatch,0.2479,0.909
-2473,"Diepoldsau, Rietbrücke",0.3617,0.837,Good,"Strong seasonal signal, low DO variance — model fits well",0.2983,0.892
-2613,"Weil, Palmrainbrücke (D)",0.6323,0.848,Good,"Strong seasonal signal, low DO variance — model fits well",0.446,0.928
+2009,Porte du Scex,0.322,0.672,Medium,Moderate DO variability or partial regime mismatch,0.2503,0.802
+2016,Brugg,0.5998,0.844,Good,"Strong seasonal signal, low DO variance — model fits well",0.531,0.88
+2018,Mellingen,0.4035,0.901,Good,"Strong seasonal signal, low DO variance — model fits well",,
+2044,Andelfingen,0.5075,0.874,Good,"Strong seasonal signal, low DO variance — model fits well",0.5015,0.877
+2085,Hagneck,0.3947,0.905,Good,"Strong seasonal signal, low DO variance — model fits well",0.3726,0.915
+2143,Rekingen,0.4883,0.91,Good,"Strong seasonal signal, low DO variance — model fits well",0.4315,0.931
+2174,"Chancy, Aux Ripes",0.4097,0.864,Good,"Strong seasonal signal, low DO variance — model fits well",0.3671,0.89
+2410,Ruggell,0.509,0.23,Poor,"Regime differences, agricultural drainage, or data quality",0.4259,0.462
+2415,Rheinsfelden,0.4143,0.903,Good,"Strong seasonal signal, low DO variance — model fits well",0.3997,0.91
+2462,S-chanf,0.3947,0.769,Medium,Moderate DO variability or partial regime mismatch,0.2632,0.897
+2473,"Diepoldsau, Rietbrücke",0.3296,0.866,Good,"Strong seasonal signal, low DO variance — model fits well",0.3002,0.891
+2613,"Weil, Palmrainbrücke (D)",0.5408,0.892,Good,"Strong seasonal signal, low DO variance — model fits well",0.4311,0.933
