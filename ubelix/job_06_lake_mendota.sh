@@ -45,8 +45,18 @@ echo ""
 echo "Running notebook 06: Cross-Ecosystem Lake Mendota...
 
 # Download LakeBeD-US data if not already present
+# Ensure ME_daily_surface.csv exists (generated from 194 MB parquet)
 if [ ! -f data/lakebed-us/ME_daily_surface.csv ]; then
-    echo "Downloading LakeBeD-US Lake Mendota data..."
+    echo "ME_daily_surface.csv not found — running download/processing..."
+    python3 download_data.py --lake-mendota
+    echo "LakeBeD step exit: $?"
+else
+    echo "LakeBeD data already exists: $(ls -lh data/lakebed-us/ME_daily_surface.csv)"
+fi
+# Verify the CSV is valid (not empty/corrupt)
+if [ ! -s data/lakebed-us/ME_daily_surface.csv ]; then
+    echo "WARNING: ME_daily_surface.csv is empty — re-running download..."
+    rm -f data/lakebed-us/ME_daily_surface.csv
     python3 download_data.py --lake-mendota
 fi"
 jupyter nbconvert \
@@ -68,7 +78,11 @@ git config user.name "AareML"
 git add -A
 git commit -m "ubelix run $(basename $0 .sh) $(date '+%Y-%m-%d %H:%M')" || true
 for attempt in 1 2 3 4 5; do
-    git add -A && git pull --rebase origin main && git push origin main && echo "Results pushed (attempt $attempt)." && break
+    git stash || true
+    git add -A
+    git commit -m "ubelix run $(basename $0 .sh) $(date '+%Y-%m-%d %H:%M') NB_EXIT=$NB_EXIT" || true
+    git stash pop || true
+    git pull --rebase origin main && git push origin main && echo "Results pushed (attempt $attempt)." && break
     echo "Push attempt $attempt failed, retrying in 15s..."
     sleep 15
 done
