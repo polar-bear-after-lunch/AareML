@@ -5,3 +5,7 @@ From https://github.com/polar-bear-after-lunch/AareML
    e358174..45cf4ae  main       -> origin/main
 error: cannot rebase: You have unstaged changes.
 error: Please commit or stash them.
+From https://github.com/polar-bear-after-lunch/AareML
+ * branch            main       -> FETCH_HEAD
+error: cannot rebase: You have unstaged changes.
+error: Please commit or stash them.
