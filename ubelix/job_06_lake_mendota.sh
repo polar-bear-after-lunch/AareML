@@ -42,7 +42,13 @@ if [ ! -f "results/lstm_single_site_best.pt" ]; then
 fi
 
 echo ""
-echo "Running notebook 06: Cross-Ecosystem Lake Mendota..."
+echo "Running notebook 06: Cross-Ecosystem Lake Mendota...
+
+# Download LakeBeD-US data if not already present
+if [ ! -f data/lakebed-us/ME_daily_surface.csv ]; then
+    echo "Downloading LakeBeD-US Lake Mendota data..."
+    python3 download_data.py --lake-mendota
+fi"
 jupyter nbconvert \
     --to notebook \
     --execute \
