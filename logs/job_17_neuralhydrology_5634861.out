@@ -5,3 +5,73 @@ Patched NeuralHydrology logging_utils.py at /storage/homefs/tn20y076/.local/lib/
 
 Notebook 17 complete.
 Job finished: Tue Jun  9 08:17:14 AM CEST 2026
+[main a3bd1a3] ubelix run nb17 2026-06-09 08:17
+ 69 files changed, 414 insertions(+)
+ create mode 100644 logs/job_17_neuralhydrology_5634861.err
+ create mode 100644 logs/job_17_neuralhydrology_5634861.out
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/config.yml
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch001.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch002.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch003.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch004.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch005.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch006.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch007.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch008.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch009.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch010.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch011.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch012.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch013.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch014.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch015.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch016.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch017.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch018.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch019.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch020.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch021.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch022.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch023.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch024.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch025.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch026.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch027.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch028.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch029.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/model_epoch030.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch001.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch002.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch003.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch004.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch005.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch006.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch007.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch008.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch009.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch010.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch011.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch012.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch013.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch014.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch015.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch016.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch017.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch018.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch019.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch020.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch021.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch022.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch023.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch024.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch025.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch026.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch027.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch028.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch029.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/optimizer_state_epoch030.pt
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/output.log
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/test/model_epoch030/test_metrics.csv
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/test/model_epoch030/test_results.p
+ create mode 100644 results/nh_run/aareml_ealstm_0906_081500/train_data/train_data_scaler.yml
+Results pushed to GitHub.

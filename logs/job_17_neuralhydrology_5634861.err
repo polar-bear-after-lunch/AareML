@@ -170,3 +170,10 @@ Metrics for 1D are calculated over last 1 elements only. Ignoring 13 predictions
 
 [31mKeyError[39m: ['RMSE', 'NSE', 'KGE']
 
+To https://github.com/polar-bear-after-lunch/AareML.git
+ ! [rejected]        main -> main (non-fast-forward)
+error: failed to push some refs to 'https://github.com/polar-bear-after-lunch/AareML.git'
+hint: Updates were rejected because the tip of your current branch is behind
+hint: its remote counterpart. If you want to integrate the remote changes,
+hint: use 'git pull' before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
