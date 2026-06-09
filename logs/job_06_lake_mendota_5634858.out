@@ -1,0 +1,42 @@
+Job started: Tue Jun  9 08:00:49 AM CEST 2026
+Node: gnode39
+
+Running notebook 06: Cross-Ecosystem Lake Mendota...
+
+# Download LakeBeD-US data if not already present
+# Ensure ME_daily_surface.csv exists (generated from 194 MB parquet)
+if [ ! -f data/lakebed-us/ME_daily_surface.csv ]; then
+    echo ME_daily_surface.csv not found — running download/processing...
+    python3 download_data.py --lake-mendota
+    echo LakeBeD step exit: 0
+else
+    echo LakeBeD data already exists: 
+fi
+# Verify the CSV is valid (not empty/corrupt)
+if [ ! -s data/lakebed-us/ME_daily_surface.csv ]; then
+    echo WARNING: ME_daily_surface.csv is empty — re-running download...
+    rm -f data/lakebed-us/ME_daily_surface.csv
+    python3 download_data.py --lake-mendota
+fi
+
+Notebook 06 complete.
+Job finished: Tue Jun  9 08:02:51 AM CEST 2026
+[main 6af88a8] ubelix run slurm_script 2026-06-09 08:02
+ 2 files changed, 163 insertions(+)
+ create mode 100644 logs/job_06_lake_mendota_5634858.err
+ create mode 100644 logs/job_06_lake_mendota_5634858.out
+[main 6a5ef3a] ubelix run slurm_script 2026-06-09 08:03 NB_EXIT=1
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...
+[main 46cdce3] ubelix run slurm_script 2026-06-09 08:03 NB_EXIT=1
+ 2 files changed, 7 insertions(+)
+Push attempt 2 failed, retrying in 15s...
+[main d97cc41] ubelix run slurm_script 2026-06-09 08:03 NB_EXIT=1
+ 2 files changed, 7 insertions(+)
+Push attempt 3 failed, retrying in 15s...
+[main fdcc326] ubelix run slurm_script 2026-06-09 08:03 NB_EXIT=1
+ 2 files changed, 7 insertions(+)
+Push attempt 4 failed, retrying in 15s...
+[main 10e3f9b] ubelix run slurm_script 2026-06-09 08:04 NB_EXIT=1
+ 2 files changed, 7 insertions(+)
+Push attempt 5 failed, retrying in 15s...
