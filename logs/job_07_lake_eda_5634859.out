@@ -9,3 +9,6 @@ Job finished: Tue Jun  9 08:05:01 AM CEST 2026
  4 files changed, 110 insertions(+)
  create mode 100644 logs/job_07_lake_eda_5634859.err
  create mode 100644 logs/job_07_lake_eda_5634859.out
+[main 0299136] ubelix run slurm_script 2026-06-09 08:05 NB_EXIT=1
+ 1 file changed, 4 insertions(+)
+Push attempt 1 failed, retrying in 15s...
