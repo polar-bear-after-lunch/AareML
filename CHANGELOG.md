@@ -5,6 +5,99 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.31] — 2026-06-08
+
+### Full Pipeline Rerun — All 18 Notebooks
+- Complete UBELIX rerun of all notebooks with auto-push infrastructure
+- All job scripts updated with retry push logic, stash-safe git operations
+- nb10: added `tqdm` import; nb11: removed hardcoded `/home/user` path
+- nb14: SARIMA(1,0,1)(1,0,1,365) skipped (intractable on CPU, exceeds cell timeout)
+- nb06: LakeBeD-US download guard added to job script
+
+### Updated Results (from rerun)
+- LSTM best RMSE: 0.300 → **0.296 mg/L**, KGE: 0.936 → **0.926**
+- LSTM default RMSE: 0.309 → **0.305 mg/L**, KGE: 0.850 → **0.901**
+- Zero-shot transfer: 0.464 → **0.451 mg/L**
+- Per-gauge retrain: 0.393 → **0.390 mg/L**
+- Spearman latitude: ρ=0.78 → **ρ=0.64**, p=0.005 → **p=0.027**
+
+### New Section: NeuralHydrology EA-LSTM (nb17)
+- EA-LSTM trained for 30 epochs on 16 Swiss gauges using NeuralHydrology framework
+- 12 valid gauges: mean RMSE=0.512 mg/L, NSE=0.756, KGE=0.868
+- Focus gauge 2473: RMSE=0.407 mg/L, NSE=0.816, KGE=0.943
+
+### Infrastructure
+- All 20 SLURM job scripts: auto git push, retry logic, stash-safe rebase
+- `run_all_notebooks.sh`: queue guard prevents double submission
+- `run_failed_notebooks.sh`: targeted rerun for selected notebooks
+- Logs cleaned: kept only latest run per notebook (406 old logs removed)
+- Placeholder figures removed (`{FOCUS_GAUGE}` in filenames)
+- Pitch deck files removed from repo
+
+### Test Suite Refactored
+- `test_src.py` → `test_core_modules.py`
+- `test_extended.py` + `test_new_notebooks.py` → `test_notebook_pipeline.py`
+- Three test classes: TestNotebooksBasics(8), TestModelsAndMetrics(27), TestSignificanceAndBaselines(10)
+- 96 passing, 1 pre-existing failure (significance_tests.json from older run)
+
+---
+
+## [v1.30] — 2026-06-05
+
+### Reviewer Calibration (9 fixes)
+- Fix 1+8: Rewrote LSTM vs Ridge as "comparable" — overlapping CIs, no "beats" claim
+- Fix 2: Clarified default LSTM KGE=0.901 worse than Ridge; advantage specific to Optuna ensemble
+- Fix 3: Removed all "3.3×/3.0×/3.6×" multiplier claims; replaced with cautionary river–lake language
+- Fix 4: Added "to the best of our knowledge as of June 2026" to all first-study claims
+- Fix 5: Softened latitude→elevation causal interpretation (correlation ≠ causation)
+- Fix 7: Softened lake benchmark language to "lower RMSE than published LakeBeD-US benchmark"
+- Fix 9: Abstract trimmed from ~250 to 165 words
+- Version history entry added
+
+---
+
+## [v1.29] — 2026-06-05
+
+### Bug fixes found during annotation pass
+- Conclusion p-value corrected: p=0.005 (Spearman latitude) → p=0.024 (Wilcoxon transfer test)
+- Discussion 6.3 nb18 results: stale pre-bugfix numbers (0.834/0.889) → post-bugfix (0.861/0.908)
+
+---
+
+## [v1.28] — 2026-06-01
+
+### New Notebooks
+- **nb17** NeuralHydrology: EA-LSTM benchmark using NeuralHydrology framework (still debugging date parsing)
+- **nb18** Cascaded DO model: professor's suggestion to decompose DO = linear(T) + LSTM residual
+
+### nb18 Results (post 5-bug fix)
+- Linear baseline A: 0.862 mg/L; Setup A (LSTM + Optuna): 0.861 mg/L; Setup B (AR + minimal): 0.908 mg/L
+- Standard LSTM (nb03): 0.296 mg/L — 3× better
+- Scientific conclusion: LSTM already implicitly captures Henry's Law; cascaded approach adds complexity without benefit
+
+### Bug Fixes (nb18 — 5 bugs)
+- Bug 1+2: Training residuals used T_obs_last (constant per window) while test used T_f_A (per-horizon forecast) — severe distribution mismatch
+- Bug 3: Optuna minimised test-set RMSE directly (data leakage) — fixed to use validation RMSE
+- Bug 4: Setup B had identical residual mismatch
+- Bug 5: N_aligned truncation not applied to T_f_B
+
+---
+
+## [v1.27] — 2026-05-31
+
+### New Notebooks
+- **nb15** Scientific rigor: Granger causality, temporal stability, residual ACF, threshold recall
+- **nb16** Pairwise transfer: 110 gauge pairs, mean RMSE=0.463 mg/L (transfer benchmark)
+
+### Report Updates
+- nb04: Wilcoxon cohort consistently excludes focus gauge 2473
+- KGE labelled as "modified KGE (CV-ratio variant, Kling et al. 2012)"
+- nb16 labelled "pairwise transfer benchmark" (not LOO CV)
+- Preprocessing leakage note added (limit=7 interpolation before split)
+- Acknowledgements: PD Dr. Sigve Haug, Mykhailo Vladymyrov, Thiago Nascimento
+
+---
+
 ## [v1.25] — 2026-05-16
 
 ### Report + Literature Updates

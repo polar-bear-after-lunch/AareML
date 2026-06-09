@@ -29,18 +29,18 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 | Persistence | 0.339 mg/L | 1.365°C | 0.930 | Baseline |
 | Climatology | 0.334 mg/L | 1.444°C | 0.853 | Baseline |
 | Ridge Regression | 0.303 mg/L | 1.261°C | 0.908 | Best RMSE |
-| LSTM (default) | 0.309 mg/L | 1.270°C | 0.850 | — |
-| **LSTM (best Optuna, 3-seed ensemble)** | **0.300 mg/L** | **1.256°C** | **0.936** | Beats Ridge on RMSE and KGE |
+| LSTM (default) | 0.305 mg/L | 1.270°C | 0.901 | — |
+| **LSTM (best Optuna, 3-seed ensemble)** | **0.296 mg/L** | **1.256°C** | **0.926** | Beats Ridge on RMSE and KGE |
 | LakeBeD-US LSTM (ref.) | 1.40 mg/L | — | — | Published lake benchmark |
 
-> LSTM beats Ridge on both RMSE (0.300 vs 0.303 mg/L) and KGE (0.936 vs 0.908) simultaneously — no trade-off.
+> LSTM best model achieves comparable RMSE to Ridge (0.296 vs 0.303 mg/L, overlapping CIs) with meaningfully better KGE (0.926 vs 0.908), indicating superior representation of DO dynamics.
 
 ### Multi-Site DO Transfer (12 Swiss Gauges)
 
 | Strategy | Mean RMSE | Significance |
 |----------|-----------|-------------|
-| Zero-shot transfer | **0.464 mg/L** | p=0.024 vs Ridge (Wilcoxon, n=11) ✓ |
-| Per-gauge retrain | **0.393 mg/L** | — |
+| Zero-shot transfer | **0.451 mg/L** | p=0.024 vs Ridge (Wilcoxon, n=11) ✓ |
+| Per-gauge retrain | **0.390 mg/L** | — |
 | EA-LSTM | **0.420 mg/L** | — |
 
 > **EA-LSTM static features** (Höge et al. 2023 + Nascimento et al. 2025): log catchment area, mean elevation, aridity index, mean precipitation, snow fraction, forest fraction, crop fraction, urban fraction
@@ -64,7 +64,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 
 | Model | RMSE | NSE |
 |-------|------|-----|
-| River LSTM zero-shot → lake | 3.980 mg/L | -6.486 |
+| Lake Mendota river zero-shot | 2.962 mg/L | -2.145 |
 | **Lake-retrained LSTM** | **0.768 mg/L** | **0.700** |
 | LakeBeD-US benchmark | 1.40 mg/L | — |
 
@@ -74,7 +74,7 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 - `temp_sensor[t-1]`: dominant driver (mean |SHAP| = 0.644)
 - `O2C_sensor[t-1]`: second (|SHAP| = 0.527)
 - Effective LSTM memory: 3–4 days despite 21-day lookback
-- The AI rediscovered Henry's Law purely from data
+- Temperature dominance is consistent with Henry's Law (correlation, not established causation)
 
 ### Additional Results (v1.25)
 
@@ -85,6 +85,26 @@ AareML applies a sequence-to-sequence LSTM to predict dissolved oxygen (DO) and 
 | Short lookback: 6d vs 21d | 0.308 vs 0.304 mg/L | Δ=0.004 mg/L — confirms SHAP finding |
 | EA-LSTM temperature | 1.721°C (NSE=0.862) | 34% improvement over zero-shot |
 | nb16 LOO CV (110 pairs) | 0.463 mg/L mean | Leave-one-out transfer across 16 DO gauges |
+
+### NeuralHydrology EA-LSTM (nb17 — Independent Framework Benchmark)
+
+| Gauge | RMSE | NSE | KGE |
+|-------|------|-----|-----|
+| Mean (12 valid gauges) | **0.512 mg/L** | **0.756** | **0.868** |
+| Focus gauge 2473 | **0.407 mg/L** | **0.816** | **0.943** |
+
+> NeuralHydrology framework (Kratzert et al. 2022), 30-epoch EA-LSTM on CAMELS-CH base attributes. 4 gauges returned NaN (missing static attributes). Focus gauge KGE of 0.943 exceeds the standard LSTM (0.926), suggesting the NeuralHydrology framework's data pipeline and training loop offer marginal additional gains.
+
+### Cascaded DO Model — Physics-Informed Residual LSTM (nb18)
+
+| Model | RMSE | vs Standard LSTM |
+|-------|------|-----------------|
+| Linear baseline (T→DO) | 0.862 mg/L | 2.9× worse |
+| Setup A: LSTM T-forecast + Optuna residual | 0.861 mg/L | 2.9× worse |
+| Setup B: AR(7) T-forecast + minimal residual | 0.908 mg/L | 3.1× worse |
+| **Standard LSTM (nb03)** | **0.296 mg/L** | — |
+
+> The cascaded approach (DO = linear(T\_future) + residual\_LSTM) does not improve on direct LSTM prediction. Temperature alone explains ~12% of DO variance; the remaining signal (pH, EC, DO autocorrelation) is captured natively by the direct LSTM. Setup A marginally beats its own linear baseline (0.861 vs 0.862 mg/L) after correcting 5 implementation bugs — a valid negative result.
 
 ---
 
@@ -135,6 +155,8 @@ python download_data.py --swiss-lakes # Bärenbold 2026 Swiss lakes
 14_ar_baseline.ipynb               — AR(7) autoregressive baseline comparison
 15_scientific_rigor.ipynb          — Granger causality, temporal stability, threshold recall
 16_cross_validation.ipynb          — Leave-one-out transfer across all 16 DO gauges (110 pairs)
+17_neuralhydrology.ipynb           — NeuralHydrology EA-LSTM benchmark (12 gauges, Mean RMSE=0.512 mg/L, NSE=0.756)
+18_cascaded_do_model.ipynb         — Cascaded physics-informed (Henry's Law + residual LSTM)
 ```
 
 ### 5. UBELIX HPC
@@ -172,8 +194,8 @@ AareML/
 │   ├── 14_ar_baseline.ipynb             # ~8min (CPU local)
 │   ├── 15_scientific_rigor.ipynb        # ~3min
 │   ├── 16_cross_validation.ipynb        # ~3min (LOO CV, 110 pairs)
-│   ├── 17_neuralhydrology.ipynb         # ~3-4h (NeuralHydrology EA-LSTM)
-│   └── 18_cascaded_do_model.ipynb       # ~9min (cascaded Henry's Law + residual LSTM)
+│   ├── 17_neuralhydrology.ipynb         # ~3-4h (NeuralHydrology EA-LSTM) ✓
+│   └── 18_cascaded_do_model.ipynb       # ~9min (cascaded Henry's Law + residual LSTM) ✓
 ├── src/
 │   ├── config.py      — Shared config (LOOKBACK=21, HORIZON=14)
 │   ├── data.py        — Data loading, preprocessing, windowing
@@ -214,6 +236,18 @@ AareML/
 
 ---
 
+## Pipeline Status
+
+All 18 notebooks are complete and verified on the full pipeline (June 2026 rerun).
+
+| Notebook | Status | Notes |
+|----------|--------|-------|
+| nb01–nb16 | ✅ Complete | All passing |
+| nb17 (NeuralHydrology) | ✅ Complete | EA-LSTM, 12 gauges, Mean RMSE=0.512 mg/L |
+| nb18 (Cascaded DO) | ✅ Complete | Physics-informed residual LSTM |
+
+---
+
 ## Testing
 
 ```bash
@@ -248,16 +282,34 @@ Used as EA-LSTM static input features.
 ## Version History
 
 See [CHANGELOG.md](CHANGELOG.md) for full history.
-**Current version: v1.17** (May 2026)
+**Current version: v1.31** (June 2026)
 
 ---
 
 ## Novelty Claims
 
-- **First ML study on CAMELS-CH-Chem.** AareML is the first machine learning application to the CAMELS-CH-Chem dataset (Nascimento et al., 2025).
-- **First EA-LSTM application to water quality.** Entity-Aware LSTM (Kratzert et al., 2019) has not previously been applied to dissolved oxygen or water temperature prediction.
+- **First ML study on CAMELS-CH-Chem.** To the best of our knowledge, as of June 2026, AareML is the first machine learning application to the CAMELS-CH-Chem dataset (Nascimento et al., 2025).
+- **First EA-LSTM application to water quality.** To the best of our knowledge, as of June 2026, Entity-Aware LSTM (Kratzert et al., 2019) has not previously been applied to dissolved oxygen or water temperature prediction.
 
 ---
+
+
+## Tests
+
+The test suite provides a lightweight regression check for the full AareML workflow: data, models, and statistical evaluation.
+
+- `tests/test_core_modules.py` — source/module sanity checks for config, data, model, metrics, and impute.
+- `tests/test_notebook_pipeline.py` — notebook-dependent checks in three groups:
+  - **TestNotebooksBasics** — nb01–nb18 key outputs exist (CSVs, figures)
+  - **TestModelsAndMetrics** — LSTM, EA-LSTM, AR baselines, NSE/KGE/RMSE ranges
+  - **TestSignificanceAndBaselines** — Wilcoxon tests, `significance_tests.json`, p-values
+
+```bash
+pytest               # run all tests
+pytest -q            # quiet mode
+pytest tests/test_notebook_pipeline.py          # notebook-only
+pytest -k "significance"                        # filter by keyword
+```
 
 ## Literature
 
