@@ -1,0 +1,172 @@
+[NbConvertApp] Converting notebook notebooks/17_neuralhydrology.ipynb to notebook
+Traceback (most recent call last):
+  File "/software.9/software/Anaconda3/2024.02-1/bin/jupyter-nbconvert", line 11, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/application.py", line 280, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/traitlets/config/application.py", line 992, in launch_instance
+    app.start()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 412, in start
+    self.convert_notebooks()
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 590, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 556, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/nbconvertapp.py", line 479, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 203, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 222, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 156, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/exporters/exporter.py", line 354, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)  # type:ignore[operator]
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 102, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbconvert/preprocessors/execute.py", line 123, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/jupyter_core/utils/__init__.py", line 173, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/asyncio/base_events.py", line 653, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 1058, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/software.9/software/Anaconda3/2024.02-1/lib/python3.11/site-packages/nbclient/client.py", line 914, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from neuralhydrology.nh_run import eval_run
+from neuralhydrology.evaluation import get_tester
+
+# Find the run directory (NeuralHydrology creates timestamped subdirectory)
+run_dirs = sorted(NH_RUN_DIR.glob('aareml_ealstm_*'))
+if not run_dirs:
+    print("No run directory found — training may have failed")
+else:
+    latest_run = run_dirs[-1]
+    print(f"Evaluating run: {latest_run.name}")
+    
+    eval_run(run_dir=latest_run, period='test', gpu=0 if DEVICE=='cuda' else -1)
+    
+    # Load results
+    results_file = latest_run / 'test' / 'model_epoch030' / 'test_results.p'
+    if results_file.exists():
+        import pickle
+        with open(results_file, 'rb') as f:
+            results = pickle.load(f)
+        
+        # Extract per-gauge RMSE
+        nh_rmse = []
+        for gid, res in results.items():
+            if 'dissolved_oxygen' in res:
+                rmse = res['dissolved_oxygen']['RMSE']
+                nse  = res['dissolved_oxygen']['NSE']
+                nh_rmse.append({'gauge_id': gid, 'RMSE': rmse, 'NSE': nse, 'model': 'NH_EA-LSTM'})
+        
+        nh_df = pd.DataFrame(nh_rmse)
+        nh_df = nh_df.dropna(subset=['RMSE', 'NSE', 'KGE'])
+        print(f"\n=== NeuralHydrology EA-LSTM Results ===")
+        print(f"Gauges evaluated: {len(nh_df)}")
+        print(f"Mean RMSE: {nh_df.RMSE.mean():.4f} mg/L")
+        print(f"Mean NSE:  {nh_df.NSE.mean():.3f}")
+        
+        print(f"\n=== Comparison ===")
+        print(f"Manual EA-LSTM (nb04): 0.420 mg/L RMSE, NSE=0.843")
+        print(f"NH EA-LSTM (nb17):     {nh_df.RMSE.mean():.3f} mg/L RMSE, NSE={nh_df.NSE.mean():.3f}")
+        
+        # Save
+        nh_df.to_csv(RESULTS_DIR / 'nh_ealstm_results.csv', index=False)
+        print(f"\nSaved: nh_ealstm_results.csv")
+------------------
+
+----- stdout -----
+Evaluating run: aareml_ealstm_0906_081500
+----- stdout -----
+2026-06-09 08:17:10,633: Using the model weights from /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500/model_epoch030.pt
+----- stdout -----
+  0%|          | 0/16 [00:00<?, ?it/s]
+----- stdout -----
+# Evaluation:   0%|          | 0/16 [00:00<?, ?it/s]
+----- stdout -----
+
+----- stdout -----
+
+----- stdout -----
+Metrics for 1D are calculated over last 1 elements only. Ignoring 13 predictions per sequence.
+# Evaluation:   0%|          | 0/16 [00:00<?, ?it/s]
+----- stdout -----
+# Evaluation:   6%|▋         | 1/16 [00:00<00:03,  4.71it/s]
+----- stdout -----
+# Evaluation:  19%|█▉        | 3/16 [00:00<00:01,  7.31it/s]
+----- stdout -----
+2026-06-09 08:17:11,137: The following basins had not enough valid target values to calculate a standard deviation: 2068. NSE loss values for this basin will be NaN.
+----- stdout -----
+# Evaluation:  31%|███▏      | 5/16 [00:00<00:01,  8.64it/s]
+----- stdout -----
+2026-06-09 08:17:11,328: The following basins had not enough valid target values to calculate a standard deviation: 2130. NSE loss values for this basin will be NaN.
+----- stdout -----
+# Evaluation:  44%|████▍     | 7/16 [00:00<00:00,  9.31it/s]
+----- stdout -----
+2026-06-09 08:17:11,466: The following basins had not enough valid target values to calculate a standard deviation: 2135. NSE loss values for this basin will be NaN.
+----- stdout -----
+# Evaluation:  50%|█████     | 8/16 [00:00<00:00,  8.74it/s]
+----- stdout -----
+# Evaluation:  62%|██████▎   | 10/16 [00:01<00:00, 10.98it/s]
+----- stdout -----
+2026-06-09 08:17:11,714: The following basins had not enough valid target values to calculate a standard deviation: 2243. NSE loss values for this basin will be NaN.
+----- stdout -----
+# Evaluation:  75%|███████▌  | 12/16 [00:01<00:00, 10.77it/s]
+----- stdout -----
+# Evaluation:  88%|████████▊ | 14/16 [00:01<00:00, 12.52it/s]
+----- stdout -----
+# Evaluation: 100%|██████████| 16/16 [00:01<00:00, 13.97it/s]
+----- stdout -----
+# Evaluation: 100%|██████████| 16/16 [00:01<00:00, 10.83it/s]
+----- stdout -----
+
+2026-06-09 08:17:12,116: Stored metrics at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500/test/model_epoch030/test_metrics.csv
+----- stdout -----
+2026-06-09 08:17:12,119: Stored results at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500/test/model_epoch030/test_results.p
+------------------
+
+[31m---------------------------------------------------------------------------[39m
+[31mKeyError[39m                                  Traceback (most recent call last)
+[32m/scratch/local/5634861/ipykernel_1463415/2248775598.py[39m in [36m?[39m[34m()[39m
+[32m     26[39m                 nse  = res[[33m'dissolved_oxygen'[39m][[33m'NSE'[39m]
+[32m     27[39m                 nh_rmse.append({[33m'gauge_id'[39m: gid, [33m'RMSE'[39m: rmse, [33m'NSE'[39m: nse, [33m'model'[39m: [33m'NH_EA-LSTM'[39m})
+[32m     28[39m 
+[32m     29[39m         nh_df = pd.DataFrame(nh_rmse)
+[32m---> [39m[32m30[39m         nh_df = nh_df.dropna(subset=[[33m'RMSE'[39m, [33m'NSE'[39m, [33m'KGE'[39m])
+[32m     31[39m         print([33mf"\n=== NeuralHydrology EA-LSTM Results ==="[39m)
+[32m     32[39m         print([33mf"Gauges evaluated: {len(nh_df)}"[39m)
+[32m     33[39m         print([33mf"Mean RMSE: {nh_df.RMSE.mean():.4f} mg/L"[39m)
+
+[32m~/.conda/envs/aareml/lib/python3.11/site-packages/pandas/core/frame.py[39m in [36m?[39m[34m(self, axis, how, thresh, subset, inplace, ignore_index)[39m
+[32m   6666[39m             ax = self._get_axis(agg_axis)
+[32m   6667[39m             indices = ax.get_indexer_for(subset)
+[32m   6668[39m             check = indices == -[32m1[39m
+[32m   6669[39m             [38;5;28;01mif[39;00m check.any():
+[32m-> [39m[32m6670[39m                 [38;5;28;01mraise[39;00m KeyError(np.array(subset)[check].tolist())
+[32m   6671[39m             agg_obj = self.take(indices, axis=agg_axis)
+[32m   6672[39m 
+[32m   6673[39m         [38;5;28;01mif[39;00m thresh [38;5;28;01mis[39;00m [38;5;28;01mnot[39;00m lib.no_default:
+
+[31mKeyError[39m: ['RMSE', 'NSE', 'KGE']
+

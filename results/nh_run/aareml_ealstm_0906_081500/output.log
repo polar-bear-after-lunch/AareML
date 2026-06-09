@@ -1,0 +1,83 @@
+2026-06-09 08:15:00,483: Logging to /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500/output.log initialized.
+2026-06-09 08:15:00,484: ### Folder structure created at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500
+2026-06-09 08:15:00,484: ### Run configurations for aareml_ealstm
+2026-06-09 08:15:00,485: experiment_name: aareml_ealstm
+2026-06-09 08:15:00,485: run_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500
+2026-06-09 08:15:00,485: train_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_train.txt
+2026-06-09 08:15:00,485: validation_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_val.txt
+2026-06-09 08:15:00,485: test_basin_file: /storage/homefs/tn20y076/AareML/data/nh_dataset/basins_test.txt
+2026-06-09 08:15:00,486: dataset: generic
+2026-06-09 08:15:00,486: data_dir: /storage/homefs/tn20y076/AareML/data/nh_dataset
+2026-06-09 08:15:00,486: dynamic_inputs: ['water_temperature', 'pH', 'EC']
+2026-06-09 08:15:00,486: target_variables: ['dissolved_oxygen']
+2026-06-09 08:15:00,487: static_attributes: ['log_area', 'elev_mean', 'aridity', 'p_mean', 'frac_snow', 'runoff_ratio', 'pet_mean', 'forest_frac', 'crop_frac', 'urban_frac']
+2026-06-09 08:15:00,487: train_start_date: 1981-01-01 00:00:00
+2026-06-09 08:15:00,487: train_end_date: 2014-12-31 00:00:00
+2026-06-09 08:15:00,487: validation_start_date: 2015-01-01 00:00:00
+2026-06-09 08:15:00,487: validation_end_date: 2016-12-31 00:00:00
+2026-06-09 08:15:00,488: test_start_date: 2017-01-01 00:00:00
+2026-06-09 08:15:00,488: test_end_date: 2020-12-31 00:00:00
+2026-06-09 08:15:00,488: seq_length: 21
+2026-06-09 08:15:00,488: predict_last_n: 14
+2026-06-09 08:15:00,488: model: ealstm
+2026-06-09 08:15:00,489: head: regression
+2026-06-09 08:15:00,489: hidden_size: 128
+2026-06-09 08:15:00,489: initial_forget_bias: 3
+2026-06-09 08:15:00,489: output_dropout: 0.4
+2026-06-09 08:15:00,489: batch_size: 256
+2026-06-09 08:15:00,490: epochs: 30
+2026-06-09 08:15:00,490: learning_rate: {0: 0.001, 10: 0.0005}
+2026-06-09 08:15:00,490: optimizer: Adam
+2026-06-09 08:15:00,490: clip_gradient_norm: 1.0
+2026-06-09 08:15:00,490: loss: NSE
+2026-06-09 08:15:00,490: metrics: ['NSE', 'RMSE', 'KGE']
+2026-06-09 08:15:00,491: log_tensorboard: False
+2026-06-09 08:15:00,491: save_git_diff: False
+2026-06-09 08:15:00,491: seed: 42
+2026-06-09 08:15:00,491: device: cuda:0
+2026-06-09 08:15:00,492: num_workers: 4
+2026-06-09 08:15:00,492: number_of_basins: 16
+2026-06-09 08:15:00,492: train_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500/train_data
+2026-06-09 08:15:00,492: img_log_dir: /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500/img_log
+2026-06-09 08:15:00,586: ### Device cuda:0 will be used for training
+2026-06-09 08:15:00,592: Loading basin data into xarray data set.
+2026-06-09 08:15:00,781: Calculating target variable stds per basin
+2026-06-09 08:15:00,925: Create lookup table and convert to pytorch tensor
+2026-06-09 08:15:31,322: Epoch 1 average loss: avg_loss: 0.14765, avg_total_loss: 0.14765
+2026-06-09 08:15:34,747: Epoch 2 average loss: avg_loss: 0.10523, avg_total_loss: 0.10523
+2026-06-09 08:15:38,135: Epoch 3 average loss: avg_loss: 0.09274, avg_total_loss: 0.09274
+2026-06-09 08:15:41,527: Epoch 4 average loss: avg_loss: 0.08579, avg_total_loss: 0.08579
+2026-06-09 08:15:44,913: Epoch 5 average loss: avg_loss: 0.08128, avg_total_loss: 0.08128
+2026-06-09 08:15:48,290: Epoch 6 average loss: avg_loss: 0.07915, avg_total_loss: 0.07915
+2026-06-09 08:15:51,699: Epoch 7 average loss: avg_loss: 0.07729, avg_total_loss: 0.07729
+2026-06-09 08:15:55,080: Epoch 8 average loss: avg_loss: 0.07553, avg_total_loss: 0.07553
+2026-06-09 08:15:58,453: Epoch 9 average loss: avg_loss: 0.07418, avg_total_loss: 0.07418
+2026-06-09 08:15:58,458: Setting learning rate to 0.0005
+2026-06-09 08:16:01,846: Epoch 10 average loss: avg_loss: 0.07180, avg_total_loss: 0.07180
+2026-06-09 08:16:05,216: Epoch 11 average loss: avg_loss: 0.07069, avg_total_loss: 0.07069
+2026-06-09 08:16:08,605: Epoch 12 average loss: avg_loss: 0.07031, avg_total_loss: 0.07031
+2026-06-09 08:16:11,986: Epoch 13 average loss: avg_loss: 0.06972, avg_total_loss: 0.06972
+2026-06-09 08:16:15,373: Epoch 14 average loss: avg_loss: 0.06900, avg_total_loss: 0.06900
+2026-06-09 08:16:18,752: Epoch 15 average loss: avg_loss: 0.06861, avg_total_loss: 0.06861
+2026-06-09 08:16:22,165: Epoch 16 average loss: avg_loss: 0.06800, avg_total_loss: 0.06800
+2026-06-09 08:16:25,552: Epoch 17 average loss: avg_loss: 0.06771, avg_total_loss: 0.06771
+2026-06-09 08:16:28,933: Epoch 18 average loss: avg_loss: 0.06717, avg_total_loss: 0.06717
+2026-06-09 08:16:32,310: Epoch 19 average loss: avg_loss: 0.06681, avg_total_loss: 0.06681
+2026-06-09 08:16:35,687: Epoch 20 average loss: avg_loss: 0.06633, avg_total_loss: 0.06633
+2026-06-09 08:16:39,069: Epoch 21 average loss: avg_loss: 0.06601, avg_total_loss: 0.06601
+2026-06-09 08:16:42,486: Epoch 22 average loss: avg_loss: 0.06542, avg_total_loss: 0.06542
+2026-06-09 08:16:45,868: Epoch 23 average loss: avg_loss: 0.06528, avg_total_loss: 0.06528
+2026-06-09 08:16:49,252: Epoch 24 average loss: avg_loss: 0.06481, avg_total_loss: 0.06481
+2026-06-09 08:16:52,645: Epoch 25 average loss: avg_loss: 0.06435, avg_total_loss: 0.06435
+2026-06-09 08:16:56,116: Epoch 26 average loss: avg_loss: 0.06413, avg_total_loss: 0.06413
+2026-06-09 08:16:59,511: Epoch 27 average loss: avg_loss: 0.06414, avg_total_loss: 0.06414
+2026-06-09 08:17:03,314: Epoch 28 average loss: avg_loss: 0.06345, avg_total_loss: 0.06345
+2026-06-09 08:17:07,079: Epoch 29 average loss: avg_loss: 0.06302, avg_total_loss: 0.06302
+2026-06-09 08:17:10,597: Epoch 30 average loss: avg_loss: 0.06293, avg_total_loss: 0.06293
+2026-06-09 08:17:10,633: Using the model weights from /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500/model_epoch030.pt
+2026-06-09 08:17:11,137: The following basins had not enough valid target values to calculate a standard deviation: 2068. NSE loss values for this basin will be NaN.
+2026-06-09 08:17:11,328: The following basins had not enough valid target values to calculate a standard deviation: 2130. NSE loss values for this basin will be NaN.
+2026-06-09 08:17:11,466: The following basins had not enough valid target values to calculate a standard deviation: 2135. NSE loss values for this basin will be NaN.
+2026-06-09 08:17:11,714: The following basins had not enough valid target values to calculate a standard deviation: 2243. NSE loss values for this basin will be NaN.
+2026-06-09 08:17:12,116: Stored metrics at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500/test/model_epoch030/test_metrics.csv
+2026-06-09 08:17:12,119: Stored results at /storage/homefs/tn20y076/AareML/results/nh_run/aareml_ealstm_0906_081500/test/model_epoch030/test_results.p
