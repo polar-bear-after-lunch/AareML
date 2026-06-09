@@ -1,0 +1,14 @@
+[NbConvertApp] Converting notebook notebooks/14_autoregressive_baseline.ipynb to notebook
+[NbConvertApp] ERROR | Notebook JSON is invalid: Additional properties are not allowed ('execution_count', 'outputs' were unexpected)
+
+Failed validating 'additionalProperties' in markdown_cell:
+
+On instance['cells'][18]:
+{'cell_type': 'markdown',
+ 'execution_count': None,
+ 'id': '400fece5',
+ 'metadata': {},
+ 'outputs': ['...0 outputs...'],
+ 'source': '# SARIMA(1,0,1)(1,0,1,365) — SKIPPED\n'
+           '# SARIMAX with annual seaso...'}
+[NbConvertApp] Writing 145929 bytes to notebooks/14_autoregressive_baseline.ipynb
