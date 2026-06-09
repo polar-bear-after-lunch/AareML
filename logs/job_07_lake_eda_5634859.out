@@ -12,3 +12,8 @@ Job finished: Tue Jun  9 08:05:01 AM CEST 2026
 [main 0299136] ubelix run slurm_script 2026-06-09 08:05 NB_EXIT=1
  1 file changed, 4 insertions(+)
 Push attempt 1 failed, retrying in 15s...
+On branch main
+Your branch is up to date with 'origin/main'.
+
+nothing to commit, working tree clean
+Push attempt 2 failed, retrying in 15s...
