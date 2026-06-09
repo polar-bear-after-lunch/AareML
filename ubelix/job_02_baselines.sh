@@ -60,9 +60,8 @@ for attempt in 1 2 3 4 5; do
     SCRIPT_NAME=$(basename $0 .sh)
     git add -A
     git commit -m "ubelix run $SCRIPT_NAME $(date '+%Y-%m-%d %H:%M') NB_EXIT=$NB_EXIT" || true
-    git fetch origin main
-    git rebase origin/main && git push origin main && echo "Results pushed (attempt $attempt)." && break
-    git rebase --abort 2>/dev/null || true
+    git pull --no-rebase -X ours origin main
+    git push origin main && echo "Results pushed (attempt $attempt)." && break
     echo "Push attempt $attempt failed, retrying in 15s..."
     sleep 15
 done
