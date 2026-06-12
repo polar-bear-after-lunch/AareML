@@ -5,6 +5,39 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [v1.34] — 2026-06-12
+
+### Peer Review Fixes (all H/M/L priority issues resolved)
+- **H1**: Wilcoxon p-value reconciled to p=0.037 everywhere (was p=0.024 in Conclusion)
+- **H2**: 0.451 mg/L denominator fixed — explicitly "11 non-training gauges"; deleted contradictory "includes all 12" sentence
+- **H3**: Table 6 ablation caveat added (30-epoch budget, within seed noise)
+- **M1**: "confirms" → "provides preliminary evidence"; no-multiple-comparison note added
+- **M2**: Clarified per-gauge Ridge enters Wilcoxon (conservative comparison)
+- **M3**: NeuralHydrology "confirms findings" → "supports feasibility"
+- **M4**: VAR(7) RMSE=0.299 surfaced — beats LSTM on single-site; LSTM advantage relocated to KGE+transfer
+- **M5**: 1.82× and 4.6× multipliers demoted to "indicative; no shared test set"
+- **L1**: Abstract citation Höge 2023 → Nascimento et al. 2025
+- **L2**: Temperature NSE 0.730 → 0.727 in Conclusion
+- **L4**: SAITS clarification added to §4.1
+- Model 3 fixes: removed "post bug-fix" artifact, cleaned SHAP note, varied hedging language
+
+---
+
+## [v1.33] — 2026-06-11
+
+### Provenance Corrections
+- LSTM best RMSE: 0.296 → 0.303 mg/L; KGE: 0.926 → 0.945; NSE: 0.894 → 0.889 (nb03 Cell 40)
+- EA-LSTM temperature: 1.721°C → 1.360°C, NSE 0.862 → 0.915, improvement 34% → 47% (nb04b)
+- EA-LSTM DO: 0.420 → 0.435 mg/L, NSE 0.843 → 0.833 (nb04)
+- nb18 Setup A: 0.861 → 0.872 mg/L; Setup B: 0.908 → 0.893 mg/L (post-rerun)
+- Lake-retrained 0.768 mg/L correctly attributed to nb10 (21 Swiss lakes), not nb06 (Lake Mendota)
+- Lake Mendota (nb06) and Swiss lakes (nb10) clearly distinguished throughout
+- Section 6.3 rewritten: restatements removed, interpretive paragraphs added
+- Park et al. KGE 0.685 vs 0.560 added; "dominant" → "leading" architecture
+- Three-model peer review conducted (Claude Opus, GPT-5, Gemini): avg 7.7/10
+
+---
+
 ## [v1.31] — 2026-06-08
 
 ### Full Pipeline Rerun — All 18 Notebooks
